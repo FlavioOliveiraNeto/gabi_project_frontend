@@ -1,5 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-midnight via-midnight to-glacier">
-    <RouterView />
-  </div>
+  <NavBar />
+  <router-view />
 </template>
+
+<script setup>
+import NavBar from "./components/NavBar.vue";
+</script>

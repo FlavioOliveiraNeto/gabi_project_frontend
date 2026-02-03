@@ -1,47 +1,18 @@
-import { createRouter, createWebHistory } from "vue-router";
-import PublicLayout from "../layouts/PublicLayout.vue";
-import DashboardLayout from "../layouts/DashboardLayout.vue";
-import AuthLayout from "../layouts/AuthLayout.vue";
-import PublicIndex from "../pages/PublicIndex.vue";
-import AdminDashboard from "../pages/AdminDashboard.vue";
-import ClientDashboard from "../pages/ClientDashboard.vue";
-import SignIn from "../pages/auth/SignIn.vue";
-import SignUp from "../pages/auth/SignUp.vue";
-import ForgotPassword from "../pages/auth/ForgotPassword.vue";
-import ResetPassword from "../pages/auth/ResetPassword.vue";
+import { createRouter, createWebHistory } from 'vue-router'
+
+import HomeView from '../views/HomeView.vue'
+import LoginView from '../views/LoginView.vue'
+import PatientDashboard from '../components/PatientDashboard.vue'
+import PsychDashboard from '../components/PsychDashboard.vue'
 
 const routes = [
-  {
-    path: "/",
-    component: PublicLayout,
-    children: [{ path: "", name: "home", component: PublicIndex }]
-  },
-  {
-    path: "/dashboard",
-    component: DashboardLayout,
-    children: [
-      { path: "admin", name: "admin-dashboard", component: AdminDashboard },
-      { path: "cliente", name: "client-dashboard", component: ClientDashboard }
-    ]
-  },
-  {
-    path: "/auth",
-    component: AuthLayout,
-    children: [
-      { path: "entrar", name: "sign-in", component: SignIn },
-      { path: "cadastro", name: "sign-up", component: SignUp },
-      { path: "recuperar", name: "forgot-password", component: ForgotPassword },
-      { path: "resetar", name: "reset-password", component: ResetPassword }
-    ]
-  }
-];
+  { path: '/', name: 'home', component: HomeView },
+  { path: '/login', name: 'login', component: LoginView },
+  { path: '/patient', name: 'patient', component: PatientDashboard },
+  { path: '/psych', name: 'psych', component: PsychDashboard }
+]
 
-const router = createRouter({
+export default createRouter({
   history: createWebHistory(),
-  routes,
-  scrollBehavior() {
-    return { top: 0 };
-  }
-});
-
-export default router;
+  routes
+})
