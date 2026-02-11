@@ -15,7 +15,7 @@
           src="@/assets/images/logo.png"
           alt="Logo da Gabriella"
         />
-        <span>Gabriella<span class="text-secondary">.</span></span>
+        <span>Psi. Gabriella<span class="text-secondary">.</span></span>
       </button>
 
       <!-- Desktop -->

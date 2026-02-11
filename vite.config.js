@@ -6,11 +6,16 @@ import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
-    port: 8080,
-    hmr: {
-      overlay: false,
+    host: true,
+    port: 5173,
+    watch: {
+      usePolling: true,
+      interval: 100
     },
+    hmr: {
+      host: "localhost",
+      port: 5173
+    }
   },
   plugins: [vue(), tailwindcss(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
