@@ -7,10 +7,15 @@
     >
       <!-- Logo -->
       <button
-        class="font-display text-xl font-bold text-primary"
+        class="flex items-center gap-3 font-display text-xl font-bold text-primary"
         @click="scrollTop"
       >
-        Gabriella<span class="text-secondary">.</span>
+        <img
+          class="logo"
+          src="@/assets/images/logo.png"
+          alt="Logo da Gabriella"
+        />
+        <span>Gabriella<span class="text-secondary">.</span></span>
       </button>
 
       <!-- Desktop -->

@@ -4,9 +4,6 @@
   >
     <!-- Decorative shapes -->
     <div
-      class="absolute top-20 left-10 w-32 h-32 rounded-full bg-sage/30 animate-float"
-    />
-    <div
       class="absolute bottom-40 right-20 w-24 h-24 rounded-full bg-primary/10 animate-float"
       style="animation-delay: 2s"
     />
@@ -20,6 +17,10 @@
     >
       <!-- Left -->
       <div class="space-y-8 animate-fade-in-up">
+        <img
+          src="@/assets/images/hero_image.jpg"
+          class="p-0 -m-2 w-32 h-32 rounded-full object-cover animate-float"
+        />
         <div
           class="inline-flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border"
         >
@@ -53,16 +54,6 @@
           >
             Agendar Consulta
           </Button>
-
-          <!-- Outline Button -->
-          <Button
-            variant="outline"
-            size="lg"
-            class="font-body text-base px-8 py-6 rounded-full border-primary/30 text-primary hover:bg-primary/5"
-            @click="scrollTo('sobre')"
-          >
-            Conhecer Mais
-          </Button>
         </div>
       </div>
 
@@ -93,11 +84,11 @@
 
     <!-- Scroll indicator -->
     <button
-      @click="scrollTo('sobre')"
       class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
       aria-label="Rolar para baixo"
+      @click="scrollTo('sobre')"
     >
-      <span class="text-sm font-body">Descubra</span>
+      <span class="text-sm font-body">Conheça mais sobre mim</span>
       <ArrowDown class="w-5 h-5 animate-bounce" />
     </button>
   </section>
