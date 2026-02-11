@@ -5,7 +5,7 @@
         <!-- Sidebar -->
         <div class="sidebar">
           <a href="#" class="side-link active">Practice Overview</a>
-          <a href="#" class="side-link">Patient List</a>
+          <a href="#" class="side-link">Paciente List</a>
           <a href="#" class="side-link">Schedule</a>
           <a href="#" class="side-link">Clinical Notes</a>
           <a href="#" class="side-link">Settings</a>
@@ -52,7 +52,7 @@
             >
               <tr style="border-bottom: 1px solid #eee; text-align: left">
                 <th style="padding: 10px">Time</th>
-                <th>Patient</th>
+                <th>Paciente</th>
                 <th>Type</th>
                 <th>Status</th>
               </tr>
