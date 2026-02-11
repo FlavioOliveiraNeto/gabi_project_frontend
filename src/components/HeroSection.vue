@@ -1,29 +1,114 @@
 <template>
-  <section class="hero">
-    <div>
-      <h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h1>
-      <p
-        style="font-size: 1.2rem; margin-bottom: 30px; color: var(--text-muted)"
-      >
-        Proin felis magna, imperdiet vel nibh et, rutrum congue dolor. Donec id
-        volutpat nulla, eu sollicitudin nulla. Aliquam ut diam et augue
-        tincidunt semper.
-      </p>
+  <section
+    class="relative min-h-screen flex items-center overflow-hidden bg-lavender-light"
+  >
+    <!-- Decorative shapes -->
+    <div
+      class="absolute top-20 left-10 w-32 h-32 rounded-full bg-sage/30 animate-float"
+    />
+    <div
+      class="absolute bottom-40 right-20 w-24 h-24 rounded-full bg-primary/10 animate-float"
+      style="animation-delay: 2s"
+    />
+    <div
+      class="absolute top-1/3 right-1/4 w-16 h-16 rotate-45 bg-sage/20 animate-float"
+      style="animation-delay: 4s"
+    />
 
-      <RouterLink to="/login" class="btn btn-primary">
-        Agende uma consulta
-      </RouterLink>
+    <div
+      class="container mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-12 items-center relative z-10"
+    >
+      <!-- Left -->
+      <div class="space-y-8 animate-fade-in-up">
+        <div
+          class="inline-flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border"
+        >
+          <Heart class="w-4 h-4 text-primary" />
+          <span class="text-sm font-body text-muted-foreground">
+            Psicóloga Clínica — CRP XX/XXXXX
+          </span>
+        </div>
+
+        <h1
+          class="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-foreground leading-tight"
+        >
+          Gabriella<br />
+          <span class="text-primary">Alves Felix</span><br />
+          Silva
+        </h1>
+
+        <p
+          class="text-lg md:text-xl font-body text-muted-foreground max-w-lg leading-relaxed"
+        >
+          Um espaço acolhedor para você se reconectar consigo mesma. Através da
+          escuta e da arte, trilhamos juntas o caminho do autoconhecimento.
+        </p>
+
+        <div class="flex flex-wrap gap-4">
+          <!-- Primary Button -->
+          <Button
+            size="lg"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 font-body text-base px-8 py-6 rounded-full shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
+            @click="scrollTo('contato')"
+          >
+            Agendar Consulta
+          </Button>
+
+          <!-- Outline Button -->
+          <Button
+            variant="outline"
+            size="lg"
+            class="font-body text-base px-8 py-6 rounded-full border-primary/30 text-primary hover:bg-primary/5"
+            @click="scrollTo('sobre')"
+          >
+            Conhecer Mais
+          </Button>
+        </div>
+      </div>
+
+      <!-- Right image -->
+      <div class="relative animate-fade-in-up" style="animation-delay: 0.3s">
+        <div
+          class="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-primary/20 rotate-2 hover:rotate-0 transition-transform duration-500"
+        >
+          <img
+            :src="heroImage"
+            alt="Arte de colagem com formas orgânicas em roxo, verde e branco representando acolhimento e psicologia"
+            class="w-full h-[500px] lg:h-[600px] object-cover"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"
+          />
+        </div>
+
+        <!-- Paper decorations -->
+        <div
+          class="absolute -bottom-6 -left-6 w-28 h-28 bg-sage rounded-full opacity-60"
+        />
+        <div
+          class="absolute -top-4 -right-4 w-20 h-20 bg-lavender rounded-2xl rotate-12 opacity-70"
+        />
+      </div>
     </div>
 
-    <div class="hero-img">
-      <img
-        src="../assets/images/hero_image.jpg"
-        style="width: 100%; height: 100%; object-fit: cover"
-      />
-    </div>
+    <!-- Scroll indicator -->
+    <button
+      @click="scrollTo('sobre')"
+      class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+      aria-label="Rolar para baixo"
+    >
+      <span class="text-sm font-body">Descubra</span>
+      <ArrowDown class="w-5 h-5 animate-bounce" />
+    </button>
   </section>
 </template>
 
-<script setup>
-import { RouterLink } from "vue-router";
+<script setup lang="ts">
+import heroImage from "@/assets/images/hero-collage.jpg";
+import { Heart, ArrowDown } from "lucide-vue-next";
+import Button from "@/components/ui/button/Button.vue";
+
+function scrollTo(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+}
 </script>
