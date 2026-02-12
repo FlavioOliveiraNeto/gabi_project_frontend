@@ -1,21 +1,11 @@
 <template>
-  <header
-    class="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-lg border-b border-border/50"
-  >
+  <header class="fixed top-0 left-0 right-0 z-50 background-header">
     <div
-      class="container mx-auto px-6 lg:px-12 flex items-center justify-between h-16"
+      class="container mx-auto px-6 lg:px-25 flex items-center justify-between h-16"
     >
       <!-- Logo -->
-      <button
-        class="flex items-center gap-3 font-display text-xl font-bold text-primary"
-        @click="scrollTop"
-      >
-        <img
-          class="logo"
-          src="@/assets/images/logo.png"
-          alt="Logo da Gabriella"
-        />
-        <span>Psi. Gabriella<span class="text-secondary">.</span></span>
+      <button class="font-display text-xl text-primary" @click="scrollTop">
+        <LogoComponent />
       </button>
 
       <!-- Desktop -->
@@ -37,7 +27,7 @@
         </button>
 
         <router-link
-          to="/admin"
+          to="/login"
           class="flex items-center justify-center w-10 h-10 rounded-full border border-primary text-primary hover:bg-primary/10 transition-colors"
           title="Área Administrativa"
         >
@@ -78,7 +68,7 @@
         </button>
 
         <router-link
-          to="/admin"
+          to="/login"
           class="flex items-center justify-center w-12 h-12 rounded-full border border-primary text-primary hover:bg-primary/10 transition-colors"
           title="Área Administrativa"
         >
@@ -92,6 +82,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { Menu, X, User } from "lucide-vue-next";
+import LogoComponent from "@/components/LogoComponent.vue";
 
 const open = ref(false);
 

@@ -13,11 +13,11 @@
     />
 
     <div
-      class="container mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-12 items-center relative z-10"
+      class="container mx-auto px-6 lg:px-25 grid lg:grid-cols-2 gap-12 items-center relative z-10"
     >
       <!-- Left -->
       <div class="space-y-8 animate-fade-in-up">
-        <img
+        <!--<img
           src="@/assets/images/hero_image.jpg"
           class="p-0 -m-2 w-32 h-32 rounded-full object-cover animate-float"
         />
@@ -26,30 +26,43 @@
         >
           <Heart class="w-4 h-4 text-primary" />
           <span class="text-sm font-body text-muted-foreground">
-            Psicóloga Clínica — CRP XX/XXXXX
+            Psicóloga Clínica — CRP 09/21105
+          </span>
+        </div>-->
+
+        <h1
+          class="text-5xl md:text-4xl lg:text-6xl font-display font-bold text-foreground leading-tight"
+        >
+          Gabriella<span class="text-primary"> Felix</span>
+        </h1>
+
+        <div
+          class="inline-flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border"
+        >
+          <Heart class="w-4 h-4 text-primary" />
+          <span class="text-md font-body text-muted-foreground">
+            Psicóloga Clínica — CRP 09/21105
           </span>
         </div>
 
-        <h1
-          class="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-foreground leading-tight"
+        <p
+          class="text-primary font-bold text-3xl md:text-4xl font-body text-muted-foreground leading-relaxed"
         >
-          Gabriella<br />
-          <span class="text-primary">Alves Felix</span><br />
-          Silva
-        </h1>
+          Cuidar da saúde mental também é considerar o mundo que te atravessa.
+        </p>
 
         <p
-          class="text-lg md:text-xl font-body text-muted-foreground max-w-lg leading-relaxed"
+          class="text-lg md:text-xl font-body text-muted-foreground leading-relaxed"
         >
-          Um espaço acolhedor para você se reconectar consigo mesma. Através da
-          escuta e da arte, trilhamos juntas o caminho do autoconhecimento.
+          Uma escuta clínica que reconhece que o sofrimento não nasce no vazio,
+          mas nas relações, na história e na sociedade.
         </p>
 
         <div class="flex flex-wrap gap-4">
           <!-- Primary Button -->
           <Button
             size="lg"
-            class="bg-primary text-primary-foreground hover:bg-primary/90 font-body text-base px-8 py-6 rounded-full shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
+            class="bg-primary text-primary-foreground hover:bg-primary/90 font-body text-lg px-8 py-6 rounded-full shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
             @click="scrollTo('contato')"
           >
             Agendar Consulta
@@ -58,14 +71,17 @@
       </div>
 
       <!-- Right image -->
-      <div class="relative animate-fade-in-up" style="animation-delay: 0.3s">
+      <div
+        class="w-fit relative place-self-end animate-fade-in-up"
+        style="animation-delay: 0.3s"
+      >
         <div
           class="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-primary/20 rotate-2 hover:rotate-0 transition-transform duration-500"
         >
           <img
-            :src="heroImage"
+            src="@/assets/images/hero_image.jpg"
             alt="Arte de colagem com formas orgânicas em roxo, verde e branco representando acolhimento e psicologia"
-            class="w-full h-[500px] lg:h-[600px] object-cover"
+            class="w-full h-[550px] lg:h-[650px] object-cover"
           />
           <div
             class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"

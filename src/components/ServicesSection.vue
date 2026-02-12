@@ -4,7 +4,7 @@
       class="absolute top-0 left-0 right-0 h-20 bg-background torn-edge-bottom z-10"
     />
 
-    <div class="container mx-auto px-6 lg:px-12 pt-12">
+    <div class="container mx-auto px-6 lg:px-25 pt-12">
       <!-- Header -->
       <div class="text-center mb-16 max-w-2xl mx-auto">
         <span

@@ -5,7 +5,7 @@
       class="absolute top-0 left-0 right-0 h-20 bg-lavender-light torn-edge-bottom z-10"
     />
 
-    <div class="container mx-auto px-6 lg:px-12 pt-12">
+    <div class="container mx-auto px-6 lg:px-25 pt-12">
       <div class="grid lg:grid-cols-2 gap-16 items-center">
         <!-- Image -->
         <div class="relative">
@@ -44,17 +44,37 @@
           </div>
 
           <p class="text-lg font-body text-muted-foreground leading-relaxed">
-            Sou Gabriella Alves Felix Silva, psicóloga clínica apaixonada pela
-            interseção entre arte e saúde mental. Acredito que cada pessoa
-            carrega em si uma história rica e complexa — como uma colagem —
-            feita de camadas, texturas e cores que merecem ser exploradas com
-            cuidado e respeito.
+            Sou Gabriella Felix, psicóloga e mestranda pela UFG. Acredito que
+            saúde mental não pode ser pensada fora do contexto de vida de cada
+            pessoa. Minha escuta parte do entendimento de que o sofrimento
+            psíquico não nasce no vazio, ele é atravessado por histórias,
+            relações, desigualdades, expectativas e pelas marcas sociais que nos
+            constituem.
           </p>
 
           <p class="text-lg font-body text-muted-foreground leading-relaxed">
-            Minha abordagem integra técnicas terapêuticas com expressões
-            artísticas, criando um espaço onde você pode se expressar livremente
-            e reconstruir narrativas de forma criativa.
+            Atendo adolescentes, adultos e pessoas idosas, buscando ouvir todos
+            os tipos de demandas psíquicas como ansiedade, depressão, vício em
+            jogos, processos pós-bariátrica e questões relacionadas aos
+            atravessamentos de gênero e raça. Minha prática clínica é sensível e
+            comprometida com uma escuta que reconhece a singularidade de cada
+            trajetória, sem desconsiderar os impactos do mundo sobre ela.
+          </p>
+
+          <p class="text-lg font-body text-muted-foreground leading-relaxed">
+            Assim como você, eu também tive infância, adolescência,
+            atravessamentos, dúvidas e medos. Também faço terapia e sei, na
+            pele, o quanto iniciar um processo pode ser difícil. Falar de si
+            exige coragem. Sustentar o próprio sofrimento diante de outra pessoa
+            não é simples. E é justamente por reconhecer essa dimensão humana
+            que construo um espaço seguro, respeitoso e sem julgamentos.
+          </p>
+
+          <p class="text-lg font-body text-muted-foreground leading-relaxed">
+            Acredito na clínica como um lugar de elaboração, fortalecimento e
+            reconstrução de sentidos. Um espaço onde você pode existir com
+            complexidade, sem precisar se explicar o tempo todo, mas sendo
+            profundamente escutado.
           </p>
 
           <!-- Features -->

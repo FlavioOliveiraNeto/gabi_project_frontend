@@ -4,7 +4,7 @@
       class="absolute top-0 left-0 right-0 h-20 bg-sage-light torn-edge-bottom z-10"
     />
 
-    <div class="container mx-auto px-6 lg:px-12 pt-12">
+    <div class="container mx-auto px-6 lg:px-25 pt-12">
       <!-- Header -->
       <div class="text-center mb-16 max-w-2xl mx-auto">
         <span
@@ -58,12 +58,12 @@
           class="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-10 text-primary-foreground flex flex-col justify-center items-center text-center shadow-2xl shadow-primary/20"
         >
           <h3 class="text-3xl font-display font-bold mb-4">
-            Pronta para dar o primeiro passo?
+            Vamos dar o primeiro passo?
           </h3>
 
           <p class="font-body text-primary-foreground/80 mb-8 max-w-sm">
-            A terapia é um presente que você dá a si mesma. Agende sua primeira
-            sessão e comece sua jornada de autoconhecimento.
+            A terapia é um presente que você se dá. Agende sua primeira sessão e
+            comece sua jornada.
           </p>
 
           <Button
@@ -71,7 +71,7 @@
             class="bg-card text-primary hover:bg-card/90 font-body text-base px-10 py-6 rounded-full shadow-lg transition-all hover:-translate-y-0.5"
           >
             <a
-              href="https://wa.me/55XXXXXXXXXXX"
+              href="https://wa.me/5562996195671?text=Olá%20gostaria%20de%20agendar%20uma%20sessão"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -93,28 +93,28 @@ const contactItems = [
   {
     icon: Phone,
     title: "Telefone / WhatsApp",
-    text: "(XX) XXXXX-XXXX",
+    text: "(62) 99619-5671",
     bg: "bg-primary/10",
     iconColor: "text-primary",
   },
   {
     icon: Mail,
     title: "E-mail",
-    text: "contato@gabriellaalves.com.br",
+    text: "gabrielafelixsilva@gmail.com",
     bg: "bg-secondary/10",
     iconColor: "text-secondary",
   },
   {
     icon: Instagram,
     title: "Instagram",
-    text: "@psi.gabriellaalves",
+    text: "@psi.gabriellafelix",
     bg: "bg-primary/10",
     iconColor: "text-primary",
   },
   {
     icon: MapPin,
     title: "Atendimento",
-    text: "Presencial e Online",
+    text: "Online",
     bg: "bg-secondary/10",
     iconColor: "text-secondary",
   },

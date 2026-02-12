@@ -1,27 +1,144 @@
 <template>
-  <div class="page active">
-    <div class="container">
-      <div class="card auth-card">
-        <div class="form-group">
-          <label>Endereço de Email</label>
-          <input v-model="email" type="email" />
+  <div class="min-h-screen bg-background flex items-center justify-center px-4">
+    <div class="w-full max-w-md">
+      <button
+        @click="router.push('/')"
+        class="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8 font-body text-sm"
+      >
+        ← Voltar ao site
+      </button>
+
+      <div
+        class="bg-background/95 backdrop-blur-lg border border-border/50 shadow-lg rounded-xl"
+      >
+        <div class="text-center space-y-2 p-6">
+          <div class="font-display text-2xl text-primary">
+            <LogoComponent class="justify-center" />
+          </div>
+          <p class="font-body text-muted-foreground">
+            {{
+              showForgot ? "Recuperar senha" : "Acesse sua área administrativa"
+            }}
+          </p>
         </div>
 
-        <div class="form-group">
-          <label>Senha</label>
-          <input v-model="password" type="password" />
+        <div class="p-6">
+          <!-- FORGOT PASSWORD -->
+          <template v-if="showForgot">
+            <div v-if="forgotSent" class="text-center space-y-4">
+              <p class="font-body text-sm text-muted-foreground">
+                Se o e-mail <strong>{{ forgotEmail }}</strong> estiver
+                cadastrado, você receberá as instruções de recuperação.
+              </p>
+
+              <button
+                class="w-full border rounded-full py-2 font-body"
+                @click="
+                  () => {
+                    showForgot = false;
+                    forgotSent = false;
+                    forgotEmail = '';
+                  }
+                "
+              >
+                Voltar ao login
+              </button>
+            </div>
+
+            <form
+              v-else
+              @submit.prevent="handleForgotPassword"
+              class="space-y-4"
+            >
+              <div class="space-y-2">
+                <label class="font-body">E-mail</label>
+                <input
+                  type="email"
+                  v-model="forgotEmail"
+                  required
+                  placeholder="seu@email.com"
+                  class="w-full border rounded-md p-2 font-body"
+                />
+              </div>
+
+              <button
+                type="submit"
+                class="w-full bg-primary text-white rounded-full py-2 font-body"
+              >
+                Enviar link de recuperação
+              </button>
+
+              <button
+                type="button"
+                class="w-full text-sm font-body"
+                @click="showForgot = false"
+              >
+                Voltar ao login
+              </button>
+            </form>
+          </template>
+
+          <!-- LOGIN FORM -->
+          <form v-else @submit.prevent="handleSubmit" class="space-y-4">
+            <div
+              v-if="error"
+              class="bg-red-100 text-red-600 text-sm font-body p-3 rounded-md"
+            >
+              {{ error }}
+            </div>
+
+            <div class="space-y-2">
+              <label class="font-body">E-mail</label>
+              <input
+                type="email"
+                v-model="email"
+                required
+                placeholder="seu@email.com"
+                class="w-full border rounded-md p-2 font-body"
+              />
+            </div>
+
+            <div class="space-y-2">
+              <label class="font-body">Senha</label>
+
+              <div class="relative">
+                <input
+                  :type="showPassword ? 'text' : 'password'"
+                  v-model="password"
+                  required
+                  placeholder="••••••••••••"
+                  class="w-full border rounded-md p-2 pr-10 font-body"
+                />
+
+                <button
+                  type="button"
+                  @click="showPassword = !showPassword"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <Eye v-if="!showPassword" class="w-4 h-4" />
+                  <EyeOff v-else class="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              @click="showForgot = true"
+              class="text-sm font-body text-primary hover:underline"
+            >
+              Esqueceu a senha?
+            </button>
+
+            <Button
+              size="lg"
+              class="w-2/3 block justify-self-center bg-primary text-primary-foreground hover:bg-primary/90 font-body text-base px-8 py-2 rounded-full shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
+              type="submit"
+              :disabled="isLoading"
+            >
+              {{ isLoading ? "Entrando..." : "Entrar" }}
+            </Button>
+          </form>
         </div>
-
-        <button
-          class="btn btn-primary"
-          style="width: 100%"
-          :disabled="loading"
-          @click="login"
-        >
-          {{ loading ? "Entrando..." : "Entrar" }}
-        </button>
-
-        <p v-if="error" class="error">{{ error }}</p>
       </div>
     </div>
   </div>
@@ -29,39 +146,48 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { loginRequest, type User } from "../services/auth";
-
-const email = ref<string>("");
-const password = ref<string>("");
-const loading = ref<boolean>(false);
-const error = ref<string | null>(null);
+import { useRouter, useRoute } from "vue-router";
+import { useAuth } from "@/composables/useAuth";
+import { Eye, EyeOff } from "lucide-vue-next";
+import LogoComponent from "@/components/LogoComponent.vue";
 
 const router = useRouter();
+const route = useRoute();
 
-async function login(): Promise<void> {
-  error.value = null;
-  loading.value = true;
+const { login, isLoading, error } = useAuth();
 
+const email = ref("");
+const password = ref("");
+const showPassword = ref(false);
+
+const showForgot = ref(false);
+const forgotEmail = ref("");
+const forgotSent = ref(false);
+
+const handleSubmit = async () => {
   try {
-    const { token, user } = await loginRequest(email.value, password.value);
+    await login(email.value, password.value);
 
-    localStorage.setItem("auth_token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    const redirect = route.query.redirect as string | undefined;
 
-    redirectByRole(user);
-  } catch (err: any) {
-    error.value = err?.response?.data?.error ?? "Email ou senha inválidos";
-  } finally {
-    loading.value = false;
+    if (redirect) {
+      router.push(redirect);
+    } else {
+      const userRaw = localStorage.getItem("auth_user");
+      const user = userRaw ? JSON.parse(userRaw) : null;
+
+      if (user?.role === "admin") {
+        router.push("/terapeuta");
+      } else {
+        router.push("/paciente");
+      }
+    }
+  } catch {
+    console.error("Erro ao fazer login");
   }
-}
+};
 
-function redirectByRole(user: User): void {
-  if (user.role === "admin") {
-    router.push("/terapeuta");
-  } else {
-    router.push("/paciente");
-  }
-}
+const handleForgotPassword = () => {
+  forgotSent.value = true;
+};
 </script>
