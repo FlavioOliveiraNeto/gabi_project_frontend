@@ -203,3 +203,9 @@
     );
   }
 }
+
+@layer components {
+  .background-header {
+    @apply bg-background/70 backdrop-blur-lg border-b border-border/50;
+  }
+}

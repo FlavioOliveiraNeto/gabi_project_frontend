@@ -2,16 +2,15 @@ import {
   createRouter,
   createWebHistory,
   type RouteRecordRaw,
-  type RouteLocationNormalized,
 } from "vue-router";
 
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
-import PatientDashboard from "../components/PatientDashboard.vue";
-import PsychDashboard from "../components/PsychDashboard.vue";
+import PatientDashboard from "../views/PatientDashboard.vue";
+import PsychDashboard from "../views/PsychDashboard.vue";
 import NotFound from "../views/NotFound.vue";
 
-type Role = "admin" | "client";
+import type { Role } from "@/services/auth";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -42,8 +41,6 @@ const routes: RouteRecordRaw[] = [
       role: "admin" as Role,
     },
   },
-
-  // 👇 CATCH-ALL (equivalente ao "*" do React)
   {
     path: "/:pathMatch(.*)*",
     name: "not-found",
@@ -56,12 +53,11 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to: RouteLocationNormalized) => {
+router.beforeEach((to) => {
   const token = localStorage.getItem("auth_token");
-  const userRaw = localStorage.getItem("user");
-  const user = userRaw ? (JSON.parse(userRaw) as { role?: Role }) : null;
+  const userRaw = localStorage.getItem("auth_user");
+  const user = userRaw ? JSON.parse(userRaw) : null;
 
-  // 🔐 Se precisa auth e não tem token
   if (to.meta.requiresAuth && !token) {
     return {
       name: "login",
@@ -69,9 +65,13 @@ router.beforeEach((to: RouteLocationNormalized) => {
     };
   }
 
-  // 🛑 Se tem role definida e não bate com usuário
   if (to.meta.role && user?.role !== to.meta.role) {
     return { name: "login" };
+  }
+
+  if (to.name === "login" && token) {
+    if (user?.role === "admin") return { name: "terapeuta" };
+    if (user?.role === "client") return { name: "paciente" };
   }
 });
 
