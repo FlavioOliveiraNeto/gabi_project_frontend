@@ -100,7 +100,7 @@ const contactItems = [
   {
     icon: Mail,
     title: "E-mail",
-    text: "gabrielafelixsilva@gmail.com",
+    text: "psi.gabriellafelixx@gmail.com",
     bg: "bg-secondary/10",
     iconColor: "text-secondary",
   },
@@ -121,7 +121,7 @@ const contactItems = [
   {
     icon: Clock,
     title: "Horário",
-    text: "Segunda a Sexta — 8h às 18h",
+    text: "Segunda a Sexta — 8h às 22h",
     bg: "bg-primary/10",
     iconColor: "text-primary",
   },
