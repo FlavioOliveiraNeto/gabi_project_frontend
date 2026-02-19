@@ -2,9 +2,6 @@
   <div class="min-h-screen bg-lavender-light">
     <NavBar variant="internal">
       <template #right>
-        <span class="hidden sm:block font-body text-sm text-muted-foreground">
-          Olá, {{ user ? user?.name : "Usuário" }}
-        </span>
         <button
           @click="handleLogout"
           class="p-2 hover:bg-muted rounded-md transition"
@@ -17,11 +14,11 @@
     <!-- MAIN -->
     <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-24 pb-12">
       <!-- Greeting -->
-      <div class="mb-8">
-        <h2 class="block sm:hidden font-display text-2xl text-primary">
-          Olá, {{ user ? user?.name : "Usuário" }}
+      <div class="sm:flex sm:justify-between sm:items-center my-6">
+        <h2 class="font-display text-2xl text-primary">
+          Olá, {{ user ? user?.name : "Usuário" }}!
         </h2>
-        <p class="hidden sm:block font-body text-sm text-muted-foreground">
+        <p class="font-body text-sm text-muted-foreground">
           {{ todayFormatted }}
         </p>
       </div>
