@@ -1,10 +1,10 @@
 <template>
-  <section id="contato" class="py-24 bg-background relative overflow-hidden">
+  <section id="contato" class="py-16 bg-background relative overflow-x-hidden">
     <div
-      class="absolute top-0 left-0 right-0 h-20 bg-sage-light torn-edge-bottom z-10"
+      class="absolute top-0 left-0 right-0 h-10 md:h-20 bg-sage-light torn-edge-bottom z-10"
     />
 
-    <div class="container mx-auto px-6 lg:px-25 pt-12">
+    <div class="container mx-auto px-6 lg:px-12 pt-12">
       <!-- Header -->
       <div class="text-center mb-16 max-w-2xl mx-auto">
         <span
@@ -25,17 +25,23 @@
         </p>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto w-full"
+      >
         <!-- Contact Info -->
         <div class="space-y-8">
-          <div
+          <component
+            :is="item.link ? 'a' : 'div'"
             v-for="item in contactItems"
             :key="item.title"
-            class="flex items-start gap-4"
+            :href="item.link"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-start gap-4 group break-all"
           >
             <div
               :class="[
-                'w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0',
+                'w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-105',
                 item.bg,
               ]"
             >
@@ -43,19 +49,21 @@
             </div>
 
             <div>
-              <h3 class="font-display font-semibold text-foreground">
+              <h3
+                class="font-display font-semibold text-foreground group-hover:text-primary transition-colors"
+              >
                 {{ item.title }}
               </h3>
-              <p class="font-body text-muted-foreground mt-1">
+              <p class="font-body text-muted-foreground mt-1 wrap-break-word">
                 {{ item.text }}
               </p>
             </div>
-          </div>
+          </component>
         </div>
 
         <!-- CTA Card -->
         <div
-          class="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-10 text-primary-foreground flex flex-col justify-center items-center text-center shadow-2xl shadow-primary/20"
+          class="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-10 text-primary-foreground flex flex-col justify-center items-center text-align: justify md:text-center shadow-2xl shadow-primary/20"
         >
           <h3 class="text-3xl font-display font-bold mb-4">
             Vamos dar o primeiro passo?
@@ -68,12 +76,13 @@
 
           <Button
             size="lg"
-            class="bg-card text-primary hover:bg-card/90 font-body text-base px-10 py-6 rounded-full shadow-lg transition-all hover:-translate-y-0.5"
+            class="w-fit h-fit bg-card text-primary hover:bg-card/90 font-body text-base px-4 md:px-10 py-2 md:py-6 rounded-full shadow-lg transition-all hover:-translate-y-0.5 wrap-break-word"
           >
             <a
               href="https://wa.me/5562996195671?text=Olá%20gostaria%20de%20agendar%20uma%20sessão"
               target="_blank"
               rel="noopener noreferrer"
+              class="whitespace-break-spaces"
             >
               Agendar pelo WhatsApp
             </a>
@@ -108,6 +117,7 @@ const contactItems = [
     icon: Instagram,
     title: "Instagram",
     text: "@psi.gabriellafelix",
+    link: "https://instagram.com/psi.gabriellafelix",
     bg: "bg-primary/10",
     iconColor: "text-primary",
   },

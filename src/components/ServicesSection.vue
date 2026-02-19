@@ -1,7 +1,7 @@
 <template>
-  <section id="servicos" class="py-24 bg-sage-light relative overflow-hidden">
+  <section id="servicos" class="py-16 bg-sage-light relative overflow-hidden">
     <div
-      class="absolute top-0 left-0 right-0 h-20 bg-background torn-edge-bottom z-10"
+      class="absolute top-0 left-0 right-0 h-10 md:h-20 bg-background torn-edge-bottom z-10"
     />
 
     <div class="container mx-auto px-6 lg:px-25 pt-12">
@@ -55,49 +55,49 @@
 </template>
 
 <script setup lang="ts">
-import { Heart, Users, Baby, Flower2, Puzzle, Palette } from "lucide-vue-next";
+import { Heart, Ear, Users, Flower2, Puzzle, HeartPlus } from "lucide-vue-next";
 
 const services = [
   {
     icon: Heart,
     title: "Terapia Individual",
     description:
-      "Sessões personalizadas para trabalhar questões emocionais, comportamentais e de autoconhecimento.",
+      "Um espaço para se escutar, se compreender e construir mudanças possíveis e respeitosas com a sua história.",
     color: "bg-primary/10 text-primary",
   },
   {
-    icon: Users,
-    title: "Terapia de Casal",
+    icon: Ear,
+    title: "Abordagem de Psicanálise",
     description:
-      "Fortalecimento da comunicação e dos vínculos afetivos entre parceiros.",
+      "Um encontro com aquilo que habita em você, até mesmo o que ainda não tem nome e o que não se lembrava que ainda estava ai dentro. Entre palavras e pausas, construímos sentidos, elaboramos dores e abrimos espaço para novas formas de existir considerando sua infancia e psique. Em uma sessão que leva em média 50 minutos.",
     color: "bg-secondary/10 text-secondary",
   },
   {
-    icon: Baby,
-    title: "Atendimento Infantil",
+    icon: Users,
+    title: "Atendimento com adolescentes, adultos e idosos",
     description:
-      "Abordagem lúdica e acolhedora para crianças, utilizando brincadeiras e arte.",
+      "Cada fase da vida carrega seus próprios desafios, dúvidas e transformações. Ofereço um espaço de escuta cuidadosa e respeitosa para adolescentes em descoberta, adultos em construção e idosos em ressignificação de suas histórias.",
     color: "bg-primary/10 text-primary",
   },
   {
-    icon: Palette,
-    title: "Arteterapia",
+    icon: HeartPlus,
+    title: "Cuidando do que dói por dentro",
     description:
-      "Uso de colagens, pinturas e recortes como ferramentas terapêuticas de expressão.",
+      "Quando a ansiedade aperta, a tristeza se prolonga ou a autoestima se fragiliza, pode ser difícil atravessar tudo sozinha(o). Este é um espaço de cuidado para acolher sentimentos como ansiedade, depressão, insegurança, medo, sobrecarga emocional e conflitos internos em geral. Acompanhamento de qualquer demanda psicologia não reduzindo apenas ao diagnostico, mas compreendido dentro da sua vivência.",
     color: "bg-secondary/10 text-secondary",
   },
   {
     icon: Flower2,
-    title: "Saúde da Mulher",
+    title: "Saúde de grupos vulnerabilizados",
     description:
-      "Acompanhamento psicológico voltado para questões femininas e empoderamento.",
+      "Um espaço de cuidado dedicado a mulheres, pessoas LGBTQIA+, pessoas negras e quilombolas e pessoas em situação de violência. A escuta considera os impactos das desigualdades sociais, do racismo, do machismo e da discriminação na saúde emocional, oferecendo acolhimento ético, respeito à identidade e fortalecimento da autonomia.",
     color: "bg-primary/10 text-primary",
   },
   {
     icon: Puzzle,
-    title: "Orientação Profissional",
+    title: "Cada demanda é única",
     description:
-      "Auxílio na descoberta de caminhos profissionais alinhados ao seu propósito.",
+      "Mesmo que a sua não esteja listada aqui, vamos conversar e entender sobre seu processo terapeutico.",
     color: "bg-secondary/10 text-secondary",
   },
 ];

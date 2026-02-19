@@ -4,8 +4,6 @@
 }
 
 .logo {
-  height: 3rem;
-  width: auto;
   will-change: filter;
   transition: filter 300ms;
   border-radius: 100%;

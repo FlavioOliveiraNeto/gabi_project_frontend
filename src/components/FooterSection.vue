@@ -8,9 +8,10 @@
         </div>
 
         <!-- Copyright -->
-        <p class="font-body text-sm flex items-center gap-1">
-          Feito com
-          <Heart class="w-3.5 h-3.5 text-primary inline" />
+        <p class="font-body text-sm grid md:flex items-center gap-1">
+          <div class="justify-self-center">
+            Feito com <Heart class="w-3.5 h-3.5 text-primary inline" />
+          </div>
           © {{ currentYear }} Gabriella Alves Felix Silva
         </p>
 

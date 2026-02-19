@@ -1,7 +1,7 @@
 <template>
   <header class="fixed top-0 left-0 right-0 z-50 background-header">
     <div
-      class="container mx-auto px-6 lg:px-25 flex items-center justify-between h-16"
+      class="container mx-auto px-3 py-6 lg:px-25 lg:py-auto flex items-center justify-between"
     >
       <!-- Logo -->
       <button class="font-display text-xl text-primary" @click="scrollTop">
@@ -20,7 +20,7 @@
         </button>
 
         <button
-          class="bg-primary text-primary-foreground font-body text-sm px-6 py-2.5 rounded-full hover:bg-primary/90 transition-colors"
+          class="bg-primary text-primary-foreground font-body text-sm px-6 py-2.5 rounded-full hover:bg-primary/90 transition-colors hover:opacity-95"
           @click="handleClick('#contato')"
         >
           Agendar
@@ -61,7 +61,7 @@
         </button>
 
         <button
-          class="bg-primary text-primary-foreground font-body text-base px-8 py-3 rounded-full"
+          class="bg-primary text-primary-foreground font-body text-base px-8 py-3 rounded-full hover:opacity-90 hover:bg-primary/90 transition-colors"
           @click="handleClick('#contato')"
         >
           Agendar

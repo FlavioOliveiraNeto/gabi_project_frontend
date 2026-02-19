@@ -1,13 +1,11 @@
 <template>
-  <section id="sobre" class="py-24 bg-background relative overflow-hidden">
-    <!-- Torn paper edge effect -->
+  <section id="sobre" class="py-16 bg-background relative overflow-hidden">
     <div
-      class="absolute top-0 left-0 right-0 h-20 bg-lavender-light torn-edge-bottom z-10"
+      class="absolute top-0 left-0 right-0 h-10 md:h-20 bg-lavender-light torn-edge-bottom z-10"
     />
 
     <div class="container mx-auto px-6 lg:px-25 pt-12">
       <div class="grid lg:grid-cols-2 gap-16 items-center">
-        <!-- Image -->
         <div class="relative">
           <div
             class="rounded-[2rem] overflow-hidden shadow-xl -rotate-2 hover:rotate-0 transition-transform duration-500"
@@ -26,7 +24,6 @@
           />
         </div>
 
-        <!-- Content -->
         <div class="space-y-8">
           <div>
             <span
@@ -77,15 +74,14 @@
             profundamente escutado.
           </p>
 
-          <!-- Features -->
-          <div class="grid sm:grid-cols-3 gap-6 pt-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 items-stretch">
             <div
               v-for="item in features"
               :key="item.title"
-              class="flex flex-col items-center text-center p-4 rounded-2xl bg-lavender-light/50 hover:bg-lavender-light transition-colors"
+              class="flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-lavender-light/50 hover:bg-lavender-light transition-colors min-h-[220px]"
             >
               <div
-                class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3"
+                class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4"
               >
                 <component :is="item.icon" class="w-5 h-5 text-primary" />
               </div>
@@ -94,7 +90,7 @@
                 {{ item.title }}
               </h3>
 
-              <p class="text-sm font-body text-muted-foreground mt-1">
+              <p class="text-sm font-body text-muted-foreground mt-2">
                 {{ item.desc }}
               </p>
             </div>
@@ -107,11 +103,24 @@
 
 <script setup lang="ts">
 import aboutImage from "@/assets/images/about-collage.jpg";
-import { Sparkles, Palette, Brain } from "lucide-vue-next";
+import { Sparkles, Lightbulb, Brain, AlarmClock } from "lucide-vue-next";
 
 const features = [
-  { icon: Brain, title: "Escuta Ativa", desc: "Acolhimento genuíno" },
-  { icon: Palette, title: "Arte Terapia", desc: "Expressão criativa" },
-  { icon: Sparkles, title: "Autoconhecimento", desc: "Transformação pessoal" },
+  { icon: Brain, title: "Escuta Sem Julgamentos", desc: "Espaço seguro" },
+  {
+    icon: Lightbulb,
+    title: "Psicoterapia Online",
+    desc: "Atendimento onde você estiver",
+  },
+  {
+    icon: AlarmClock,
+    title: "Preparando o ambiente",
+    desc: "Você precisa ter um lugar seguro e confortável em que poderá ficar 50 minutos sozinho",
+  },
+  {
+    icon: Sparkles,
+    title: "Autoconhecimento",
+    desc: "Se fortalecer para viver com mais leveza",
+  },
 ];
 </script>
