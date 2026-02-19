@@ -9,7 +9,10 @@
       </button>
 
       <!-- Desktop -->
-      <nav class="hidden md:flex items-center gap-8">
+      <nav
+        v-if="variant === 'landing'"
+        class="hidden md:flex items-center gap-8"
+      >
         <button
           v-for="link in navLinks"
           :key="link.href"
@@ -20,25 +23,31 @@
         </button>
 
         <button
-          class="bg-primary text-primary-foreground font-body text-sm px-6 py-2.5 rounded-full hover:bg-primary/90 transition-colors hover:opacity-95"
+          v-if="showScheduleButton"
+          class="bg-primary text-primary-foreground font-body text-sm px-6 py-2.5 rounded-full hover:bg-primary/90 transition-colors"
           @click="handleClick('#contato')"
         >
           Agendar
         </button>
 
         <router-link
+          v-if="showLoginButton"
           to="/login"
           class="flex items-center justify-center w-10 h-10 rounded-full border border-primary text-primary hover:bg-primary/10 transition-colors"
-          title="Área Administrativa"
         >
           <User class="w-5 h-5" />
         </router-link>
       </nav>
 
-      <!-- Mobile toggle -->
+      <!-- Área customizável (ex: área logada) -->
+      <div v-else class="flex items-center gap-4">
+        <slot name="right" />
+      </div>
+
+      <!-- Mobile toggle (apenas landing) -->
       <button
+        v-if="variant === 'landing'"
         class="md:hidden text-foreground"
-        aria-label="Menu"
         @click="open = !open"
       >
         <component :is="open ? X : Menu" class="w-6 h-6" />
@@ -47,7 +56,7 @@
 
     <!-- Mobile menu -->
     <div
-      v-if="open"
+      v-if="open && variant === 'landing'"
       class="md:hidden bg-background/95 backdrop-blur-lg border-t border-border"
     >
       <nav class="flex flex-col items-center gap-6 py-8">
@@ -61,16 +70,17 @@
         </button>
 
         <button
-          class="bg-primary text-primary-foreground font-body text-base px-8 py-3 rounded-full hover:opacity-90 hover:bg-primary/90 transition-colors"
+          v-if="showScheduleButton"
+          class="bg-primary text-primary-foreground font-body text-base px-8 py-3 rounded-full hover:opacity-90 transition-colors"
           @click="handleClick('#contato')"
         >
           Agendar
         </button>
 
         <router-link
+          v-if="showLoginButton"
           to="/login"
           class="flex items-center justify-center w-12 h-12 rounded-full border border-primary text-primary hover:bg-primary/10 transition-colors"
-          title="Área Administrativa"
         >
           <User class="w-6 h-6" />
         </router-link>
@@ -84,6 +94,18 @@ import { ref } from "vue";
 import { Menu, X, User } from "lucide-vue-next";
 import LogoComponent from "@/components/LogoComponent.vue";
 
+interface Props {
+  variant?: "landing" | "internal";
+  showScheduleButton?: boolean;
+  showLoginButton?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  variant: "landing",
+  showScheduleButton: true,
+  showLoginButton: true,
+});
+
 const open = ref(false);
 
 const navLinks = [
@@ -94,7 +116,6 @@ const navLinks = [
 
 function handleClick(href: string) {
   open.value = false;
-
   const el = document.querySelector(href);
   el?.scrollIntoView({ behavior: "smooth" });
 }
