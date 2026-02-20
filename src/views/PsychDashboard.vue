@@ -25,84 +25,203 @@
 
       <!-- STATS -->
       <div class="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-8">
-        <div class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3">
+        <div
+          class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3"
+        >
           <div class="flex items-center gap-2">
             <div class="p-2 rounded-lg bg-primary/10">
               <Users class="w-4 h-4 text-primary" />
             </div>
-            <h3 class="font-body text-sm font-medium text-muted-foreground">Pacientes</h3>
+            <h3 class="font-body text-sm font-medium text-muted-foreground">
+              Pacientes
+            </h3>
           </div>
           <div>
-            <p class="font-display text-3xl text-foreground">{{ stats.active_clients }}</p>
+            <p class="font-display text-3xl text-foreground">
+              {{ stats.active_clients }}
+            </p>
             <p class="font-body text-xs text-muted-foreground mt-0.5">ativos</p>
           </div>
         </div>
 
-        <div class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3">
+        <div
+          class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3"
+        >
           <div class="flex items-center gap-2">
             <div class="p-2 rounded-lg bg-secondary/10">
               <CalendarIcon class="w-4 h-4 text-secondary" />
             </div>
-            <h3 class="font-body text-sm font-medium text-muted-foreground">Hoje</h3>
+            <h3 class="font-body text-sm font-medium text-muted-foreground">
+              Hoje
+            </h3>
           </div>
           <div>
-            <p class="font-display text-3xl text-foreground">{{ stats.today_sessions }}</p>
-            <p class="font-body text-xs text-muted-foreground mt-0.5">sessões agendadas</p>
+            <p class="font-display text-3xl text-foreground">
+              {{ stats.today_sessions }}
+            </p>
+            <p class="font-body text-xs text-muted-foreground mt-0.5">
+              sessões agendadas
+            </p>
           </div>
         </div>
 
-        <div class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3">
+        <div
+          class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3"
+        >
           <div class="flex items-center gap-2">
             <div class="p-2 rounded-lg bg-primary/10">
               <Clock class="w-4 h-4 text-primary" />
             </div>
-            <h3 class="font-body text-sm font-medium text-muted-foreground">Esta Semana</h3>
+            <h3 class="font-body text-sm font-medium text-muted-foreground">
+              Esta Semana
+            </h3>
           </div>
           <div>
-            <p class="font-display text-3xl text-foreground">{{ stats.sessions_this_week }}</p>
-            <p class="font-body text-xs text-muted-foreground mt-0.5">sessões realizadas</p>
+            <p class="font-display text-3xl text-foreground">
+              {{ stats.sessions_this_week }}
+            </p>
+            <p class="font-body text-xs text-muted-foreground mt-0.5">
+              sessões realizadas
+            </p>
           </div>
         </div>
       </div>
 
       <!-- CALENDAR -->
-      <div class="border border-border/50 rounded-xl p-6 bg-card mb-6">
-        <div class="flex items-center gap-3 mb-5">
-          <CalendarIcon class="w-5 h-5 text-primary" />
-          <h3 class="font-display text-xl text-foreground">{{ currentMonthLabel }}</h3>
-          <div class="flex items-center gap-1 ml-auto">
-            <button @click="prevMonth" class="p-1.5 hover:bg-muted rounded-lg transition">
-              <ChevronLeft class="w-4 h-4 text-muted-foreground" />
-            </button>
-            <button @click="nextMonth" class="p-1.5 hover:bg-muted rounded-lg transition">
-              <ChevronRight class="w-4 h-4 text-muted-foreground" />
-            </button>
+      <div
+        class="grid grid-cols-1 gap-4 items-stretch md:grid md:grid-cols-2 md:gap-6"
+      >
+        <div class="border border-border/50 rounded-xl p-6 bg-card mb-6">
+          <div class="flex items-center gap-3 mb-5">
+            <CalendarIcon class="w-5 h-5 text-primary" />
+            <h3 class="font-display text-xl text-foreground">
+              {{ currentMonthLabel }}
+            </h3>
+            <div class="flex items-center gap-1 ml-auto">
+              <button
+                @click="prevMonth"
+                class="p-1.5 hover:bg-muted rounded-lg transition"
+              >
+                <ChevronLeft class="w-4 h-4 text-muted-foreground" />
+              </button>
+              <button
+                @click="nextMonth"
+                class="p-1.5 hover:bg-muted rounded-lg transition"
+              >
+                <ChevronRight class="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Day labels -->
+          <div class="grid grid-cols-7 gap-1 w-full mb-1">
+            <div
+              v-for="label in weekDayLabels"
+              :key="label"
+              class="text-center text-xs font-body text-muted-foreground py-1"
+            >
+              {{ label }}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-7 gap-1 w-full">
+            <div
+              v-for="(cell, idx) in calendarCells"
+              :key="idx"
+              @click="selectDate(cell)"
+              class="relative min-w-0 aspect-square flex items-center justify-center rounded-lg text-sm font-body transition-colors border cursor-pointer"
+              :class="[
+                getCellClass(cell),
+                selectedDate &&
+                cell.date &&
+                format(cell.date, 'yyyy-MM-dd') ===
+                  format(selectedDate, 'yyyy-MM-dd')
+                  ? 'ring-2 ring-primary'
+                  : '',
+              ]"
+            >
+              <span v-if="cell.day">{{ cell.day }}</span>
+              <span
+                v-if="cell.day && cell.hasSession && !cell.isToday"
+                class="w-full h-full absolute rounded-lg bg-secondary opacity-40"
+              ></span>
+            </div>
           </div>
         </div>
 
-        <!-- Day labels -->
-        <div class="grid grid-cols-7 gap-1 w-full mb-1">
-          <div
-            v-for="label in weekDayLabels"
-            :key="label"
-            class="text-center text-xs font-body text-muted-foreground py-1"
-          >
-            {{ label }}
+        <div
+          v-if="selectedDate"
+          class="border border-border/50 rounded-xl p-6 bg-card mb-6"
+        >
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="font-display text-xl text-foreground">
+              {{ format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR }) }}
+            </h3>
+            <div v-if="totalPages > 1" class="flex items-center gap-1 ml-auto">
+              <button
+                @click="currentPage--"
+                :disabled="currentPage === 1"
+                class="p-1.5 hover:bg-muted rounded-lg transition"
+              >
+                <ChevronLeft class="w-4 h-4 text-muted-foreground" />
+              </button>
+              <span class="text-xs font-body">
+                {{ currentPage }} / {{ totalPages }}
+              </span>
+              <button
+                @click="currentPage++"
+                :disabled="currentPage === totalPages"
+                class="p-1.5 hover:bg-muted rounded-lg transition"
+              >
+                <ChevronRight class="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div class="grid grid-cols-7 gap-1 w-full">
+          <!-- Empty -->
           <div
-            v-for="(cell, idx) in calendarCells"
-            :key="idx"
-            class="relative min-w-0 aspect-square flex items-center justify-center rounded-lg text-sm font-body transition-colors border"
-            :class="getCellClass(cell)"
+            v-if="patientsOfSelectedDay.length === 0"
+            class="text-center py-6"
           >
-            <span v-if="cell.day">{{ cell.day }}</span>
-            <span
-              v-if="cell.day && cell.hasSession && !cell.isToday"
-              class="w-full h-full absolute rounded-lg bg-secondary opacity-40"
-            ></span>
+            <p class="font-body text-sm text-muted-foreground">
+              Nenhum atendimento neste dia.
+            </p>
+          </div>
+
+          <!-- List -->
+          <div v-else class="space-y-3 overflow-y-auto flex-1 pr-2">
+            <div
+              v-for="patient in paginatedPatients"
+              :key="patient.id"
+              class="border border-border/30 rounded-xl p-4 flex items-center justify-between"
+            >
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-body text-sm font-semibold text-primary"
+                >
+                  {{ initials(patient.name) }}
+                </div>
+
+                <div>
+                  <p class="font-body font-semibold text-sm text-foreground">
+                    {{ patient.name }}
+                  </p>
+                  <p class="font-body text-xs text-muted-foreground">
+                    {{ patient.session_time || "Horário não definido" }}
+                  </p>
+                </div>
+              </div>
+
+              <a
+                v-if="patient.google_meet_link && !isSelectedDatePast"
+                :href="patient.google_meet_link"
+                target="_blank"
+                class="flex items-center gap-1 text-xs font-body font-medium text-secondary hover:underline"
+              >
+                <Video class="w-3.5 h-3.5" />
+                Google Meet
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -112,8 +231,12 @@
         <div class="flex items-center gap-3 mb-5 flex-wrap">
           <FileText class="w-5 h-5 text-primary" />
           <h3 class="font-display text-xl text-foreground">Pacientes</h3>
-          <span class="ml-auto font-body text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full">
-            {{ patients.length }} cadastrado{{ patients.length !== 1 ? "s" : "" }}
+          <span
+            class="ml-auto font-body text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full"
+          >
+            {{ patients.length }} cadastrado{{
+              patients.length !== 1 ? "s" : ""
+            }}
           </span>
           <button
             @click="openCreateModal"
@@ -125,7 +248,9 @@
 
         <!-- Search -->
         <div class="relative mb-4">
-          <Search class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Search
+            class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+          />
           <input
             v-model="patientSearch"
             type="text"
@@ -136,20 +261,31 @@
 
         <!-- Loading -->
         <div v-if="isLoading" class="text-center py-10">
-          <p class="font-body text-sm text-muted-foreground">Carregando pacientes...</p>
+          <p class="font-body text-sm text-muted-foreground">
+            Carregando pacientes...
+          </p>
         </div>
 
         <!-- Empty -->
-        <div v-else-if="filteredPatients.length === 0" class="text-center py-10">
+        <div
+          v-else-if="filteredPatients.length === 0"
+          class="text-center py-10"
+        >
           <p class="font-body text-sm text-muted-foreground">
-            {{ patientSearch ? "Nenhum paciente encontrado." : "Nenhum paciente cadastrado ainda." }}
+            {{
+              patientSearch
+                ? "Nenhum paciente encontrado."
+                : "Nenhum paciente cadastrado ainda."
+            }}
           </p>
         </div>
 
         <!-- Patient rows -->
         <div v-else class="space-y-2">
           <div v-for="patient in filteredPatients" :key="patient.id">
-            <div class="border border-border/30 rounded-xl p-4 hover:border-border/60 transition">
+            <div
+              class="border border-border/30 rounded-xl p-4 hover:border-border/60 transition"
+            >
               <div class="flex items-start gap-3 flex-wrap">
                 <!-- Avatar -->
                 <div
@@ -161,8 +297,12 @@
                 <!-- Info -->
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
-                    <p class="font-body font-semibold text-sm text-foreground">{{ patient.name }}</p>
-                    <p class="font-body text-xs text-muted-foreground">{{ patient.email }}</p>
+                    <p class="font-body font-semibold text-sm text-foreground">
+                      {{ patient.name }}
+                    </p>
+                    <p class="font-body text-xs text-muted-foreground">
+                      {{ patient.email }}
+                    </p>
                   </div>
 
                   <!-- Schedule badges -->
@@ -198,11 +338,17 @@
                     </div>
                     <div
                       class="flex items-center gap-1.5"
-                      :class="patient.absent_sessions > 0 ? 'text-amber-500' : 'text-muted-foreground'"
+                      :class="
+                        patient.absent_sessions > 0
+                          ? 'text-amber-500'
+                          : 'text-muted-foreground'
+                      "
                     >
                       <AlertCircle class="w-3.5 h-3.5" />
                       <span class="font-body text-xs">
-                        {{ patient.absent_sessions }} falta{{ patient.absent_sessions !== 1 ? "s" : "" }}
+                        {{ patient.absent_sessions }} falta{{
+                          patient.absent_sessions !== 1 ? "s" : ""
+                        }}
                       </span>
                     </div>
                     <a
@@ -213,7 +359,10 @@
                     >
                       <Video class="w-3.5 h-3.5" /> Google Meet
                     </a>
-                    <span v-else class="font-body text-xs text-muted-foreground italic">
+                    <span
+                      v-else
+                      class="font-body text-xs text-muted-foreground italic"
+                    >
                       Sem link de Meet
                     </span>
                   </div>
@@ -224,7 +373,11 @@
                   <button
                     @click="togglePatient(patient.id)"
                     class="p-1.5 rounded-lg hover:bg-muted transition"
-                    :title="selectedPatient === patient.id ? 'Fechar anotações' : 'Ver anotações'"
+                    :title="
+                      selectedPatient === patient.id
+                        ? 'Fechar anotações'
+                        : 'Ver anotações'
+                    "
                   >
                     <FileText class="w-4 h-4 text-muted-foreground" />
                   </button>
@@ -250,7 +403,9 @@
                 v-if="selectedPatient === patient.id"
                 class="mt-4 border-t border-border/30 pt-4"
               >
-                <p class="font-body text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                <p
+                  class="font-body text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3"
+                >
                   Anotações clínicas (visíveis apenas para você)
                 </p>
 
@@ -285,13 +440,17 @@
                         {{ formatDate(note.created_at) }}
                       </span>
                     </div>
-                    <p class="font-body text-sm text-foreground leading-relaxed">
+                    <p
+                      class="font-body text-sm text-foreground leading-relaxed"
+                    >
                       {{ note.content }}
                     </p>
                   </div>
                 </div>
                 <div v-else class="text-center py-4">
-                  <p class="font-body text-xs text-muted-foreground">Nenhuma anotação ainda.</p>
+                  <p class="font-body text-xs text-muted-foreground">
+                    Nenhuma anotação ainda.
+                  </p>
                 </div>
               </div>
             </div>
@@ -307,20 +466,30 @@
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
         @click.self="closeModals"
       >
-        <div class="bg-card rounded-2xl shadow-lg w-full max-w-lg p-6 overflow-y-auto max-h-[90vh]">
+        <div
+          class="bg-card rounded-2xl shadow-lg w-full max-w-lg p-6 overflow-y-auto max-h-[90vh]"
+        >
           <div class="flex items-center justify-between mb-5">
             <h2 class="font-display text-xl text-foreground">
               {{ showEditModal ? "Editar paciente" : "Adicionar paciente" }}
             </h2>
-            <button @click="closeModals" class="p-1.5 rounded-lg hover:bg-muted transition">
+            <button
+              @click="closeModals"
+              class="p-1.5 rounded-lg hover:bg-muted transition"
+            >
               <X class="w-4 h-4" />
             </button>
           </div>
 
-          <form @submit.prevent="showEditModal ? handleUpdate() : handleCreate()" class="space-y-4">
+          <form
+            @submit.prevent="showEditModal ? handleUpdate() : handleCreate()"
+            class="space-y-4"
+          >
             <!-- Nome -->
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">Nome completo *</label>
+              <label class="font-body text-sm font-medium text-foreground"
+                >Nome completo *</label
+              >
               <input
                 v-model="modalForm.name"
                 type="text"
@@ -328,12 +497,19 @@
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 :class="{ 'border-destructive': modalErrors.name }"
               />
-              <p v-if="modalErrors.name" class="text-xs text-destructive font-body">{{ modalErrors.name }}</p>
+              <p
+                v-if="modalErrors.name"
+                class="text-xs text-destructive font-body"
+              >
+                {{ modalErrors.name }}
+              </p>
             </div>
 
             <!-- E-mail -->
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">E-mail *</label>
+              <label class="font-body text-sm font-medium text-foreground"
+                >E-mail *</label
+              >
               <input
                 v-model="modalForm.email"
                 type="email"
@@ -341,12 +517,19 @@
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 :class="{ 'border-destructive': modalErrors.email }"
               />
-              <p v-if="modalErrors.email" class="text-xs text-destructive font-body">{{ modalErrors.email }}</p>
+              <p
+                v-if="modalErrors.email"
+                class="text-xs text-destructive font-body"
+              >
+                {{ modalErrors.email }}
+              </p>
             </div>
 
             <!-- Google Meet -->
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">Link do Google Meet</label>
+              <label class="font-body text-sm font-medium text-foreground"
+                >Link do Google Meet</label
+              >
               <input
                 v-model="modalForm.google_meet_link"
                 type="url"
@@ -357,19 +540,25 @@
 
             <!-- Sessões por semana -->
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">Sessões por semana</label>
+              <label class="font-body text-sm font-medium text-foreground"
+                >Sessões por semana</label
+              >
               <select
                 v-model.number="modalForm.sessions_per_week"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               >
                 <option :value="0">Não definido</option>
-                <option v-for="n in 7" :key="n" :value="n">{{ n }}x por semana</option>
+                <option v-for="n in 7" :key="n" :value="n">
+                  {{ n }}x por semana
+                </option>
               </select>
             </div>
 
             <!-- Dias da semana -->
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">Dias das sessões</label>
+              <label class="font-body text-sm font-medium text-foreground"
+                >Dias das sessões</label
+              >
               <div class="flex flex-wrap gap-3">
                 <label
                   v-for="(label, day) in WEEKDAY_LABELS"
@@ -389,7 +578,9 @@
 
             <!-- Horário -->
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">Horário da sessão</label>
+              <label class="font-body text-sm font-medium text-foreground"
+                >Horário da sessão</label
+              >
               <input
                 v-model="modalForm.session_time"
                 type="time"
@@ -418,7 +609,13 @@
                 :disabled="modalLoading"
                 class="flex-1 py-2.5 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition"
               >
-                {{ modalLoading ? "Salvando..." : showEditModal ? "Salvar alterações" : "Cadastrar paciente" }}
+                {{
+                  modalLoading
+                    ? "Salvando..."
+                    : showEditModal
+                      ? "Salvar alterações"
+                      : "Cadastrar paciente"
+                }}
               </button>
             </div>
           </form>
@@ -434,11 +631,13 @@
         @click.self="deleteTarget = null"
       >
         <div class="bg-card rounded-2xl shadow-lg w-full max-w-sm p-6">
-          <h2 class="font-display text-lg text-foreground mb-2">Excluir paciente</h2>
+          <h2 class="font-display text-lg text-foreground mb-2">
+            Excluir paciente
+          </h2>
           <p class="font-body text-sm text-muted-foreground mb-6">
             Tem certeza que deseja excluir
-            <strong class="text-foreground">{{ deleteTarget.name }}</strong>?
-            Todas as anotações e sessões serão removidas permanentemente.
+            <strong class="text-foreground">{{ deleteTarget.name }}</strong
+            >? Todas as anotações e sessões serão removidas permanentemente.
           </p>
           <div class="flex gap-3">
             <button
@@ -487,12 +686,14 @@ import {
 import NavBar from "@/components/NavBar.vue";
 import {
   format,
+  startOfDay,
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
   getDay,
   addMonths,
   subMonths,
+  isBefore,
   isToday,
   parseISO,
 } from "date-fns";
@@ -575,6 +776,7 @@ onMounted(loadDashboard);
 
 // ─── Calendar ────────────────────────────────────────────────────────────────
 const calendarBase = ref(new Date());
+const selectedDate = ref<Date | null>(null);
 const weekDayLabels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 const currentMonthLabel = computed(() =>
@@ -586,8 +788,13 @@ const currentMonthLabel = computed(() =>
 
 const sessionWeekdays = computed<number[]>(() => {
   const weekdayNums: Record<string, number> = {
-    sunday: 0, monday: 1, tuesday: 2, wednesday: 3,
-    thursday: 4, friday: 5, saturday: 6,
+    sunday: 0,
+    monday: 1,
+    tuesday: 2,
+    wednesday: 3,
+    thursday: 4,
+    friday: 5,
+    saturday: 6,
   };
   const days = new Set<number>();
   patients.value.forEach((p) => {
@@ -629,6 +836,47 @@ const calendarCells = computed<CalendarCell[]>(() => {
   return cells;
 });
 
+const patientsOfSelectedDay = computed(() => {
+  if (!selectedDate.value) return [];
+
+  const weekdayMap: Record<number, string> = {
+    0: "sunday",
+    1: "monday",
+    2: "tuesday",
+    3: "wednesday",
+    4: "thursday",
+    5: "friday",
+    6: "saturday",
+  };
+
+  const weekdayKey = weekdayMap[selectedDate.value.getDay()];
+
+  return patients.value
+    .filter((p) => p.session_days.includes(weekdayKey))
+    .sort((a, b) => (a.session_time || "").localeCompare(b.session_time || ""));
+});
+
+const isSelectedDatePast = computed(() => {
+  if (!selectedDate.value) return false;
+  return isBefore(startOfDay(selectedDate.value), startOfDay(new Date()));
+});
+
+const currentPage = ref(1);
+const perPage = 4;
+
+const paginatedPatients = computed(() => {
+  const start = (currentPage.value - 1) * perPage;
+  return patientsOfSelectedDay.value.slice(start, start + perPage);
+});
+
+const totalPages = computed(() =>
+  Math.ceil(patientsOfSelectedDay.value.length / perPage),
+);
+
+watch(selectedDate, () => {
+  currentPage.value = 1;
+});
+
 function getCellClass(cell: CalendarCell) {
   if (!cell.day) return "cursor-default border-transparent";
   if (cell.isToday)
@@ -638,8 +886,16 @@ function getCellClass(cell: CalendarCell) {
   return "text-muted-foreground cursor-default hover:bg-muted/40 border-transparent";
 }
 
-function prevMonth() { calendarBase.value = subMonths(calendarBase.value, 1); }
-function nextMonth() { calendarBase.value = addMonths(calendarBase.value, 1); }
+function prevMonth() {
+  calendarBase.value = subMonths(calendarBase.value, 1);
+}
+function nextMonth() {
+  calendarBase.value = addMonths(calendarBase.value, 1);
+}
+function selectDate(cell: CalendarCell) {
+  if (!cell.date) return;
+  selectedDate.value = cell.date;
+}
 
 // ─── Patient search & notes panel ────────────────────────────────────────────
 const patientSearch = ref("");
@@ -647,7 +903,9 @@ const selectedPatient = ref<number | null>(null);
 const newNote = ref("");
 const savingNote = ref(false);
 
-watch(selectedPatient, () => { newNote.value = ""; });
+watch(selectedPatient, () => {
+  newNote.value = "";
+});
 
 const filteredPatients = computed(() => {
   const q = patientSearch.value.toLowerCase().trim();
@@ -763,7 +1021,9 @@ async function handleCreate() {
     closeModals();
   } catch (err: any) {
     const msgs = err?.response?.data?.errors;
-    modalError.value = Array.isArray(msgs) ? msgs.join(", ") : "Erro ao cadastrar paciente.";
+    modalError.value = Array.isArray(msgs)
+      ? msgs.join(", ")
+      : "Erro ao cadastrar paciente.";
   } finally {
     modalLoading.value = false;
   }
@@ -787,7 +1047,9 @@ async function handleUpdate() {
     closeModals();
   } catch (err: any) {
     const msgs = err?.response?.data?.errors;
-    modalError.value = Array.isArray(msgs) ? msgs.join(", ") : "Erro ao atualizar paciente.";
+    modalError.value = Array.isArray(msgs)
+      ? msgs.join(", ")
+      : "Erro ao atualizar paciente.";
   } finally {
     modalLoading.value = false;
   }
@@ -802,9 +1064,12 @@ async function handleDelete() {
   modalLoading.value = true;
   try {
     await deletePatient(deleteTarget.value.id);
-    patients.value = patients.value.filter((p) => p.id !== deleteTarget.value!.id);
+    patients.value = patients.value.filter(
+      (p) => p.id !== deleteTarget.value!.id,
+    );
     stats.value.active_clients = Math.max(0, stats.value.active_clients - 1);
-    if (selectedPatient.value === deleteTarget.value.id) selectedPatient.value = null;
+    if (selectedPatient.value === deleteTarget.value.id)
+      selectedPatient.value = null;
     deleteTarget.value = null;
   } catch {
     // silently ignore
