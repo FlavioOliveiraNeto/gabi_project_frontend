@@ -6,6 +6,7 @@ import {
 
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
+import RegisterView from "../views/RegisterView.vue";
 import PatientDashboard from "../views/PatientDashboard.vue";
 import PsychDashboard from "../views/PsychDashboard.vue";
 import NotFound from "../views/NotFound.vue";
@@ -24,6 +25,11 @@ const routes: RouteRecordRaw[] = [
     component: LoginView,
   },
   {
+    path: "/cadastro",
+    name: "register",
+    component: RegisterView,
+  },
+  {
     path: "/paciente",
     name: "paciente",
     component: PatientDashboard,
@@ -38,7 +44,7 @@ const routes: RouteRecordRaw[] = [
     component: PsychDashboard,
     meta: {
       requiresAuth: true,
-      role: "admin" as Role,
+      role: "therapist" as Role,
     },
   },
   {
@@ -70,7 +76,7 @@ router.beforeEach((to) => {
   }
 
   if (to.name === "login" && token) {
-    if (user?.role === "admin") return { name: "terapeuta" };
+    if (user?.role === "therapist") return { name: "terapeuta" };
     if (user?.role === "client") return { name: "paciente" };
   }
 });

@@ -12,173 +12,175 @@
     </NavBar>
 
     <main class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-12 pt-24 pb-12">
-      <div
-        class="grid gap-4 justify-items-center sm:flex sm:justify-between sm:items-center my-6"
-      >
-        <div class="flex items-end gap-6">
-          <div class="flex flex-col items-center gap-4">
-            <div class="relative">
-              <img
-                :src="profileImage || defaultAvatar"
-                class="w-24 h-24 rounded-full object-cover border border-border"
-              />
-              <label
-                class="absolute bottom-0 right-0 bg-primary text-primary-foreground p-1.5 rounded-full cursor-pointer"
-              >
-                <Camera class="w-4 h-4" />
-                <input
-                  type="file"
-                  class="hidden"
-                  accept="image/*"
-                  @change="handleImageUpload"
-                />
-              </label>
-            </div>
-          </div>
-          <h2 class="font-display text-2xl text-primary mb-4">
-            Olá, {{ user ? user?.name : "Usuário" }}!
-          </h2>
-        </div>
+      <!-- Header -->
+      <div class="sm:flex sm:justify-between sm:items-center my-6">
+        <h2 class="font-display text-2xl text-primary">
+          Olá, {{ user?.name ?? "Paciente" }}!
+        </h2>
         <p class="font-body text-sm text-muted-foreground">
           {{ todayFormatted }}
         </p>
       </div>
 
-      <!-- STATS -->
-      <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 mb-8">
-        <!-- Próxima sessão -->
-        <div
-          class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3"
-        >
-          <div class="flex items-center gap-2">
-            <div class="p-2 rounded-lg bg-primary/10">
-              <CalendarIcon class="w-4 h-4 text-primary" />
-            </div>
-            <h3 class="font-body text-sm text-muted-foreground">
-              Próxima Sessão
-            </h3>
-          </div>
-          <div>
-            <p class="font-display text-lg text-foreground">
-              {{ nextSession.date }}
-            </p>
-            <p class="font-body text-sm text-primary font-semibold">
-              {{ nextSession.time }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Faltas -->
-        <div
-          class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3"
-        >
-          <div class="flex items-center gap-2">
-            <div class="p-2 rounded-lg bg-secondary/10">
-              <AlertCircle class="w-4 h-4 text-secondary" />
-            </div>
-            <h3 class="font-body text-sm text-muted-foreground">
-              Faltas acumuladas
-            </h3>
-          </div>
-          <div>
-            <p class="font-display text-3xl text-foreground">
-              {{ absences }}
-            </p>
-          </div>
-        </div>
+      <!-- Loading -->
+      <div v-if="isLoading" class="text-center py-20">
+        <p class="font-body text-sm text-muted-foreground">Carregando...</p>
       </div>
 
-      <!-- MAIN GRID -->
-      <div class="grid gap-6 grid-cols-1 lg:grid-cols-3">
-        <!-- LEFT: Sessão -->
-        <div
-          class="lg:col-span-2 border border-border/50 rounded-xl p-6 bg-card space-y-4"
-        >
-          <div class="flex items-center gap-3">
-            <Clock class="w-5 h-5 text-primary" />
-            <h3 class="font-display text-xl text-foreground">
-              Detalhes da Sessão
-            </h3>
+      <template v-else>
+        <!-- STATS -->
+        <div class="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-8">
+          <!-- Próxima sessão -->
+          <div class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3 sm:col-span-1">
+            <div class="flex items-center gap-2">
+              <div class="p-2 rounded-lg bg-primary/10">
+                <CalendarIcon class="w-4 h-4 text-primary" />
+              </div>
+              <h3 class="font-body text-sm text-muted-foreground">Próxima Sessão</h3>
+            </div>
+            <div v-if="profile?.next_session">
+              <p class="font-display text-base text-foreground">
+                {{ formatNextDate(profile.next_session.date) }}
+              </p>
+              <p class="font-body text-sm text-primary font-semibold mt-0.5">
+                {{ profile.next_session.time ?? "Horário a definir" }}
+              </p>
+            </div>
+            <div v-else>
+              <p class="font-body text-sm text-muted-foreground">Nenhuma sessão agendada</p>
+            </div>
           </div>
 
-          <div class="space-y-2">
+          <!-- Sessões realizadas -->
+          <div class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3">
+            <div class="flex items-center gap-2">
+              <div class="p-2 rounded-lg bg-primary/10">
+                <CheckCircle class="w-4 h-4 text-primary" />
+              </div>
+              <h3 class="font-body text-sm text-muted-foreground">Sessões realizadas</h3>
+            </div>
+            <div>
+              <p class="font-display text-3xl text-foreground">{{ profile?.completed_sessions ?? 0 }}</p>
+            </div>
+          </div>
+
+          <!-- Faltas -->
+          <div class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3">
+            <div class="flex items-center gap-2">
+              <div class="p-2 rounded-lg bg-secondary/10">
+                <AlertCircle class="w-4 h-4 text-secondary" />
+              </div>
+              <h3 class="font-body text-sm text-muted-foreground">Faltas acumuladas</h3>
+            </div>
+            <div>
+              <p
+                class="font-display text-3xl"
+                :class="(profile?.absent_sessions ?? 0) > 0 ? 'text-amber-500' : 'text-foreground'"
+              >
+                {{ profile?.absent_sessions ?? 0 }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sessão / Google Meet -->
+        <div class="border border-border/50 rounded-xl p-6 bg-card mb-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <Clock class="w-5 h-5 text-primary" />
+            <h3 class="font-display text-xl text-foreground">Detalhes da Sessão</h3>
+          </div>
+
+          <div v-if="profile?.next_session" class="space-y-2">
             <p class="font-body text-sm text-muted-foreground">
               Data:
               <span class="text-foreground font-medium">
-                {{ nextSession.date }}
+                {{ formatNextDate(profile.next_session.date) }}
               </span>
             </p>
-
             <p class="font-body text-sm text-muted-foreground">
               Horário:
               <span class="text-foreground font-medium">
-                {{ nextSession.time }}
+                {{ profile.next_session.time ?? "A definir" }}
               </span>
             </p>
           </div>
+          <p v-else class="font-body text-sm text-muted-foreground">
+            Nenhuma sessão agendada. Entre em contato com sua terapeuta.
+          </p>
 
           <a
-            :href="nextSession.meetLink"
+            v-if="profile?.google_meet_link"
+            :href="profile.google_meet_link"
             target="_blank"
             class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary/10 hover:bg-secondary/20 text-secondary font-body text-sm font-medium transition"
           >
             <Video class="w-4 h-4" />
             Entrar na sessão (Google Meet)
           </a>
-        </div>
-      </div>
-
-      <!-- NOTAS -->
-      <div class="mt-8 border border-border/50 rounded-xl p-6 bg-card">
-        <div class="flex items-center gap-3 mb-5">
-          <FileText class="w-5 h-5 text-primary" />
-          <h3 class="font-display text-xl text-foreground">Minhas Anotações</h3>
+          <p v-else class="font-body text-sm text-muted-foreground italic">
+            Link do Google Meet não configurado ainda.
+          </p>
         </div>
 
-        <textarea
-          v-model="newNote"
-          rows="3"
-          placeholder="Escreva algo importante sobre seu processo..."
-          class="w-full border border-border/50 rounded-lg p-3 text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
-        ></textarea>
+        <!-- NOTAS PRIVADAS -->
+        <div class="border border-border/50 rounded-xl p-6 bg-card">
+          <div class="flex items-center gap-3 mb-5">
+            <FileText class="w-5 h-5 text-primary" />
+            <h3 class="font-display text-xl text-foreground">Minhas Anotações</h3>
+            <span class="ml-auto font-body text-xs text-muted-foreground italic">
+              Visíveis apenas para você
+            </span>
+          </div>
 
-        <button
-          @click="saveNote"
-          :disabled="!newNote.trim()"
-          class="mt-3 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 disabled:opacity-40 transition"
-        >
-          Salvar anotação
-        </button>
+          <textarea
+            v-model="newNote"
+            rows="3"
+            placeholder="Escreva algo importante sobre seu processo..."
+            class="w-full border border-border/50 rounded-lg p-3 text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none bg-background"
+          ></textarea>
 
-        <!-- Histórico -->
-        <div
-          v-if="notes.length"
-          class="mt-6 border-t border-border/30 pt-4 space-y-4"
-        >
-          <div
-            v-for="note in notes"
-            :key="note.id"
-            class="border border-border/20 rounded-lg p-3"
+          <button
+            @click="saveNote"
+            :disabled="!newNote.trim() || savingNote"
+            class="mt-3 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 disabled:opacity-40 transition"
           >
-            <p class="text-xs text-muted-foreground mb-1">
-              {{ note.date }}
-            </p>
-            <p class="text-sm text-foreground">
-              {{ note.content }}
-            </p>
+            {{ savingNote ? "Salvando..." : "Salvar anotação" }}
+          </button>
+
+          <!-- Histórico -->
+          <div v-if="notes.length" class="mt-6 border-t border-border/30 pt-4 space-y-3">
+            <div
+              v-for="note in notes"
+              :key="note.id"
+              class="border border-border/20 rounded-lg p-3 group relative"
+            >
+              <div class="flex items-center justify-between mb-1">
+                <p class="text-xs text-muted-foreground font-body">
+                  {{ formatDate(note.created_at) }}
+                </p>
+                <button
+                  @click="removeNote(note.id)"
+                  class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-destructive/10 transition"
+                  title="Excluir anotação"
+                >
+                  <Trash2 class="w-3.5 h-3.5 text-destructive" />
+                </button>
+              </div>
+              <p class="text-sm text-foreground font-body leading-relaxed">{{ note.content }}</p>
+            </div>
+          </div>
+
+          <div v-else class="mt-4 text-sm text-muted-foreground font-body">
+            Nenhuma anotação ainda.
           </div>
         </div>
-
-        <div v-else class="mt-4 text-sm text-muted-foreground">
-          Nenhuma anotação ainda.
-        </div>
-      </div>
+      </template>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import {
@@ -188,12 +190,20 @@ import {
   Clock,
   Video,
   FileText,
-  User,
-  Camera,
+  CheckCircle,
+  Trash2,
 } from "lucide-vue-next";
 import NavBar from "@/components/NavBar.vue";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import {
+  getClientDashboard,
+  getPatientNotes,
+  createPatientNote,
+  deletePatientNote,
+  type ClientDashboardData,
+  type PatientNote,
+} from "@/services/dashboard";
 
 const router = useRouter();
 const { user, logout } = useAuth();
@@ -207,44 +217,70 @@ const todayFormatted = computed(() =>
   format(new Date(), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR }),
 );
 
-// Mock data
-const nextSession = {
-  date: "25 de Fevereiro de 2026",
-  time: "15:30",
-  meetLink: "https://meet.google.com",
-};
-
-const absences = 2;
-
-// Notas privadas
-const notes = ref<{ id: number; date: string; content: string }[]>([]);
-const newNote = ref("");
-
-function saveNote() {
-  if (!newNote.value.trim()) return;
-
-  notes.value.unshift({
-    id: Date.now(),
-    date: format(new Date(), "dd MMM yyyy", { locale: ptBR }),
-    content: newNote.value,
-  });
-
-  newNote.value = "";
+function formatDate(iso: string): string {
+  try {
+    return format(parseISO(iso), "dd MMM. yyyy", { locale: ptBR });
+  } catch {
+    return iso;
+  }
 }
 
-// Foto perfil
-const profileImage = ref<string | null>(null);
-const defaultAvatar =
-  "https://ui-avatars.com/api/?background=E9D8FD&color=6B21A8&name=User";
+function formatNextDate(iso: string): string {
+  try {
+    return format(parseISO(iso), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+  } catch {
+    return iso;
+  }
+}
 
-function handleImageUpload(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0];
-  if (!file) return;
+// ─── Data ─────────────────────────────────────────────────────────────────
+const profile = ref<ClientDashboardData | null>(null);
+const notes = ref<PatientNote[]>([]);
+const isLoading = ref(true);
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    profileImage.value = reader.result as string;
-  };
-  reader.readAsDataURL(file);
+async function loadData() {
+  isLoading.value = true;
+  try {
+    const [dashData, notesData] = await Promise.all([
+      getClientDashboard(),
+      getPatientNotes(),
+    ]);
+    profile.value = dashData;
+    notes.value = notesData;
+  } catch {
+    // silently ignore; token might be expired
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+onMounted(loadData);
+
+// ─── Notes ────────────────────────────────────────────────────────────────
+const newNote = ref("");
+const savingNote = ref(false);
+
+async function saveNote() {
+  if (!newNote.value.trim() || savingNote.value) return;
+
+  savingNote.value = true;
+  try {
+    const note = await createPatientNote(newNote.value.trim());
+    notes.value.unshift(note);
+    newNote.value = "";
+  } catch {
+    // silently ignore
+  } finally {
+    savingNote.value = false;
+  }
+}
+
+async function removeNote(id: number) {
+  try {
+    await deletePatientNote(id);
+    notes.value = notes.value.filter((n) => n.id !== id);
+  } catch {
+    // silently ignore
+  }
 }
 </script>

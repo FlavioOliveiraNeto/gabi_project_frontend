@@ -150,6 +150,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import { Eye, EyeOff } from "lucide-vue-next";
 import LogoComponent from "@/components/LogoComponent.vue";
+import Button from "@/components/ui/button/Button.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -176,7 +177,7 @@ const handleSubmit = async () => {
       const userRaw = localStorage.getItem("auth_user");
       const user = userRaw ? JSON.parse(userRaw) : null;
 
-      if (user?.role === "admin") {
+      if (user?.role === "therapist") {
         router.push("/terapeuta");
       } else {
         router.push("/paciente");

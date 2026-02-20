@@ -1,9 +1,10 @@
 import api from "./api";
 
-export type Role = "admin" | "client";
+export type Role = "therapist" | "client";
 
 export interface User {
   id: number;
+  name: string;
   email: string;
   role: Role;
 }
@@ -11,6 +12,18 @@ export interface User {
 export interface LoginResult {
   user: User;
   token: string;
+}
+
+export interface RegisterParams {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export async function registerRequest(params: RegisterParams): Promise<void> {
+  await api.post("/users", { user: params });
 }
 
 export async function loginRequest(
