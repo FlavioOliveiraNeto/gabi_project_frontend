@@ -121,13 +121,22 @@
               </div>
             </div>
 
-            <button
+            <div class="flex justify-between items-center">
+              <button
               type="button"
               @click="showForgot = true"
               class="text-sm font-body text-primary hover:underline"
             >
               Esqueceu a senha?
             </button>
+
+            <router-link
+              to="/cadastro"
+              class="text-sm font-body text-primary hover:underline"
+            >
+              Não tem uma conta?
+            </router-link>
+            </div>
 
             <Button
               size="lg"
