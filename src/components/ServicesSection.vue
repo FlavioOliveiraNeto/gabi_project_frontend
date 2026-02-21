@@ -69,7 +69,7 @@ const services = [
     icon: Ear,
     title: "Abordagem de Psicanálise",
     description:
-      "Um encontro com aquilo que habita em você, até mesmo o que ainda não tem nome e o que não se lembrava que ainda estava ai dentro. Entre palavras e pausas, construímos sentidos, elaboramos dores e abrimos espaço para novas formas de existir considerando sua infancia e psique. Em uma sessão que leva em média 50 minutos.",
+      "Um encontro com aquilo que habita em você, até mesmo o que ainda não tem nome e o que não se lembrava que ainda estava aí dentro. Entre palavras e pausas, construímos sentidos, elaboramos dores e abrimos espaço para novas formas de existir considerando sua infância e psique. Em uma sessão que leva em média 50 minutos.",
     color: "bg-secondary/10 text-secondary",
   },
   {
@@ -83,7 +83,7 @@ const services = [
     icon: HeartPlus,
     title: "Cuidando do que dói por dentro",
     description:
-      "Quando a ansiedade aperta, a tristeza se prolonga ou a autoestima se fragiliza, pode ser difícil atravessar tudo sozinha(o). Este é um espaço de cuidado para acolher sentimentos como ansiedade, depressão, insegurança, medo, sobrecarga emocional e conflitos internos em geral. Acompanhamento de qualquer demanda psicologia não reduzindo apenas ao diagnostico, mas compreendido dentro da sua vivência.",
+      "Quando a ansiedade aperta, a tristeza se prolonga ou a autoestima se fragiliza, pode ser difícil atravessar tudo sozinha(o). Este é um espaço de cuidado para acolher sentimentos como ansiedade, depressão, insegurança, medo, sobrecarga emocional e conflitos internos em geral. Acompanhamento de qualquer demanda psicológica, não reduzindo apenas ao diagnóstico, mas compreendido dentro da sua vivência.",
     color: "bg-secondary/10 text-secondary",
   },
   {
@@ -97,7 +97,7 @@ const services = [
     icon: Puzzle,
     title: "Cada demanda é única",
     description:
-      "Mesmo que a sua não esteja listada aqui, vamos conversar e entender sobre seu processo terapeutico.",
+      "Mesmo que a sua não esteja listada aqui, vamos conversar e entender sobre seu processo terapêutico.",
     color: "bg-secondary/10 text-secondary",
   },
 ];

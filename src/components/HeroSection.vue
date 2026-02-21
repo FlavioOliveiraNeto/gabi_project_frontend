@@ -16,7 +16,7 @@
       class="container mx-auto px-4 sm:px-6 lg:px-25 pt-30 lg:py-0 grid lg:grid-cols-2 gap-10 lg:gap-12 items-center relative z-10"
     >
       <div
-        class="order-1 lg:order-2 w-full lg:w-fit relative place-self-center lg:place-self-end animate-fade-in-up"
+        class="order-1 lg:order-2 w-full lg:w-fit relative place-self-center lg:place-self-end animate-fade-in-up max-w-[16rem] md:max-w-[60rem]"
         style="animation-delay: 0.3s"
       >
         <div

@@ -114,7 +114,7 @@ const features = [
   },
   {
     icon: AlarmClock,
-    title: "Preparando o ambiente",
+    title: "Se preparando para a sessão",
     desc: "Você precisa ter um lugar seguro e confortável em que poderá ficar 50 minutos sozinho",
   },
   {
