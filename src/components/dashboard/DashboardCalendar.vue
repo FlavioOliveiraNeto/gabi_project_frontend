@@ -111,12 +111,9 @@
                 class="w-4 h-4 text-red-500"
               />
 
-              <Clock
-                v-else
-                class="w-4 h-4 text-yellow-500"
-              />
+              <Clock v-else class="w-4 h-4 text-yellow-500" />
             </div>
-            
+
             <div
               class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-body text-sm font-semibold text-primary"
             >
@@ -270,7 +267,6 @@ const calendarCells = computed<CalendarCell[]>(() => {
   return cells;
 });
 
-/* 🔥 AQUI ESTÁ O NOME CORRETO */
 const sessionsOfSelectedDay = computed(() => {
   const key = format(selectedDate.value, "yyyy-MM-dd");
   return sessionsByDate.value[key] ?? [];
