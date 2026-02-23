@@ -12,6 +12,7 @@
     </NavBar>
 
     <main class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-12 pt-24 pb-12">
+      
       <!-- Header -->
       <div class="sm:flex sm:justify-between sm:items-center my-6">
         <h2 class="font-display text-2xl text-primary">
@@ -28,16 +29,21 @@
       </div>
 
       <template v-else>
-        <!-- STATS -->
+
+        <!-- ================= STATS ================= -->
         <div class="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-8">
+
           <!-- Próxima sessão -->
-          <div class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3 sm:col-span-1">
+          <div class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3">
             <div class="flex items-center gap-2">
               <div class="p-2 rounded-lg bg-primary/10">
                 <CalendarIcon class="w-4 h-4 text-primary" />
               </div>
-              <h3 class="font-body text-sm text-muted-foreground">Próxima Sessão</h3>
+              <h3 class="font-body text-sm text-muted-foreground">
+                Próxima Sessão
+              </h3>
             </div>
+
             <div v-if="profile?.next_session">
               <p class="font-display text-base text-foreground">
                 {{ formatNextDate(profile.next_session.date) }}
@@ -46,8 +52,11 @@
                 {{ profile.next_session.time ?? "Horário a definir" }}
               </p>
             </div>
+
             <div v-else>
-              <p class="font-body text-sm text-muted-foreground">Nenhuma sessão agendada</p>
+              <p class="font-body text-sm text-muted-foreground">
+                Nenhuma sessão agendada
+              </p>
             </div>
           </div>
 
@@ -57,11 +66,14 @@
               <div class="p-2 rounded-lg bg-primary/10">
                 <CheckCircle class="w-4 h-4 text-primary" />
               </div>
-              <h3 class="font-body text-sm text-muted-foreground">Sessões realizadas</h3>
+              <h3 class="font-body text-sm text-muted-foreground">
+                Sessões realizadas
+              </h3>
             </div>
-            <div>
-              <p class="font-display text-3xl text-foreground">{{ profile?.completed_sessions ?? 0 }}</p>
-            </div>
+
+            <p class="font-display text-3xl text-foreground">
+              {{ profile?.completed_sessions ?? 0 }}
+            </p>
           </div>
 
           <!-- Faltas -->
@@ -70,24 +82,27 @@
               <div class="p-2 rounded-lg bg-secondary/10">
                 <AlertCircle class="w-4 h-4 text-secondary" />
               </div>
-              <h3 class="font-body text-sm text-muted-foreground">Faltas acumuladas</h3>
+              <h3 class="font-body text-sm text-muted-foreground">
+                Faltas acumuladas
+              </h3>
             </div>
-            <div>
-              <p
-                class="font-display text-3xl"
-                :class="(profile?.absent_sessions ?? 0) > 0 ? 'text-amber-500' : 'text-foreground'"
-              >
-                {{ profile?.absent_sessions ?? 0 }}
-              </p>
-            </div>
+
+            <p
+              class="font-display text-3xl"
+              :class="(profile?.absent_sessions ?? 0) > 0 ? 'text-amber-500' : 'text-foreground'"
+            >
+              {{ profile?.absent_sessions ?? 0 }}
+            </p>
           </div>
         </div>
 
-        <!-- Sessão / Google Meet -->
+        <!-- ================= DETALHES DA SESSÃO ================= -->
         <div class="border border-border/50 rounded-xl p-6 bg-card mb-6 space-y-4">
           <div class="flex items-center gap-3">
             <Clock class="w-5 h-5 text-primary" />
-            <h3 class="font-display text-xl text-foreground">Detalhes da Sessão</h3>
+            <h3 class="font-display text-xl text-foreground">
+              Detalhes da Sessão
+            </h3>
           </div>
 
           <div v-if="profile?.next_session" class="space-y-2">
@@ -97,6 +112,7 @@
                 {{ formatNextDate(profile.next_session.date) }}
               </span>
             </p>
+
             <p class="font-body text-sm text-muted-foreground">
               Horário:
               <span class="text-foreground font-medium">
@@ -104,29 +120,37 @@
               </span>
             </p>
           </div>
+
           <p v-else class="font-body text-sm text-muted-foreground">
             Nenhuma sessão agendada. Entre em contato com sua terapeuta.
           </p>
 
+          <!-- Botão do Meet apenas se for HOJE -->
           <a
-            v-if="profile?.google_meet_link"
-            :href="profile.google_meet_link"
+            v-if="canJoinSession"
+            :href="profile?.google_meet_link!"
             target="_blank"
             class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary/10 hover:bg-secondary/20 text-secondary font-body text-sm font-medium transition"
           >
             <Video class="w-4 h-4" />
-            Entrar na sessão (Google Meet)
+            Entrar na sessão
           </a>
-          <p v-else class="font-body text-sm text-muted-foreground italic">
-            Link do Google Meet não configurado ainda.
+
+          <p
+            v-else-if="profile?.next_session && !profile?.google_meet_link"
+            class="font-body text-sm text-muted-foreground italic"
+          >
+            Link do Google Meet não configurado.
           </p>
         </div>
 
-        <!-- NOTAS PRIVADAS -->
+        <!-- ================= NOTAS PRIVADAS ================= -->
         <div class="border border-border/50 rounded-xl p-6 bg-card">
           <div class="flex items-center gap-3 mb-5">
             <FileText class="w-5 h-5 text-primary" />
-            <h3 class="font-display text-xl text-foreground">Minhas Anotações</h3>
+            <h3 class="font-display text-xl text-foreground">
+              Minhas Anotações
+            </h3>
             <span class="ml-auto font-body text-xs text-muted-foreground italic">
               Visíveis apenas para você
             </span>
@@ -161,12 +185,14 @@
                 <button
                   @click="removeNote(note.id)"
                   class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-destructive/10 transition"
-                  title="Excluir anotação"
                 >
                   <Trash2 class="w-3.5 h-3.5 text-destructive" />
                 </button>
               </div>
-              <p class="text-sm text-foreground font-body leading-relaxed">{{ note.content }}</p>
+
+              <p class="text-sm text-foreground font-body leading-relaxed">
+                {{ note.content }}
+              </p>
             </div>
           </div>
 
@@ -174,6 +200,7 @@
             Nenhuma anotação ainda.
           </div>
         </div>
+
       </template>
     </main>
   </div>
@@ -194,15 +221,11 @@ import {
   Trash2,
 } from "lucide-vue-next";
 import NavBar from "@/components/NavBar.vue";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   getClientDashboard,
-  getPatientNotes,
-  createPatientNote,
-  deletePatientNote,
   type ClientDashboardData,
-  type PatientNote,
 } from "@/services/dashboard";
 
 const router = useRouter();
@@ -217,26 +240,23 @@ const todayFormatted = computed(() =>
   format(new Date(), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR }),
 );
 
-function formatDate(iso: string): string {
-  try {
-    return format(parseISO(iso), "dd MMM. yyyy", { locale: ptBR });
-  } catch {
-    return iso;
-  }
+function formatDate(iso: string) {
+  return format(parseISO(iso), "dd MMM yyyy", { locale: ptBR });
 }
 
-function formatNextDate(iso: string): string {
-  try {
-    return format(parseISO(iso), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
-  } catch {
-    return iso;
-  }
+function formatNextDate(iso: string) {
+  return format(parseISO(iso), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
 }
 
-// ─── Data ─────────────────────────────────────────────────────────────────
 const profile = ref<ClientDashboardData | null>(null);
 const notes = ref<PatientNote[]>([]);
 const isLoading = ref(true);
+
+const canJoinSession = computed(() => {
+  if (!profile.value?.next_session) return false;
+  if (!profile.value.google_meet_link) return false;
+  return isToday(parseISO(profile.value.next_session.date));
+});
 
 async function loadData() {
   isLoading.value = true;
@@ -247,8 +267,6 @@ async function loadData() {
     ]);
     profile.value = dashData;
     notes.value = notesData;
-  } catch {
-    // silently ignore; token might be expired
   } finally {
     isLoading.value = false;
   }
@@ -256,7 +274,6 @@ async function loadData() {
 
 onMounted(loadData);
 
-// ─── Notes ────────────────────────────────────────────────────────────────
 const newNote = ref("");
 const savingNote = ref(false);
 
@@ -268,19 +285,13 @@ async function saveNote() {
     const note = await createPatientNote(newNote.value.trim());
     notes.value.unshift(note);
     newNote.value = "";
-  } catch {
-    // silently ignore
   } finally {
     savingNote.value = false;
   }
 }
 
 async function removeNote(id: number) {
-  try {
-    await deletePatientNote(id);
-    notes.value = notes.value.filter((n) => n.id !== id);
-  } catch {
-    // silently ignore
-  }
+  await deletePatientNote(id);
+  notes.value = notes.value.filter((n) => n.id !== id);
 }
 </script>

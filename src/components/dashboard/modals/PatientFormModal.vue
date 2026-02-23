@@ -218,7 +218,7 @@ watch(
         modalForm.email = props.patientToEdit.email;
         modalForm.google_meet_link = props.patientToEdit.google_meet_link ?? "";
         modalForm.sessions_per_week = props.patientToEdit.sessions_per_week;
-        modalForm.weekdays = [...props.patientToEdit.session_days];
+        modalForm.weekdays = [...(props.patientToEdit.session_days ?? [])];
         modalForm.session_time = props.patientToEdit.session_time ?? "";
       }
     }

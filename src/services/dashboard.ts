@@ -25,19 +25,20 @@ export interface PatientUser {
 
 export interface TherapistStats {
   active_clients: number;
-  today_sessions: number;
+  sessions_today: number;
   sessions_this_week: number;
+  sessions_completed_this_week: number;
 }
 
 export interface TherapistDashboardData {
-  clients: PatientUser[];
   stats: TherapistStats;
+  patients: PatientUser[];
+  calendar_sessions: CalendarSession[];
 }
 
 export interface NextSession {
   date: string;
   time: string | null;
-  weekday: string;
 }
 
 export interface ClientDashboardData {
@@ -65,10 +66,24 @@ export interface CreatePatientParams {
   session_time?: string;
 }
 
+export interface CalendarSession {
+  id: number;
+  date: string;       
+  time: string;       
+  status: "scheduled" | "completed" | "absent";
+  patient: {
+    id: number;
+    name: string;
+    google_meet_link: string | null;
+  };
+}
+
 // ─── API calls – Terapeuta ────────────────────────────────────────────────
 
 export async function getTherapistDashboard(): Promise<TherapistDashboardData> {
-  const { data } = await api.get<TherapistDashboardData>("/therapists/dashboard");
+  const { data } = await api.get<TherapistDashboardData>(
+    "/therapists/dashboard"
+  );
   return data;
 }
 
@@ -105,7 +120,9 @@ export async function createClinicalNote(
 // ─── API calls – Paciente ─────────────────────────────────────────────────
 
 export async function getClientDashboard(): Promise<ClientDashboardData> {
-  const { data } = await api.get<ClientDashboardData>("/clients/dashboard");
+  const { data } = await api.get<ClientDashboardData>(
+    "/clients/dashboard"
+  );
   return data;
 }
 

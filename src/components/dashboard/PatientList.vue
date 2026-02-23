@@ -6,7 +6,7 @@
       <span
         class="ml-auto font-body text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full"
       >
-        {{ patients.length }} cadastrado{{ patients.length !== 1 ? "s" : "" }}
+        {{ props.patients?.length ?? 0 }} cadastrado{{ props.patients?.length !== 1 ? "s" : "" }}
       </span>
       <button
         @click="$emit('add')"

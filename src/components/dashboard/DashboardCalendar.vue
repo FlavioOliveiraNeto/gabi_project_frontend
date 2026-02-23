@@ -87,7 +87,7 @@
         </div>
       </div>
 
-      <div v-if="patientsOfSelectedDay.length === 0" class="text-center py-6">
+      <div v-if="sessionsOfSelectedDay.length === 0" class="text-center py-6">
         <p class="font-body text-sm text-muted-foreground">
           Nenhum atendimento neste dia.
         </p>
@@ -95,35 +95,71 @@
 
       <div v-else class="space-y-3 overflow-y-auto flex-1 pr-2">
         <div
-          v-for="patient in paginatedPatients"
-          :key="patient.id"
+          v-for="session in paginatedSessions"
+          :key="session.id"
           class="border border-border/30 rounded-xl p-4 flex items-center justify-between"
         >
           <div class="flex items-center gap-3">
+            <div>
+              <Check
+                v-if="session.status === 'completed'"
+                class="w-4 h-4 text-green-500"
+              />
+
+              <X
+                v-else-if="session.status === 'absent'"
+                class="w-4 h-4 text-red-500"
+              />
+
+              <Clock
+                v-else
+                class="w-4 h-4 text-yellow-500"
+              />
+            </div>
+            
             <div
               class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-body text-sm font-semibold text-primary"
             >
-              {{ initials(patient.name) }}
+              {{ initials(session.patient?.name) }}
             </div>
+
             <div>
               <p class="font-body font-semibold text-sm text-foreground">
-                {{ patient.name }}
+                {{ session.patient?.name ?? "Paciente" }}
               </p>
               <p class="font-body text-xs text-muted-foreground">
-                {{ patient.session_time || "Horário não definido" }}
+                {{ session.time }}
               </p>
             </div>
           </div>
 
-          <a
-            v-if="patient.google_meet_link && !isSelectedDatePast"
-            :href="patient.google_meet_link"
-            target="_blank"
-            class="flex items-center gap-1 text-xs font-body font-medium text-secondary hover:underline"
+          <button
+            v-if="session.status === 'completed'"
+            @click="markAbsent(session.id)"
+            class="text-xs text-red-500 hover:underline"
           >
-            <Video class="w-3.5 h-3.5" />
-            Google Meet
-          </a>
+            Registrar falta
+          </button>
+
+          <div v-if="!isSelectedDatePast && session.status == 'scheduled'">
+            <a
+              v-if="session.patient?.google_meet_link"
+              :href="session.patient.google_meet_link"
+              target="_blank"
+              class="flex items-center gap-1 text-xs font-body font-medium text-secondary hover:underline"
+            >
+              <Video class="w-3.5 h-3.5" />
+              Google Meet
+            </a>
+            <button
+              v-else
+              @click="emit('edit-patient', session.patient.id)"
+              class="flex items-center gap-1 text-xs font-body font-medium text-orange-500 hover:underline"
+            >
+              <Video class="w-3.5 h-3.5" />
+              Adicionar link do Google Meet
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -134,9 +170,12 @@
 import { ref, computed, watch } from "vue";
 import {
   Calendar as CalendarIcon,
+  Check,
   ChevronLeft,
   ChevronRight,
+  Clock,
   Video,
+  X,
 } from "lucide-vue-next";
 import {
   format,
@@ -151,10 +190,14 @@ import {
   isToday,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import type { PatientUser } from "@/services/dashboard";
+import type { CalendarSession } from "@/services/dashboard";
 
 const props = defineProps<{
-  patients: PatientUser[];
+  sessions: CalendarSession[];
+}>();
+
+const emit = defineEmits<{
+  (e: "edit-patient", patientId: number): void;
 }>();
 
 const weekDayLabels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -163,12 +206,13 @@ const selectedDate = ref<Date>(startOfDay(new Date()));
 const currentPage = ref(1);
 const perPage = 4;
 
-function initials(name: string) {
+function initials(name?: string) {
+  if (!name) return "?";
   return name
     .split(" ")
     .filter(Boolean)
     .slice(0, 2)
-    .map((w) => w[0].toUpperCase())
+    .map((w) => w[0]?.toUpperCase() ?? "")
     .join("");
 }
 
@@ -179,24 +223,13 @@ const currentMonthLabel = computed(() =>
   ),
 );
 
-const sessionWeekdays = computed<number[]>(() => {
-  const weekdayNums: Record<string, number> = {
-    sunday: 0,
-    monday: 1,
-    tuesday: 2,
-    wednesday: 3,
-    thursday: 4,
-    friday: 5,
-    saturday: 6,
-  };
-  const days = new Set<number>();
-  props.patients.forEach((p) => {
-    p.session_days.forEach((d) => {
-      const n = weekdayNums[d];
-      if (n !== undefined) days.add(n);
-    });
+const sessionsByDate = computed(() => {
+  const map: Record<string, CalendarSession[]> = {};
+  (props.sessions ?? []).forEach((s) => {
+    if (!map[s.date]) map[s.date] = [];
+    map[s.date].push(s);
   });
-  return Array.from(days);
+  return map;
 });
 
 interface CalendarCell {
@@ -213,48 +246,47 @@ const calendarCells = computed<CalendarCell[]>(() => {
   const offset = getDay(first);
 
   const cells: CalendarCell[] = [];
+
   for (let i = 0; i < offset; i++) {
-    cells.push({ day: null, date: null, isToday: false, hasSession: false });
+    cells.push({
+      day: null,
+      date: null,
+      isToday: false,
+      hasSession: false,
+    });
   }
 
   days.forEach((d) => {
+    const key = format(d, "yyyy-MM-dd");
+
     cells.push({
       day: d.getDate(),
       date: d,
       isToday: isToday(d),
-      hasSession: sessionWeekdays.value.includes(d.getDay()),
+      hasSession: Boolean(sessionsByDate.value[key]),
     });
   });
+
   return cells;
 });
 
-const patientsOfSelectedDay = computed(() => {
-  const weekdayMap: Record<number, string> = {
-    0: "sunday",
-    1: "monday",
-    2: "tuesday",
-    3: "wednesday",
-    4: "thursday",
-    5: "friday",
-    6: "saturday",
-  };
-  const weekdayKey = weekdayMap[selectedDate.value.getDay()];
-  return props.patients
-    .filter((p) => p.session_days.includes(weekdayKey))
-    .sort((a, b) => (a.session_time || "").localeCompare(b.session_time || ""));
+/* 🔥 AQUI ESTÁ O NOME CORRETO */
+const sessionsOfSelectedDay = computed(() => {
+  const key = format(selectedDate.value, "yyyy-MM-dd");
+  return sessionsByDate.value[key] ?? [];
 });
 
 const isSelectedDatePast = computed(() => {
   return isBefore(startOfDay(selectedDate.value), startOfDay(new Date()));
 });
 
-const paginatedPatients = computed(() => {
+const paginatedSessions = computed(() => {
   const start = (currentPage.value - 1) * perPage;
-  return patientsOfSelectedDay.value.slice(start, start + perPage);
+  return sessionsOfSelectedDay.value.slice(start, start + perPage);
 });
 
 const totalPages = computed(
-  () => Math.ceil(patientsOfSelectedDay.value.length / perPage) || 1,
+  () => Math.ceil(sessionsOfSelectedDay.value.length / perPage) || 1,
 );
 
 watch(selectedDate, () => {
@@ -264,10 +296,10 @@ watch(selectedDate, () => {
 function getCellClass(cell: CalendarCell) {
   if (!cell.day) return "cursor-default border-transparent";
   if (cell.isToday)
-    return "bg-primary text-primary-foreground font-semibold cursor-default border-transparent";
+    return "bg-primary text-primary-foreground font-semibold border-transparent";
   if (cell.hasSession)
-    return "bg-muted/60 text-foreground cursor-default hover:bg-muted border-border/20";
-  return "text-muted-foreground cursor-default hover:bg-muted/40 border-transparent";
+    return "bg-muted/60 text-foreground hover:bg-muted border-border/20";
+  return "text-muted-foreground hover:bg-muted/40 border-transparent";
 }
 
 function prevMonth() {
