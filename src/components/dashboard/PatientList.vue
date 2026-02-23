@@ -6,7 +6,9 @@
       <span
         class="ml-auto font-body text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full"
       >
-        {{ props.patients?.length ?? 0 }} cadastrado{{ props.patients?.length !== 1 ? "s" : "" }}
+        {{ props.patients?.length ?? 0 }} cadastrado{{
+          props.patients?.length !== 1 ? "s" : ""
+        }}
       </span>
       <button
         @click="$emit('add')"
@@ -45,8 +47,30 @@
     </div>
 
     <div v-else class="space-y-2">
+      <div
+        v-if="totalPages > 1"
+        class="flex justify-end items-center gap-1 ml-auto"
+      >
+        <button
+          @click="currentPage--"
+          :disabled="currentPage === 1"
+          class="p-1.5 hover:bg-muted rounded-lg transition"
+        >
+          <ChevronLeft class="w-4 h-4 text-muted-foreground" />
+        </button>
+        <span class="text-xs font-body"
+          >{{ currentPage }} / {{ totalPages }}</span
+        >
+        <button
+          @click="currentPage++"
+          :disabled="currentPage === totalPages"
+          class="p-1.5 hover:bg-muted rounded-lg transition"
+        >
+          <ChevronRight class="w-4 h-4 text-muted-foreground" />
+        </button>
+      </div>
       <PatientCard
-        v-for="patient in filteredPatients"
+        v-for="patient in paginatedPatients"
         :key="patient.id"
         :patient="patient"
         :is-open="selectedPatient === patient.id"
@@ -61,7 +85,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { FileText, Plus, Search } from "lucide-vue-next";
+import {
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Plus,
+  Search,
+} from "lucide-vue-next";
 import PatientCard from "./PatientCard.vue";
 import type { PatientUser } from "@/services/dashboard";
 
@@ -79,6 +109,8 @@ const emit = defineEmits<{
 
 const patientSearch = ref("");
 const selectedPatient = ref<number | null>(null);
+const currentPage = ref(1);
+const perPage = 5;
 
 const filteredPatients = computed(() => {
   const q = patientSearch.value.toLowerCase().trim();
@@ -88,6 +120,15 @@ const filteredPatients = computed(() => {
   if (!q) return sorted;
   return sorted.filter((p) => p.name.toLowerCase().includes(q));
 });
+
+const paginatedPatients = computed(() => {
+  const start = (currentPage.value - 1) * perPage;
+  return filteredPatients.value.slice(start, start + perPage);
+});
+
+const totalPages = computed(
+  () => Math.ceil(filteredPatients.value.length / perPage) || 1,
+);
 
 function togglePatient(id: number) {
   selectedPatient.value = selectedPatient.value === id ? null : id;
