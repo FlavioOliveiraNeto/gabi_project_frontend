@@ -12,7 +12,6 @@
     </NavBar>
 
     <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-24 pb-12">
-      
       <!-- Header -->
       <div class="sm:flex sm:justify-between sm:items-center my-6">
         <h2 class="font-display text-2xl text-primary">
@@ -29,6 +28,7 @@
       <!-- Calendar -->
       <DashboardCalendar
         :sessions="calendarSessions"
+        :patients="patients"
         @edit-patient="handleEditFromCalendar"
       />
 
@@ -127,7 +127,6 @@ async function loadDashboard() {
     stats.value = response.stats;
     calendarSessions.value = response.calendar_sessions ?? [];
     patients.value = response.patients ?? [];
-
   } catch (error) {
     console.error(error);
   } finally {
@@ -149,7 +148,7 @@ function openCreateModal() {
 }
 
 function openEditModal(patient: PatientUser) {
-  console.log(patient)
+  console.log(patient);
   editingPatient.value = patient;
   showFormModal.value = true;
 }
@@ -167,8 +166,8 @@ function handlePatientSaved(patient: PatientUser, isNew: boolean) {
     const idx = patients.value.findIndex((p) => p.id === patient.id);
     if (idx !== -1) {
       patients.value[idx] = {
-        ...patients.value[idx], 
-        ...patient,             
+        ...patients.value[idx],
+        ...patient,
       };
     }
   }
@@ -199,10 +198,7 @@ function closeDeleteModal() {
 
 function handlePatientDeleted(patientId: number) {
   patients.value = patients.value.filter((p) => p.id !== patientId);
-  stats.value.active_clients = Math.max(
-    0,
-    stats.value.active_clients - 1
-  );
+  stats.value.active_clients = Math.max(0, stats.value.active_clients - 1);
 }
 
 /* ---------------------------

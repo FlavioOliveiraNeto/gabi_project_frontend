@@ -78,6 +78,12 @@ export interface CalendarSession {
   };
 }
 
+export interface CreateSessionParams {
+  patient_id: number;
+  scheduled_at: string;
+  session_type?: "regular" | "extra";
+}
+
 // ─── API calls – Terapeuta ────────────────────────────────────────────────
 
 export async function getTherapistDashboard(): Promise<TherapistDashboardData> {
@@ -132,6 +138,16 @@ export async function updateSessionStatus(
   const { data } = await api.patch<CalendarSession>(
     `/therapists/sessions/${sessionId}`,
     { status },
+  );
+  return data;
+}
+
+export async function createSession(
+  params: CreateSessionParams,
+): Promise<CalendarSession> {
+  const { data } = await api.post<CalendarSession>(
+    "/therapists/sessions",
+    params,
   );
   return data;
 }

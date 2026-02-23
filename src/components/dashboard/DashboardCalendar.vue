@@ -66,11 +66,11 @@
         <h3 class="font-display text-xl text-foreground">
           {{ format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR }) }}
         </h3>
-        <div v-if="totalPages > 1" class="flex items-center gap-1 ml-auto">
+        <div v-if="totalPages > 1" class="flex items-center gap-1 ml-auto mr-4">
           <button
             @click="currentPage--"
             :disabled="currentPage === 1"
-            class="p-1.5 hover:bg-muted rounded-lg transition"
+            class="p-1.5 hover:bg-muted rounded-lg transition disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ChevronLeft class="w-4 h-4 text-muted-foreground" />
           </button>
@@ -80,11 +80,18 @@
           <button
             @click="currentPage++"
             :disabled="currentPage === totalPages"
-            class="p-1.5 hover:bg-muted rounded-lg transition"
+            class="p-1.5 hover:bg-muted rounded-lg transition disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ChevronRight class="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
+        <CalendarPlus
+          v-if="!isSelectedDatePast"
+          @click="openCreateSessionModal"
+          class="w-5 h-5 text-primary cursor-pointer hover:rotate-10 transition"
+          alt="Adicionar sessão no dia"
+          title="Adicionar sessão no dia"
+        />
       </div>
 
       <div v-if="sessionsOfSelectedDay.length === 0" class="text-center py-6">
@@ -167,6 +174,14 @@
       @close="closeAbsentModal"
       @absent="handleSessionAbsent"
     />
+
+    <ConfirmAddSessionModal
+      :is-open="showCreateSessionModal"
+      :date="selectedDate"
+      :patients="patients"
+      @close="closeCreateSessionModal"
+      @create="handleCreateSession"
+    />
   </div>
 </template>
 
@@ -174,6 +189,7 @@
 import { ref, computed, watch } from "vue";
 import {
   Calendar as CalendarIcon,
+  CalendarPlus,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -196,12 +212,23 @@ import {
 import { ptBR } from "date-fns/locale";
 import {
   type CalendarSession,
+  type PatientUser,
+  createSession,
   updateSessionStatus,
 } from "@/services/dashboard";
 import ConfirmAbsentModal from "@/components/dashboard/modals/ConfirmAbsentModal.vue";
+import ConfirmAddSessionModal from "@/components/dashboard/modals/ConfirmAddSessionModal.vue";
+
+interface CalendarCell {
+  day: number | null;
+  date: Date | null;
+  isToday: boolean;
+  hasSession: boolean;
+}
 
 const props = defineProps<{
   sessions: CalendarSession[];
+  patients: PatientUser[];
 }>();
 
 const emit = defineEmits<{
@@ -213,16 +240,6 @@ const calendarBase = ref(new Date());
 const selectedDate = ref<Date>(startOfDay(new Date()));
 const currentPage = ref(1);
 const perPage = 4;
-
-function initials(name?: string) {
-  if (!name) return "?";
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? "")
-    .join("");
-}
 
 const currentMonthLabel = computed(() =>
   format(calendarBase.value, "MMMM yyyy", { locale: ptBR }).replace(
@@ -239,13 +256,6 @@ const sessionsByDate = computed(() => {
   });
   return map;
 });
-
-interface CalendarCell {
-  day: number | null;
-  date: Date | null;
-  isToday: boolean;
-  hasSession: boolean;
-}
 
 const calendarCells = computed<CalendarCell[]>(() => {
   const first = startOfMonth(calendarBase.value);
@@ -296,9 +306,26 @@ const totalPages = computed(
   () => Math.ceil(sessionsOfSelectedDay.value.length / perPage) || 1,
 );
 
+const showAbsentModal = ref(false);
+const absentTarget = ref<CalendarSession | null>(null);
+
+const showCreateSessionModal = ref(false);
+const createSessionLoading = ref(false);
+const selectedPatientId = ref<number | null>(null);
+
 watch(selectedDate, () => {
   currentPage.value = 1;
 });
+
+function initials(name?: string) {
+  if (!name) return "?";
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 function getCellClass(cell: CalendarCell) {
   if (!cell.day) return "cursor-default border-transparent";
@@ -323,9 +350,6 @@ function selectDate(cell: CalendarCell) {
 /* ---------------------------
    Absent Modal
 ---------------------------- */
-const showAbsentModal = ref(false);
-const absentTarget = ref<CalendarSession | null>(null);
-
 function confirmAbsent(session: CalendarSession) {
   absentTarget.value = session;
   showAbsentModal.value = true;
@@ -349,6 +373,34 @@ async function handleSessionAbsent(sessionId: number) {
     console.error("Erro ao marcar falta:", error);
   } finally {
     closeAbsentModal();
+  }
+}
+
+/* ---------------------------
+   Add Session Modal
+---------------------------- */
+function openCreateSessionModal() {
+  selectedPatientId.value = null;
+  showCreateSessionModal.value = true;
+}
+
+function closeCreateSessionModal() {
+  showCreateSessionModal.value = false;
+}
+
+async function handleCreateSession(payload: {
+  patientId: number;
+  datetime: string;
+}) {
+  try {
+    const newSession = await createSession({
+      patient_id: payload.patientId,
+      scheduled_at: payload.datetime,
+    });
+
+    props.sessions.push(newSession);
+  } catch (error) {
+    console.error("Erro ao criar sessão:", error);
   }
 }
 </script>
