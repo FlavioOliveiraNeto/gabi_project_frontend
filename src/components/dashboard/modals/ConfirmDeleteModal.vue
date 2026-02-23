@@ -67,6 +67,7 @@ async function handleConfirm() {
     // Tratar erro
   } finally {
     isLoading.value = false;
+    closeModal();
   }
 }
 </script>

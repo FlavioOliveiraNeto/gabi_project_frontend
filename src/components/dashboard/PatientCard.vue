@@ -21,6 +21,62 @@
 
         <div class="flex flex-wrap gap-1.5 mt-2">
           <span
+            v-if="patient.schedule_type"
+            class="font-body text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
+          >
+            {{
+              patient.schedule_type === "weekly"
+                ? "Agendamento semanal"
+                : patient.schedule_type === "monthly"
+                  ? "Agendamento mensal"
+                  : "Agendamento avulso"
+            }}
+          </span>
+          <span
+            v-if="
+              patient.sessions_per_week > 0 &&
+              patient.schedule_type === 'weekly'
+            "
+            class="font-body text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
+          >
+            {{ patient.sessions_per_week }}x/semana
+          </span>
+          <!-- BADGE AVULSO COM TOOLTIP -->
+          <div
+            v-else-if="patient.schedule_type === 'single'"
+            class="relative group inline-block"
+          >
+            <span
+              class="font-body text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-medium cursor-pointer"
+            >
+              {{ patient.single_sessions.length }}
+              {{
+                patient.single_sessions.length > 1
+                  ? "sessões agendadas"
+                  : "sessão agendada"
+              }}
+            </span>
+
+            <!-- Tooltip -->
+            <div
+              class="absolute left-1/2 -translate-x-1/2 mt-2 w-max max-w-xs opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 bg-card border border-border rounded-lg shadow-lg p-3 z-50"
+            >
+              <div
+                v-for="s in patient.single_sessions"
+                :key="s.id"
+                class="text-xs font-body text-foreground whitespace-nowrap flex items-center gap-2"
+              >
+                <span>{{ formatSingleDate(s.date) }}</span>
+                <span>às</span>
+                <span>{{ s.time }}</span>
+                <span class="text-muted-foreground">
+                  ({{ statusLabel(s.status) }})
+                </span>
+              </div>
+            </div>
+          </div>
+          <span
+            v-if="patient.schedule_type === 'weekly'"
             v-for="day in patient.session_days"
             :key="day"
             class="font-body text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-medium"
@@ -28,14 +84,8 @@
             {{ WEEKDAY_LABELS[day] ?? day }}
           </span>
           <span
-            v-if="patient.sessions_per_week > 0"
-            class="font-body text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
-          >
-            {{ patient.sessions_per_week }}x/semana
-          </span>
-          <span
             v-if="patient.session_time"
-            class="font-body text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
+            class="font-body text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-medium"
           >
             {{ patient.session_time }}
           </span>
@@ -215,6 +265,21 @@ function formatDate(iso: string): string {
   } catch {
     return iso;
   }
+}
+
+function formatSingleDate(dateStr: string): string {
+  try {
+    return format(parseISO(dateStr), "EEE, dd/MM", { locale: ptBR });
+  } catch {
+    return dateStr;
+  }
+}
+
+function statusLabel(status: string): string {
+  if (status === "scheduled") return "Agendada";
+  if (status === "completed") return "Concluída";
+  if (status === "absent") return "Falta";
+  return status;
 }
 
 async function saveNote() {

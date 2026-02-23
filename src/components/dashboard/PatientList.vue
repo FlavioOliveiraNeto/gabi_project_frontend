@@ -69,6 +69,7 @@
           <ChevronRight class="w-4 h-4 text-muted-foreground" />
         </button>
       </div>
+
       <PatientCard
         v-for="patient in paginatedPatients"
         :key="patient.id"

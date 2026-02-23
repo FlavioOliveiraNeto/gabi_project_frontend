@@ -30,6 +30,7 @@
         :sessions="calendarSessions"
         :patients="patients"
         @edit-patient="handleEditFromCalendar"
+        @load-dashboard="loadDashboard"
       />
 
       <!-- Patients -->
@@ -158,19 +159,8 @@ function closeFormModal() {
   editingPatient.value = null;
 }
 
-function handlePatientSaved(patient: PatientUser, isNew: boolean) {
-  if (isNew) {
-    patients.value.unshift(patient);
-    stats.value.active_clients += 1;
-  } else {
-    const idx = patients.value.findIndex((p) => p.id === patient.id);
-    if (idx !== -1) {
-      patients.value[idx] = {
-        ...patients.value[idx],
-        ...patient,
-      };
-    }
-  }
+async function handlePatientSaved(patient: PatientUser, isNew: boolean) {
+  await loadDashboard();
 }
 
 function handleEditFromCalendar(patientId: number) {
@@ -196,9 +186,8 @@ function closeDeleteModal() {
   deleteTarget.value = null;
 }
 
-function handlePatientDeleted(patientId: number) {
-  patients.value = patients.value.filter((p) => p.id !== patientId);
-  stats.value.active_clients = Math.max(0, stats.value.active_clients - 1);
+async function handlePatientDeleted(patientId: number) {
+  await loadDashboard();
 }
 
 /* ---------------------------

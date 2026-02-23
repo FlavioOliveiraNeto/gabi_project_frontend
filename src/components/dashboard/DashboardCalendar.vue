@@ -233,6 +233,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "edit-patient", patientId: number): void;
+  (e: "load-dashboard"): void;
 }>();
 
 const weekDayLabels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -401,6 +402,8 @@ async function handleCreateSession(payload: {
     props.sessions.push(newSession);
   } catch (error) {
     console.error("Erro ao criar sessão:", error);
+  } finally {
+    emit("load-dashboard");
   }
 }
 </script>

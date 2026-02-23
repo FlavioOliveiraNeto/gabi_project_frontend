@@ -72,47 +72,88 @@
           </div>
 
           <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground"
-              >Sessões por semana</label
-            >
+            <label class="font-body text-sm font-medium text-foreground">
+              Tipo de agendamento
+            </label>
             <select
-              v-model.number="modalForm.sessions_per_week"
+              v-model="modalForm.schedule_type"
               class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
             >
-              <option :value="0">Não definido</option>
-              <option v-for="n in 7" :key="n" :value="n">
-                {{ n }}x por semana
-              </option>
+              <option value="weekly">Semanal</option>
+              <option value="single">Avulso</option>
             </select>
           </div>
 
-          <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground"
-              >Dias das sessões</label
-            >
-            <div class="flex flex-wrap gap-3">
-              <label
-                v-for="(label, day) in WEEKDAY_LABELS"
-                :key="day"
-                class="flex items-center gap-1.5 cursor-pointer"
+          <div v-if="modalForm.schedule_type === 'weekly'" class="space-y-4">
+            <div class="space-y-1.5">
+              <label class="font-body text-sm font-medium text-foreground"
+                >Sessões por semana</label
               >
-                <input
-                  type="checkbox"
-                  :value="day"
-                  v-model="modalForm.weekdays"
-                  class="accent-primary w-4 h-4 cursor-pointer"
-                />
-                <span class="font-body text-sm">{{ label }}</span>
-              </label>
+              <select
+                v-model.number="modalForm.sessions_per_week"
+                class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+              >
+                <option :value="0">Não definido</option>
+                <option v-for="n in 7" :key="n" :value="n">
+                  {{ n }}x por semana
+                </option>
+              </select>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="font-body text-sm font-medium text-foreground"
+                >Dias das sessões</label
+              >
+              <div class="flex flex-wrap gap-3">
+                <label
+                  v-for="(label, day) in WEEKDAY_LABELS"
+                  :key="day"
+                  class="flex items-center gap-1.5 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    :value="day"
+                    v-model="modalForm.weekdays"
+                    class="accent-primary w-4 h-4 cursor-pointer"
+                  />
+                  <span class="font-body text-sm">{{ label }}</span>
+                </label>
+              </div>
             </div>
           </div>
 
-          <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground"
-              >Horário da sessão</label
-            >
+          <div v-if="modalForm.schedule_type === 'single'" class="space-y-4">
+            <div class="space-y-1.5">
+              <label class="font-body text-sm font-medium text-foreground">
+                Data da sessão
+              </label>
+              <input
+                v-model="modalForm.single_date"
+                type="date"
+                class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+              />
+            </div>
+          </div>
+
+          <!-- Horário semanal -->
+          <div v-if="modalForm.schedule_type === 'weekly'" class="space-y-1.5">
+            <label class="font-body text-sm font-medium text-foreground">
+              Horário da sessão
+            </label>
             <input
               v-model="modalForm.session_time"
+              type="time"
+              class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+            />
+          </div>
+
+          <!-- Horário avulso -->
+          <div v-if="modalForm.schedule_type === 'single'" class="space-y-1.5">
+            <label class="font-body text-sm font-medium text-foreground">
+              Horário da sessão
+            </label>
+            <input
+              v-model="modalForm.single_time"
               type="time"
               class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
             />
@@ -191,9 +232,12 @@ const modalForm = reactive({
   name: "",
   email: "",
   google_meet_link: "",
+  schedule_type: "weekly" as "weekly" | "single",
   sessions_per_week: 0,
   weekdays: [] as string[],
   session_time: "",
+  single_date: "",
+  single_time: "",
 });
 
 function resetModal() {
@@ -206,6 +250,9 @@ function resetModal() {
   Object.keys(modalErrors).forEach((k) => delete modalErrors[k]);
   modalError.value = "";
   modalLoading.value = false;
+  modalForm.schedule_type = "weekly";
+  modalForm.single_date = "";
+  modalForm.single_time = "";
 }
 
 watch(
@@ -244,14 +291,24 @@ async function handleSubmit() {
   modalError.value = "";
 
   try {
-    const payload = {
+    const payload: any = {
       name: modalForm.name.trim(),
       email: modalForm.email.trim(),
       google_meet_link: modalForm.google_meet_link.trim() || undefined,
-      sessions_per_week: modalForm.sessions_per_week || undefined,
-      weekdays: modalForm.weekdays.length > 0 ? modalForm.weekdays : undefined,
-      session_time: modalForm.session_time || undefined,
+      schedule_type: modalForm.schedule_type,
     };
+
+    if (modalForm.schedule_type === "weekly") {
+      payload.sessions_per_week = modalForm.sessions_per_week || undefined;
+      payload.weekdays =
+        modalForm.weekdays.length > 0 ? modalForm.weekdays : undefined;
+      payload.session_time = modalForm.session_time || undefined;
+    }
+
+    if (modalForm.schedule_type === "single") {
+      payload.single_date = modalForm.single_date || undefined;
+      payload.single_time = modalForm.single_time || undefined;
+    }
 
     if (isEditing.value && props.patientToEdit) {
       const updated = await updatePatient(props.patientToEdit.id, payload);
