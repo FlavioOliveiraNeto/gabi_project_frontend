@@ -68,8 +68,8 @@ export interface CreatePatientParams {
 
 export interface CalendarSession {
   id: number;
-  date: string;       
-  time: string;       
+  date: string;
+  time: string;
   status: "scheduled" | "completed" | "absent";
   patient: {
     id: number;
@@ -82,7 +82,7 @@ export interface CalendarSession {
 
 export async function getTherapistDashboard(): Promise<TherapistDashboardData> {
   const { data } = await api.get<TherapistDashboardData>(
-    "/therapists/dashboard"
+    "/therapists/dashboard",
   );
   return data;
 }
@@ -92,13 +92,21 @@ export async function getPatients(): Promise<PatientUser[]> {
   return data;
 }
 
-export async function createPatient(params: CreatePatientParams): Promise<PatientUser> {
+export async function createPatient(
+  params: CreatePatientParams,
+): Promise<PatientUser> {
   const { data } = await api.post<PatientUser>("/therapists/patients", params);
   return data;
 }
 
-export async function updatePatient(id: number, params: CreatePatientParams): Promise<PatientUser> {
-  const { data } = await api.put<PatientUser>(`/therapists/patients/${id}`, params);
+export async function updatePatient(
+  id: number,
+  params: CreatePatientParams,
+): Promise<PatientUser> {
+  const { data } = await api.put<PatientUser>(
+    `/therapists/patients/${id}`,
+    params,
+  );
   return data;
 }
 
@@ -117,12 +125,21 @@ export async function createClinicalNote(
   return data;
 }
 
+export async function updateSessionStatus(
+  sessionId: number,
+  status: "scheduled" | "completed" | "absent",
+): Promise<CalendarSession> {
+  const { data } = await api.patch<CalendarSession>(
+    `/therapists/sessions/${sessionId}`,
+    { status },
+  );
+  return data;
+}
+
 // ─── API calls – Paciente ─────────────────────────────────────────────────
 
 export async function getClientDashboard(): Promise<ClientDashboardData> {
-  const { data } = await api.get<ClientDashboardData>(
-    "/clients/dashboard"
-  );
+  const { data } = await api.get<ClientDashboardData>("/clients/dashboard");
   return data;
 }
 
@@ -132,7 +149,9 @@ export async function getPatientNotes(): Promise<PatientNote[]> {
 }
 
 export async function createPatientNote(content: string): Promise<PatientNote> {
-  const { data } = await api.post<PatientNote>("/clients/patient_notes", { content });
+  const { data } = await api.post<PatientNote>("/clients/patient_notes", {
+    content,
+  });
   return data;
 }
 

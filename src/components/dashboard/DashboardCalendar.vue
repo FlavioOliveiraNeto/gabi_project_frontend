@@ -132,7 +132,7 @@
 
           <button
             v-if="session.status === 'completed'"
-            @click="markAbsent(session.id)"
+            @click="confirmAbsent(session)"
             class="text-xs text-red-500 hover:underline"
           >
             Registrar falta
@@ -160,6 +160,13 @@
         </div>
       </div>
     </div>
+
+    <ConfirmAbsentModal
+      :is-open="showAbsentModal"
+      :target="absentTarget"
+      @close="closeAbsentModal"
+      @absent="handleSessionAbsent"
+    />
   </div>
 </template>
 
@@ -187,7 +194,11 @@ import {
   isToday,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import type { CalendarSession } from "@/services/dashboard";
+import {
+  type CalendarSession,
+  updateSessionStatus,
+} from "@/services/dashboard";
+import ConfirmAbsentModal from "@/components/dashboard/modals/ConfirmAbsentModal.vue";
 
 const props = defineProps<{
   sessions: CalendarSession[];
@@ -307,5 +318,37 @@ function nextMonth() {
 function selectDate(cell: CalendarCell) {
   if (!cell.date) return;
   selectedDate.value = cell.date;
+}
+
+/* ---------------------------
+   Absent Modal
+---------------------------- */
+const showAbsentModal = ref(false);
+const absentTarget = ref<CalendarSession | null>(null);
+
+function confirmAbsent(session: CalendarSession) {
+  absentTarget.value = session;
+  showAbsentModal.value = true;
+}
+
+function closeAbsentModal() {
+  showAbsentModal.value = false;
+  absentTarget.value = null;
+}
+
+async function handleSessionAbsent(sessionId: number) {
+  try {
+    const updated = await updateSessionStatus(sessionId, "absent");
+
+    const session = sessionsOfSelectedDay.value.find((s) => s.id === sessionId);
+
+    if (session) {
+      session.status = updated.status;
+    }
+  } catch (error) {
+    console.error("Erro ao marcar falta:", error);
+  } finally {
+    closeAbsentModal();
+  }
 }
 </script>
