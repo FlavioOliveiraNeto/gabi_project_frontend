@@ -149,7 +149,6 @@ function openCreateModal() {
 }
 
 function openEditModal(patient: PatientUser) {
-  console.log(patient);
   editingPatient.value = patient;
   showFormModal.value = true;
 }

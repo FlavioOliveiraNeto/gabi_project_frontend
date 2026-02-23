@@ -258,15 +258,32 @@ function resetModal() {
 watch(
   () => props.isOpen,
   (newVal) => {
-    if (newVal) {
-      resetModal();
-      if (props.patientToEdit) {
-        modalForm.name = props.patientToEdit.name;
-        modalForm.email = props.patientToEdit.email;
-        modalForm.google_meet_link = props.patientToEdit.google_meet_link ?? "";
-        modalForm.sessions_per_week = props.patientToEdit.sessions_per_week;
-        modalForm.weekdays = [...(props.patientToEdit.session_days ?? [])];
-        modalForm.session_time = props.patientToEdit.session_time ?? "";
+    if (!newVal) return;
+
+    resetModal();
+
+    if (!props.patientToEdit) return;
+
+    const p = props.patientToEdit;
+
+    modalForm.name = p.name;
+    modalForm.email = p.email;
+    modalForm.google_meet_link = p.google_meet_link ?? "";
+
+    modalForm.schedule_type = p.schedule_type as "weekly" | "single";
+
+    if (p.schedule_type === "weekly") {
+      modalForm.sessions_per_week = p.sessions_per_week ?? 0;
+      modalForm.weekdays = [...(p.session_days ?? [])];
+      modalForm.session_time = p.session_time ?? "";
+    }
+
+    if (p.schedule_type === "single") {
+      const firstSession = p.single_sessions?.[0];
+
+      if (firstSession) {
+        modalForm.single_date = firstSession.date ?? "";
+        modalForm.single_time = firstSession.time ?? "";
       }
     }
   },
