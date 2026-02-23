@@ -62,7 +62,14 @@ const router = createRouter({
 router.beforeEach((to) => {
   const token = localStorage.getItem("auth_token");
   const userRaw = localStorage.getItem("auth_user");
-  const user = userRaw ? JSON.parse(userRaw) : null;
+
+  let user = null;
+
+  try {
+    user = userRaw ? JSON.parse(userRaw) : null;
+  } catch {
+    localStorage.removeItem("auth_user");
+  }
 
   if (to.meta.requiresAuth && !token) {
     return {
@@ -76,9 +83,15 @@ router.beforeEach((to) => {
   }
 
   if (to.name === "login" && token) {
-    if (user?.role === "therapist") return { name: "terapeuta" };
-    if (user?.role === "client") return { name: "paciente" };
+    if (user?.role === "therapist") {
+      return { name: "terapeuta" };
+    }
+    if (user?.role === "client") {
+      return { name: "paciente" };
+    }
   }
+
+  return true;
 });
 
 export default router;

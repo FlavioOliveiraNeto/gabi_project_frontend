@@ -1,4 +1,5 @@
 import axios, { type AxiosInstance, AxiosHeaders } from "axios";
+import router from "@/router";
 
 const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:3000",
@@ -21,5 +22,26 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("auth_user");
+
+      if (router.currentRoute.value.name !== "login") {
+        router.push({
+          name: "login",
+          query: {
+            redirect: router.currentRoute.value.fullPath,
+          },
+        });
+      }
+    }
+
+    return Promise.reject(error);
+  },
+);
 
 export default api;
