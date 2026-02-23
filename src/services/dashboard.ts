@@ -42,13 +42,25 @@ export interface NextSession {
 }
 
 export interface ClientDashboardData {
-  name: string;
-  email: string;
-  phone: string | null;
-  google_meet_link: string | null;
-  completed_sessions: number;
-  absent_sessions: number;
-  next_session: NextSession | null;
+  profile: {
+    name: string;
+    email: string;
+    phone: string | null;
+    google_meet_link: string | null;
+  };
+  stats: {
+    completed_sessions: number;
+    absent_sessions: number;
+  };
+  next_session: {
+    id: number;
+    date: string;
+    time: string | null;
+    weekday: string;
+    session_type: string;
+    status: string;
+  } | null;
+  notes: PatientNote[];
 }
 
 export interface PatientNote {
