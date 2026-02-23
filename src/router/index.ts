@@ -15,6 +15,15 @@ import type { Role } from "@/services/auth";
 
 const routes: RouteRecordRaw[] = [
   {
+    path: "/trocar-senha",
+    name: "change-password",
+    component: () => import("../views/ChangePasswordView.vue"),
+    meta: {
+      requiresAuth: true,
+      role: "client" as Role,
+    },
+  },
+  {
     path: "/",
     name: "home",
     component: HomeView,

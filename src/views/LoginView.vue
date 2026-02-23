@@ -123,19 +123,19 @@
 
             <div class="flex justify-between items-center">
               <button
-              type="button"
-              @click="showForgot = true"
-              class="text-sm font-body text-primary hover:underline"
-            >
-              Esqueceu a senha?
-            </button>
+                type="button"
+                @click="showForgot = true"
+                class="text-sm font-body text-primary hover:underline"
+              >
+                Esqueceu a senha?
+              </button>
 
-            <router-link
-              to="/cadastro"
-              class="text-sm font-body text-primary hover:underline"
-            >
-              Não tem uma conta?
-            </router-link>
+              <router-link
+                to="/cadastro"
+                class="text-sm font-body text-primary hover:underline"
+              >
+                Não tem uma conta?
+              </router-link>
             </div>
 
             <Button
@@ -178,14 +178,18 @@ const handleSubmit = async () => {
   try {
     await login(email.value, password.value);
 
-    const redirect = route.query.redirect as string | undefined;
+    const userRaw = localStorage.getItem("auth_user");
+    const user = userRaw ? JSON.parse(userRaw) : null;
 
+    if (user?.must_change_password && user?.role === "client") {
+      router.push("/trocar-senha");
+      return;
+    }
+
+    const redirect = route.query.redirect as string | undefined;
     if (redirect) {
       router.push(redirect);
     } else {
-      const userRaw = localStorage.getItem("auth_user");
-      const user = userRaw ? JSON.parse(userRaw) : null;
-
       if (user?.role === "therapist") {
         router.push("/terapeuta");
       } else {
