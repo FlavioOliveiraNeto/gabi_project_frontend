@@ -1,45 +1,78 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
-      <h2 class="text-2xl font-bold mb-4 text-center">Trocar senha</h2>
-      <form @submit.prevent="handleChangePassword">
-        <div class="mb-4">
-          <label class="block mb-1">Nova senha</label>
-          <input
-            v-model="newPassword"
-            type="password"
-            class="w-full border rounded px-3 py-2"
-            required
-          />
+  <div class="min-h-screen bg-lavender-light flex items-center justify-center px-4">
+    <div class="w-full max-w-md">
+      <div class="bg-card border border-border/50 rounded-2xl p-8 shadow-sm space-y-5">
+        <div>
+          <h2 class="font-display text-2xl text-primary text-center">Trocar senha</h2>
+          <p class="font-body text-sm text-muted-foreground text-center mt-1">
+            Crie uma senha pessoal para continuar
+          </p>
         </div>
-        <div class="mb-4">
-          <label class="block mb-1">Confirme a nova senha</label>
-          <input
-            v-model="confirmPassword"
-            type="password"
-            class="w-full border rounded px-3 py-2"
-            required
-          />
+
+        <!-- Passo: formulário -->
+        <form v-if="!success" @submit.prevent="handleChangePassword" class="space-y-4">
+          <div class="space-y-1.5">
+            <label class="font-body text-sm font-medium text-foreground">Nova senha</label>
+            <input
+              v-model="newPassword"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+              required
+            />
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="font-body text-sm font-medium text-foreground">Confirme a nova senha</label>
+            <input
+              v-model="confirmPassword"
+              type="password"
+              placeholder="Repita a senha"
+              class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+              required
+            />
+          </div>
+
+          <p
+            v-if="error"
+            class="text-sm text-destructive font-body text-center bg-destructive/10 rounded-lg py-2 px-3"
+          >
+            {{ error }}
+          </p>
+
+          <button
+            type="submit"
+            :disabled="isLoading"
+            class="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition"
+          >
+            {{ isLoading ? "Salvando..." : "Definir nova senha" }}
+          </button>
+        </form>
+
+        <!-- Passo: confirmação — informa que deve fazer login novamente -->
+        <div v-else class="text-center space-y-4">
+          <div class="flex justify-center">
+            <div class="p-3 rounded-full bg-green-100">
+              <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
+          <p class="font-display text-lg text-foreground">Senha alterada com sucesso!</p>
+          <p class="font-body text-sm text-muted-foreground">
+            Por segurança, faça login novamente com sua nova senha.
+          </p>
+          <p class="font-body text-xs text-muted-foreground">
+            Redirecionando em {{ countdown }}s...
+          </p>
         </div>
-        <button
-          type="submit"
-          class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          Trocar senha
-        </button>
-        <div v-if="error" class="text-red-600 mt-2 text-center">
-          {{ error }}
-        </div>
-        <div v-if="success" class="text-green-600 mt-2 text-center">
-          Senha alterada com sucesso!
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import api from "@/services/api";
 
@@ -48,25 +81,55 @@ const newPassword = ref("");
 const confirmPassword = ref("");
 const error = ref("");
 const success = ref(false);
+const isLoading = ref(false);
+const countdown = ref(3);
+
+let countdownInterval: ReturnType<typeof setInterval> | null = null;
+
+onUnmounted(() => {
+  if (countdownInterval) clearInterval(countdownInterval);
+});
 
 const handleChangePassword = async () => {
   error.value = "";
-  success.value = false;
+
   if (newPassword.value !== confirmPassword.value) {
     error.value = "As senhas não coincidem.";
     return;
   }
+
+  if (newPassword.value.length < 6) {
+    error.value = "A senha deve ter pelo menos 6 caracteres.";
+    return;
+  }
+
+  isLoading.value = true;
   try {
     await api.put("/users/change_password", {
       password: newPassword.value,
       password_confirmation: confirmPassword.value,
     });
+
+    // O backend revogou o JWT atual — limpar sessão local imediatamente.
+    // Qualquer tentativa de usar o token antigo resultará em 401.
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("auth_user");
+
     success.value = true;
-    setTimeout(() => {
-      router.push("/paciente");
-    }, 1500);
-  } catch (e) {
-    error.value = "Erro ao trocar a senha.";
+
+    // Countdown e redirect para login
+    countdownInterval = setInterval(() => {
+      countdown.value -= 1;
+      if (countdown.value <= 0) {
+        clearInterval(countdownInterval!);
+        router.push({ name: "login" });
+      }
+    }, 1000);
+  } catch (e: any) {
+    const msg = e?.response?.data?.error;
+    error.value = msg ?? "Erro ao trocar a senha. Tente novamente.";
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>

@@ -397,6 +397,7 @@ async function handleCreateSession(payload: {
     const newSession = await createSession({
       patient_id: payload.patientId,
       scheduled_at: payload.datetime,
+      session_type: "extra",
     });
 
     props.sessions.push(newSession);

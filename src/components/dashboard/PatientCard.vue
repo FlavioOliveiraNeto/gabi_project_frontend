@@ -49,9 +49,9 @@
             <span
               class="font-body text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-medium cursor-pointer"
             >
-              {{ patient.single_sessions.length }}
+              {{ (patient.single_sessions ?? []).length }}
               {{
-                patient.single_sessions.length > 1
+                (patient.single_sessions ?? []).length > 1
                   ? "sessões agendadas"
                   : "sessão agendada"
               }}
@@ -62,7 +62,7 @@
               class="absolute left-1/2 -translate-x-1/2 mt-2 w-max max-w-xs opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 bg-card border border-border rounded-lg shadow-lg p-3 z-50"
             >
               <div
-                v-for="s in patient.single_sessions"
+                v-for="s in patient.single_sessions ?? []"
                 :key="s.id"
                 class="text-xs font-body text-foreground whitespace-nowrap flex items-center gap-2"
               >
@@ -159,6 +159,7 @@
         Anotações clínicas (visíveis apenas para você)
       </p>
 
+      <!-- Nova anotação -->
       <div class="mb-3">
         <textarea
           v-model="newNote"
@@ -176,21 +177,69 @@
         </button>
       </div>
 
-      <div v-if="patient.clinical_notes.length > 0" class="space-y-2">
+      <!-- Lista de anotações -->
+      <div v-if="localNotes.length > 0" class="space-y-2">
         <div
-          v-for="note in patient.clinical_notes"
+          v-for="note in localNotes"
           :key="note.id"
-          class="border border-border/20 rounded-lg p-3"
+          class="border border-border/20 rounded-lg p-3 group"
         >
-          <div class="flex items-center gap-1.5 mb-1.5">
-            <Clock4 class="w-3 h-3 text-muted-foreground" />
-            <span class="font-body text-xs text-muted-foreground">
-              {{ formatDate(note.created_at) }}
-            </span>
-          </div>
-          <p class="font-body text-sm text-foreground leading-relaxed">
-            {{ note.content }}
-          </p>
+          <!-- Modo edição -->
+          <template v-if="editingNoteId === note.id">
+            <textarea
+              v-model="editingContent"
+              rows="3"
+              class="w-full text-sm font-body border border-border/50 rounded-lg p-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition mb-2"
+            ></textarea>
+            <div class="flex gap-2">
+              <button
+                @click="confirmEdit(note.id)"
+                :disabled="!editingContent.trim() || savingEdit"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-body text-xs font-medium hover:bg-primary/90 disabled:opacity-40 transition"
+              >
+                <Save class="w-3 h-3" />
+                {{ savingEdit ? "Salvando..." : "Salvar" }}
+              </button>
+              <button
+                @click="cancelEdit"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/60 font-body text-xs font-medium hover:bg-muted transition"
+              >
+                <X class="w-3 h-3" />
+                Cancelar
+              </button>
+            </div>
+          </template>
+
+          <!-- Modo visualização -->
+          <template v-else>
+            <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center gap-1.5">
+                <Clock4 class="w-3 h-3 text-muted-foreground" />
+                <span class="font-body text-xs text-muted-foreground">
+                  {{ formatDate(note.created_at) }}
+                </span>
+              </div>
+              <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                <button
+                  @click="startEdit(note)"
+                  class="p-1 rounded hover:bg-muted transition"
+                  title="Editar anotação"
+                >
+                  <Pencil class="w-3 h-3 text-muted-foreground" />
+                </button>
+                <button
+                  @click="deleteNote(note.id)"
+                  class="p-1 rounded hover:bg-destructive/10 transition"
+                  title="Excluir anotação"
+                >
+                  <Trash2 class="w-3 h-3 text-destructive" />
+                </button>
+              </div>
+            </div>
+            <p class="font-body text-sm text-foreground leading-relaxed">
+              {{ note.content }}
+            </p>
+          </template>
         </div>
       </div>
       <div v-else class="text-center py-4">
@@ -213,10 +262,17 @@ import {
   Trash2,
   Save,
   Clock4,
+  X,
 } from "lucide-vue-next";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { createClinicalNote, type PatientUser } from "@/services/dashboard";
+import {
+  createClinicalNote,
+  updateClinicalNote,
+  deleteClinicalNote,
+  type PatientUser,
+  type ClinicalNote,
+} from "@/services/dashboard";
 
 const props = defineProps<{
   patient: PatientUser;
@@ -240,16 +296,85 @@ const WEEKDAY_LABELS: Record<string, string> = {
   saturday: "Sáb",
 };
 
-const newNote = ref("");
-const savingNote = ref(false);
+// ── Estado local de notas (evita mutação direta da prop) ──────────────────
+const localNotes = ref<ClinicalNote[]>([...(props.patient.clinical_notes ?? [])]);
 
+// Sincroniza quando o painel reabre (parent pode ter recarregado os dados)
 watch(
   () => props.isOpen,
-  () => {
+  (opened) => {
+    if (opened) {
+      localNotes.value = [...(props.patient.clinical_notes ?? [])];
+    }
     newNote.value = "";
+    cancelEdit();
   },
 );
 
+// ── Criar nota ────────────────────────────────────────────────────────────
+const newNote = ref("");
+const savingNote = ref(false);
+
+async function saveNote() {
+  const text = newNote.value.trim();
+  if (!text || savingNote.value) return;
+
+  savingNote.value = true;
+  try {
+    const note = await createClinicalNote(props.patient.id, text);
+    localNotes.value.unshift(note);
+    emit("note-saved", props.patient.id, note);
+    newNote.value = "";
+  } catch {
+    // silencioso — toast pode ser adicionado futuramente
+  } finally {
+    savingNote.value = false;
+  }
+}
+
+// ── Editar nota ───────────────────────────────────────────────────────────
+const editingNoteId = ref<number | null>(null);
+const editingContent = ref("");
+const savingEdit = ref(false);
+
+function startEdit(note: ClinicalNote) {
+  editingNoteId.value = note.id;
+  editingContent.value = note.content;
+}
+
+function cancelEdit() {
+  editingNoteId.value = null;
+  editingContent.value = "";
+}
+
+async function confirmEdit(noteId: number) {
+  const text = editingContent.value.trim();
+  if (!text || savingEdit.value) return;
+
+  savingEdit.value = true;
+  try {
+    const updated = await updateClinicalNote(props.patient.id, noteId, text);
+    const idx = localNotes.value.findIndex((n) => n.id === noteId);
+    if (idx !== -1) localNotes.value[idx] = updated;
+    cancelEdit();
+  } catch {
+    // silencioso
+  } finally {
+    savingEdit.value = false;
+  }
+}
+
+// ── Excluir nota ──────────────────────────────────────────────────────────
+async function deleteNote(noteId: number) {
+  try {
+    await deleteClinicalNote(props.patient.id, noteId);
+    localNotes.value = localNotes.value.filter((n) => n.id !== noteId);
+  } catch {
+    // silencioso
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
 function initials(name: string) {
   return name
     .split(" ")
@@ -280,21 +405,5 @@ function statusLabel(status: string): string {
   if (status === "completed") return "Concluída";
   if (status === "absent") return "Falta";
   return status;
-}
-
-async function saveNote() {
-  const text = newNote.value.trim();
-  if (!text || savingNote.value) return;
-
-  savingNote.value = true;
-  try {
-    const note = await createClinicalNote(props.patient.id, text);
-    emit("note-saved", props.patient.id, note);
-    newNote.value = "";
-  } catch {
-    // Tratar erro se necessário
-  } finally {
-    savingNote.value = false;
-  }
 }
 </script>

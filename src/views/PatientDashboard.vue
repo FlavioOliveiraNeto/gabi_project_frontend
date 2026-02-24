@@ -194,21 +194,61 @@
               :key="note.id"
               class="border border-border/20 rounded-lg p-3 group relative"
             >
-              <div class="flex items-center justify-between mb-1">
-                <p class="text-xs text-muted-foreground font-body">
-                  {{ formatDate(note.created_at) }}
-                </p>
-                <button
-                  @click="removeNote(note.id)"
-                  class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-destructive/10 transition"
-                >
-                  <Trash2 class="w-3.5 h-3.5 text-destructive" />
-                </button>
-              </div>
+              <!-- Modo edição -->
+              <template v-if="editingNoteId === note.id">
+                <textarea
+                  v-model="editingContent"
+                  rows="3"
+                  class="w-full text-sm font-body border border-border/50 rounded-lg p-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition mb-2"
+                ></textarea>
+                <div class="flex gap-2">
+                  <button
+                    @click="confirmEdit(note.id)"
+                    :disabled="!editingContent.trim() || savingEdit"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-body text-xs font-medium hover:bg-primary/90 disabled:opacity-40 transition"
+                  >
+                    <Save class="w-3 h-3" />
+                    {{ savingEdit ? "Salvando..." : "Salvar" }}
+                  </button>
+                  <button
+                    @click="cancelEdit"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/60 font-body text-xs font-medium hover:bg-muted transition"
+                  >
+                    <X class="w-3 h-3" />
+                    Cancelar
+                  </button>
+                </div>
+              </template>
 
-              <p class="text-sm text-foreground font-body leading-relaxed">
-                {{ note.content }}
-              </p>
+              <!-- Modo visualização -->
+              <template v-else>
+                <div class="flex items-center justify-between mb-1">
+                  <p class="text-xs text-muted-foreground font-body">
+                    {{ formatDate(note.created_at) }}
+                  </p>
+                  <div
+                    class="flex gap-1 opacity-0 group-hover:opacity-100 transition"
+                  >
+                    <button
+                      @click="startEdit(note)"
+                      class="p-1 rounded hover:bg-muted transition"
+                      title="Editar anotação"
+                    >
+                      <Pencil class="w-3.5 h-3.5 text-muted-foreground" />
+                    </button>
+                    <button
+                      @click="removeNote(note.id)"
+                      class="p-1 rounded hover:bg-destructive/10 transition"
+                      title="Excluir anotação"
+                    >
+                      <Trash2 class="w-3.5 h-3.5 text-destructive" />
+                    </button>
+                  </div>
+                </div>
+                <p class="text-sm text-foreground font-body leading-relaxed">
+                  {{ note.content }}
+                </p>
+              </template>
             </div>
           </div>
 
@@ -234,12 +274,16 @@ import {
   FileText,
   CheckCircle,
   Trash2,
+  Pencil,
+  Save,
+  X,
 } from "lucide-vue-next";
 import NavBar from "@/components/NavBar.vue";
 import { format, parseISO, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   createPatientNote,
+  updatePatientNote,
   deletePatientNote,
   getClientDashboard,
   type ClientDashboardData,
@@ -308,6 +352,36 @@ async function saveNote() {
 
 async function removeNote(id: number) {
   await deletePatientNote(id);
-  notes.value = notes.value.filter((n) => n.id !== id);
+  notes.value = notes.value.filter((n: PatientNote) => n.id !== id);
+}
+
+// ── Edição de notas ───────────────────────────────────────────────────────
+const editingNoteId = ref<number | null>(null);
+const editingContent = ref("");
+const savingEdit = ref(false);
+
+function startEdit(note: PatientNote) {
+  editingNoteId.value = note.id;
+  editingContent.value = note.content;
+}
+
+function cancelEdit() {
+  editingNoteId.value = null;
+  editingContent.value = "";
+}
+
+async function confirmEdit(noteId: number) {
+  const text = editingContent.value.trim();
+  if (!text || savingEdit.value) return;
+
+  savingEdit.value = true;
+  try {
+    const updated = await updatePatientNote(noteId, text);
+    const idx = notes.value.findIndex((n: PatientNote) => n.id === noteId);
+    if (idx !== -1) notes.value[idx] = updated;
+    cancelEdit();
+  } finally {
+    savingEdit.value = false;
+  }
 }
 </script>

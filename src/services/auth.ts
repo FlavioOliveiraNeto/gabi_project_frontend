@@ -7,6 +7,7 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  must_change_password?: boolean;
 }
 
 export interface LoginResult {

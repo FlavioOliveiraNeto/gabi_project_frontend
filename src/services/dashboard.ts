@@ -9,15 +9,24 @@ export interface ClinicalNote {
   created_at: string;
 }
 
+export interface SingleSession {
+  id: number;
+  date: string;
+  time: string;
+  status: string;
+}
+
 export interface PatientUser {
   id: number;
   name: string;
   email: string;
   google_meet_link: string | null;
-  created_at: string;
+  created_at?: string;
+  schedule_type?: "weekly" | "single" | null;
   sessions_per_week: number;
   session_days: string[];
   session_time: string | null;
+  single_sessions?: SingleSession[];
   completed_sessions: number;
   absent_sessions: number;
   clinical_notes: ClinicalNote[];
@@ -82,7 +91,7 @@ export interface CalendarSession {
   id: number;
   date: string;
   time: string;
-  status: "scheduled" | "completed" | "absent";
+  status: "scheduled" | "completed" | "absent" | "cancelled";
   patient: {
     id: number;
     name: string;
@@ -110,10 +119,14 @@ export async function getPatients(): Promise<PatientUser[]> {
   return data;
 }
 
+export interface CreatePatientResponse extends PatientUser {
+  generated_password: string;
+}
+
 export async function createPatient(
   params: CreatePatientParams,
-): Promise<PatientUser> {
-  const { data } = await api.post<PatientUser>("/therapists/patients", params);
+): Promise<CreatePatientResponse> {
+  const { data } = await api.post<CreatePatientResponse>("/therapists/patients", params);
   return data;
 }
 
@@ -141,6 +154,25 @@ export async function createClinicalNote(
     { content },
   );
   return data;
+}
+
+export async function updateClinicalNote(
+  patientId: number,
+  noteId: number,
+  content: string,
+): Promise<ClinicalNote> {
+  const { data } = await api.patch<ClinicalNote>(
+    `/therapists/patients/${patientId}/notes/${noteId}`,
+    { content },
+  );
+  return data;
+}
+
+export async function deleteClinicalNote(
+  patientId: number,
+  noteId: number,
+): Promise<void> {
+  await api.delete(`/therapists/patients/${patientId}/notes/${noteId}`);
 }
 
 export async function updateSessionStatus(
@@ -178,6 +210,16 @@ export async function getPatientNotes(): Promise<PatientNote[]> {
 
 export async function createPatientNote(content: string): Promise<PatientNote> {
   const { data } = await api.post<PatientNote>("/clients/patient_notes", {
+    content,
+  });
+  return data;
+}
+
+export async function updatePatientNote(
+  id: number,
+  content: string,
+): Promise<PatientNote> {
+  const { data } = await api.patch<PatientNote>(`/clients/patient_notes/${id}`, {
     content,
   });
   return data;

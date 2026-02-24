@@ -91,6 +91,14 @@ router.beforeEach((to) => {
     return { name: "login" };
   }
 
+  if (
+    user?.role === "client" &&
+    user?.must_change_password &&
+    to.name !== "change-password"
+  ) {
+    return { name: "change-password" };
+  }
+
   if (to.name === "login" && token) {
     if (user?.role === "therapist") {
       return { name: "terapeuta" };

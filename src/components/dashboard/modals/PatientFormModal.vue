@@ -8,6 +8,55 @@
       <div
         class="bg-card rounded-2xl shadow-lg w-full max-w-lg p-6 overflow-y-auto max-h-[90vh]"
       >
+        <!-- ── Passo 2: exibição da senha gerada ─────────────────────── -->
+        <div v-if="showPasswordStep" class="space-y-5">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-full bg-green-100">
+              <KeyRound class="w-5 h-5 text-green-600" />
+            </div>
+            <h2 class="font-display text-xl text-foreground">Paciente cadastrado!</h2>
+          </div>
+
+          <p class="font-body text-sm text-muted-foreground">
+            Anote a senha temporária abaixo e entregue ao paciente. Ela
+            <strong class="text-foreground">não será exibida novamente</strong>.
+          </p>
+
+          <div class="rounded-xl border border-amber-300 bg-amber-50 p-4 space-y-2">
+            <p class="font-body text-xs font-semibold text-amber-700 uppercase tracking-wide">
+              Senha temporária
+            </p>
+            <div class="flex items-center gap-3">
+              <code class="font-mono text-2xl font-bold tracking-widest text-amber-900 select-all">
+                {{ generatedPassword }}
+              </code>
+              <button
+                type="button"
+                @click="copyPassword"
+                class="ml-auto p-2 rounded-lg hover:bg-amber-100 transition"
+                :title="copied ? 'Copiado!' : 'Copiar senha'"
+              >
+                <ClipboardCheck v-if="copied" class="w-4 h-4 text-green-600" />
+                <Clipboard v-else class="w-4 h-4 text-amber-700" />
+              </button>
+            </div>
+          </div>
+
+          <p class="font-body text-xs text-muted-foreground">
+            O paciente será obrigado a trocar esta senha no primeiro login.
+          </p>
+
+          <button
+            type="button"
+            @click="confirmPasswordCopied"
+            class="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 transition"
+          >
+            Entendi, fechar
+          </button>
+        </div>
+
+        <!-- ── Passo 1: formulário ────────────────────────────────────── -->
+        <template v-else>
         <div class="flex items-center justify-between mb-5">
           <h2 class="font-display text-xl text-foreground">
             {{ isEditing ? "Editar paciente" : "Adicionar paciente" }}
@@ -189,6 +238,7 @@
             </button>
           </div>
         </form>
+        </template>
       </div>
     </div>
   </Teleport>
@@ -196,7 +246,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch, computed } from "vue";
-import { X } from "lucide-vue-next";
+import { X, KeyRound, Clipboard, ClipboardCheck } from "lucide-vue-next";
 import {
   createPatient,
   updatePatient,
@@ -228,6 +278,11 @@ const modalLoading = ref(false);
 const modalError = ref("");
 const modalErrors = reactive<Record<string, string>>({});
 
+// Passo de exibição da senha gerada
+const showPasswordStep = ref(false);
+const generatedPassword = ref("");
+const copied = ref(false);
+
 const modalForm = reactive({
   name: "",
   email: "",
@@ -253,6 +308,9 @@ function resetModal() {
   modalForm.schedule_type = "weekly";
   modalForm.single_date = "";
   modalForm.single_time = "";
+  showPasswordStep.value = false;
+  generatedPassword.value = "";
+  copied.value = false;
 }
 
 watch(
@@ -330,11 +388,14 @@ async function handleSubmit() {
     if (isEditing.value && props.patientToEdit) {
       const updated = await updatePatient(props.patientToEdit.id, payload);
       emit("saved", updated, false);
+      closeModal();
     } else {
       const created = await createPatient(payload);
+      // Exibe a senha gerada antes de fechar — spec item 7
+      generatedPassword.value = created.generated_password;
+      showPasswordStep.value = true;
       emit("saved", created, true);
     }
-    closeModal();
   } catch (err: any) {
     const msgs = err?.response?.data?.errors;
     modalError.value = Array.isArray(msgs)
@@ -343,5 +404,19 @@ async function handleSubmit() {
   } finally {
     modalLoading.value = false;
   }
+}
+
+async function copyPassword() {
+  try {
+    await navigator.clipboard.writeText(generatedPassword.value);
+    copied.value = true;
+    setTimeout(() => (copied.value = false), 2000);
+  } catch {
+    // fallback silencioso se clipboard API não estiver disponível
+  }
+}
+
+function confirmPasswordCopied() {
+  emit("close");
 }
 </script>
