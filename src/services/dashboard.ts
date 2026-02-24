@@ -92,6 +92,7 @@ export interface CalendarSession {
   date: string;
   time: string;
   status: "scheduled" | "completed" | "absent" | "cancelled";
+  session_type: "regular" | "extra";
   patient: {
     id: number;
     name: string;
@@ -177,7 +178,7 @@ export async function deleteClinicalNote(
 
 export async function updateSessionStatus(
   sessionId: number,
-  status: "scheduled" | "completed" | "absent",
+  status: "scheduled" | "completed" | "absent" | "cancelled",
 ): Promise<CalendarSession> {
   const { data } = await api.patch<CalendarSession>(
     `/therapists/sessions/${sessionId}`,

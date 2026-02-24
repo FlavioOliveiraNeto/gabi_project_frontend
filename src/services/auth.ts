@@ -27,6 +27,24 @@ export async function registerRequest(params: RegisterParams): Promise<void> {
   await api.post("/users", { user: params });
 }
 
+export async function requestPasswordReset(email: string): Promise<void> {
+  await api.post("/users/password", { user: { email } });
+}
+
+export async function confirmPasswordReset(
+  token: string,
+  password: string,
+  passwordConfirmation: string,
+): Promise<void> {
+  await api.put("/users/password", {
+    user: {
+      reset_password_token: token,
+      password,
+      password_confirmation: passwordConfirmation,
+    },
+  });
+}
+
 export async function loginRequest(
   email: string,
   password: string,

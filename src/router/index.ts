@@ -24,6 +24,12 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    // Rota pública: link enviado por e-mail para redefinição de senha
+    path: "/reset-senha",
+    name: "reset-password",
+    component: () => import("../views/ResetPasswordView.vue"),
+  },
+  {
     path: "/",
     name: "home",
     component: HomeView,
@@ -94,7 +100,8 @@ router.beforeEach((to) => {
   if (
     user?.role === "client" &&
     user?.must_change_password &&
-    to.name !== "change-password"
+    to.name !== "change-password" &&
+    to.name !== "reset-password"
   ) {
     return { name: "change-password" };
   }

@@ -61,11 +61,19 @@
                 />
               </div>
 
+              <p
+                v-if="forgotError"
+                class="bg-red-100 text-red-600 text-sm font-body p-3 rounded-md"
+              >
+                {{ forgotError }}
+              </p>
+
               <button
                 type="submit"
-                class="w-full bg-primary text-white rounded-full py-2 font-body"
+                :disabled="forgotLoading"
+                class="w-full bg-primary text-white rounded-full py-2 font-body disabled:opacity-50"
               >
-                Enviar link de recuperação
+                {{ forgotLoading ? "Enviando..." : "Enviar link de recuperação" }}
               </button>
 
               <button
@@ -157,6 +165,7 @@
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
+import { requestPasswordReset } from "@/services/auth";
 import { Eye, EyeOff } from "lucide-vue-next";
 import LogoComponent from "@/components/LogoComponent.vue";
 import Button from "@/components/ui/button/Button.vue";
@@ -201,7 +210,26 @@ const handleSubmit = async () => {
   }
 };
 
-const handleForgotPassword = () => {
-  forgotSent.value = true;
+const forgotLoading = ref(false);
+const forgotError = ref("");
+
+const handleForgotPassword = async () => {
+  if (!forgotEmail.value.trim()) return;
+
+  forgotLoading.value = true;
+  forgotError.value = "";
+
+  try {
+    await requestPasswordReset(forgotEmail.value.trim());
+    // Sempre exibe a mensagem genérica — não revelamos se o e-mail existe ou não
+    forgotSent.value = true;
+  } catch (e: any) {
+    const msgs = e?.response?.data?.errors;
+    forgotError.value = Array.isArray(msgs)
+      ? msgs.join(", ")
+      : "Não foi possível enviar o e-mail. Tente novamente.";
+  } finally {
+    forgotLoading.value = false;
+  }
 };
 </script>

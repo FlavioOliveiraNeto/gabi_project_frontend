@@ -106,8 +106,8 @@
           :key="session.id"
           class="border border-border/30 rounded-xl p-4 flex items-center justify-between"
         >
-          <div class="flex items-center gap-3">
-            <div>
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="shrink-0">
               <Check
                 v-if="session.status === 'completed'"
                 class="w-4 h-4 text-green-500"
@@ -118,51 +118,91 @@
                 class="w-4 h-4 text-red-500"
               />
 
+              <Ban
+                v-else-if="session.status === 'cancelled'"
+                class="w-4 h-4 text-muted-foreground"
+              />
+
               <Clock v-else class="w-4 h-4 text-yellow-500" />
             </div>
 
             <div
-              class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-body text-sm font-semibold text-primary"
+              class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-body text-sm font-semibold text-primary shrink-0"
             >
               {{ initials(session.patient?.name) }}
             </div>
 
-            <div>
-              <p class="font-body font-semibold text-sm text-foreground">
-                {{ session.patient?.name ?? "Paciente" }}
-              </p>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <p class="font-body font-semibold text-sm text-foreground">
+                  {{ session.patient?.name ?? "Paciente" }}
+                </p>
+                <span
+                  v-if="session.session_type === 'extra'"
+                  class="px-1.5 py-0.5 rounded text-xs font-body font-medium bg-amber-100 text-amber-700"
+                >
+                  Extra
+                </span>
+              </div>
               <p class="font-body text-xs text-muted-foreground">
                 {{ session.time }}
               </p>
             </div>
           </div>
 
-          <button
-            v-if="session.status === 'completed'"
-            @click="confirmAbsent(session)"
-            class="text-xs text-red-500 hover:underline"
-          >
-            Registrar falta
-          </button>
+          <!-- Ações por status -->
+          <div class="flex flex-col items-end gap-1 shrink-0">
+            <!-- Completada: registrar falta ou cancelar -->
+            <template v-if="session.status === 'completed'">
+              <button
+                @click="confirmAbsent(session)"
+                class="text-xs text-red-500 hover:underline whitespace-nowrap"
+              >
+                Registrar falta
+              </button>
+              <button
+                @click="confirmCancel(session)"
+                class="text-xs text-muted-foreground hover:underline whitespace-nowrap"
+              >
+                Cancelar sessão
+              </button>
+            </template>
 
-          <div v-if="!isSelectedDatePast && session.status == 'scheduled'">
-            <a
-              v-if="session.patient?.google_meet_link"
-              :href="session.patient.google_meet_link"
-              target="_blank"
-              class="flex items-center gap-1 text-xs font-body font-medium text-secondary hover:underline"
-            >
-              <Video class="w-3.5 h-3.5" />
-              Google Meet
-            </a>
+            <!-- Falta: pode cancelar -->
             <button
-              v-else
-              @click="emit('edit-patient', session.patient.id)"
-              class="flex items-center gap-1 text-xs font-body font-medium text-orange-500 hover:underline"
+              v-else-if="session.status === 'absent'"
+              @click="confirmCancel(session)"
+              class="text-xs text-muted-foreground hover:underline whitespace-nowrap"
             >
-              <Video class="w-3.5 h-3.5" />
-              Adicionar link do Google Meet
+              Cancelar sessão
             </button>
+
+            <!-- Agendada: link do meet -->
+            <div v-else-if="!isSelectedDatePast && session.status === 'scheduled'" class="flex flex-col justify-end items-end gap-1">
+              <a
+                v-if="session.patient?.google_meet_link"
+                :href="session.patient.google_meet_link"
+                target="_blank"
+                class="flex items-center gap-1 text-xs font-body font-medium text-secondary hover:underline"
+              >
+                <Video class="w-3.5 h-3.5" />
+                Google Meet
+              </a>
+              <button
+                v-else
+                @click="emit('edit-patient', session.patient.id)"
+                class="flex items-center gap-1 text-xs font-body font-medium text-orange-500 hover:underline"
+              >
+                <Video class="w-3.5 h-3.5" />
+                Adicionar link do Meet
+              </button>
+              <button
+                @click="confirmCancel(session)"
+                class="text-xs text-muted-foreground hover:underline whitespace-nowrap"
+              >
+                Cancelar sessão
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -174,6 +214,41 @@
       @close="closeAbsentModal"
       @absent="handleSessionAbsent"
     />
+
+    <!-- Modal de confirmação de cancelamento -->
+    <Teleport to="body">
+      <div
+        v-if="showCancelModal && cancelTarget"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+        @click.self="closeCancelModal"
+      >
+        <div class="bg-card rounded-2xl shadow-lg w-full max-w-sm p-6">
+          <p class="font-body text-base text-muted-foreground mb-6">
+            Tem certeza que deseja cancelar esta sessão?
+          </p>
+          <div class="flex flex-col gap-2 mb-4">
+            <p class="font-bold">Dados da sessão:</p>
+            <p class="ml-4">Paciente: {{ cancelTarget.patient?.name }}</p>
+            <p class="ml-4">Data: {{ cancelTarget.date }}</p>
+            <p class="ml-4">Horário: {{ cancelTarget.time }}</p>
+          </div>
+          <div class="flex gap-3">
+            <button
+              @click="closeCancelModal"
+              class="flex-1 py-2.5 rounded-lg border border-border/60 font-body text-sm font-medium hover:bg-muted transition"
+            >
+              Voltar
+            </button>
+            <button
+              @click="handleSessionCancelled(cancelTarget.id)"
+              class="flex-1 py-2.5 rounded-lg bg-muted text-foreground font-body text-sm font-medium hover:bg-muted/80 transition"
+            >
+              Cancelar sessão
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
 
     <ConfirmAddSessionModal
       :is-open="showCreateSessionModal"
@@ -188,6 +263,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import {
+  Ban,
   Calendar as CalendarIcon,
   CalendarPlus,
   Check,
@@ -310,6 +386,9 @@ const totalPages = computed(
 const showAbsentModal = ref(false);
 const absentTarget = ref<CalendarSession | null>(null);
 
+const showCancelModal = ref(false);
+const cancelTarget = ref<CalendarSession | null>(null);
+
 const showCreateSessionModal = ref(false);
 const createSessionLoading = ref(false);
 const selectedPatientId = ref<number | null>(null);
@@ -374,6 +453,33 @@ async function handleSessionAbsent(sessionId: number) {
     console.error("Erro ao marcar falta:", error);
   } finally {
     closeAbsentModal();
+  }
+}
+
+/* ---------------------------
+   Cancel Modal
+---------------------------- */
+function confirmCancel(session: CalendarSession) {
+  cancelTarget.value = session;
+  showCancelModal.value = true;
+}
+
+function closeCancelModal() {
+  showCancelModal.value = false;
+  cancelTarget.value = null;
+}
+
+async function handleSessionCancelled(sessionId: number) {
+  try {
+    const updated = await updateSessionStatus(sessionId, "cancelled");
+    const session = sessionsOfSelectedDay.value.find((s) => s.id === sessionId);
+    if (session) {
+      session.status = updated.status;
+    }
+  } catch (error) {
+    console.error("Erro ao cancelar sessão:", error);
+  } finally {
+    closeCancelModal();
   }
 }
 

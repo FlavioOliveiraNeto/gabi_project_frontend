@@ -1,5 +1,6 @@
 import { ref, computed } from "vue";
 import { loginRequest, type User } from "@/services/auth";
+import api from "@/services/api";
 
 const user = ref<User | null>(
   localStorage.getItem("auth_user")
@@ -29,10 +30,17 @@ const login = async (email: string, password: string) => {
   }
 };
 
-const logout = () => {
-  localStorage.removeItem("auth_token");
-  localStorage.removeItem("auth_user");
-  user.value = null;
+const logout = async () => {
+  try {
+    // Revoga o JWT no backend para que o token não possa ser reutilizado
+    await api.delete("/users/sign_out");
+  } catch {
+    // Falha silenciosa: limpa a sessão local mesmo se a chamada falhar
+  } finally {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("auth_user");
+    user.value = null;
+  }
 };
 
 export function useAuth() {
