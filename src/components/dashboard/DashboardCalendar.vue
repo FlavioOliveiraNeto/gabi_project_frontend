@@ -86,11 +86,9 @@
           </button>
         </div>
         <CalendarPlus
-          v-if="!isSelectedDatePast"
           @click="openCreateSessionModal"
           class="w-5 h-5 text-primary cursor-pointer hover:rotate-10 transition"
-          alt="Adicionar sessão no dia"
-          title="Adicionar sessão no dia"
+          title="Adicionar sessão extra neste dia"
         />
       </div>
 
@@ -112,17 +110,14 @@
                 v-if="session.status === 'completed'"
                 class="w-4 h-4 text-green-500"
               />
-
               <X
                 v-else-if="session.status === 'absent'"
                 class="w-4 h-4 text-red-500"
               />
-
               <Ban
                 v-else-if="session.status === 'cancelled'"
                 class="w-4 h-4 text-muted-foreground"
               />
-
               <Clock v-else class="w-4 h-4 text-yellow-500" />
             </div>
 
@@ -150,10 +145,26 @@
             </div>
           </div>
 
-          <!-- Ações por status -->
+          <!-- ── Ações por status ──────────────────────────────────────── -->
           <div class="flex flex-col items-end gap-1 shrink-0">
+
+            <!-- Cancelada: nenhuma ação -->
+            <template v-if="session.status === 'cancelled'">
+              <span class="text-xs text-muted-foreground italic">Cancelada</span>
+            </template>
+
+            <!-- Falta: apenas cancelar -->
+            <template v-else-if="session.status === 'absent'">
+              <button
+                @click="confirmCancel(session)"
+                class="text-xs text-muted-foreground hover:underline whitespace-nowrap"
+              >
+                Cancelar sessão
+              </button>
+            </template>
+
             <!-- Completada: registrar falta ou cancelar -->
-            <template v-if="session.status === 'completed'">
+            <template v-else-if="session.status === 'completed'">
               <button
                 @click="confirmAbsent(session)"
                 class="text-xs text-red-500 hover:underline whitespace-nowrap"
@@ -168,28 +179,20 @@
               </button>
             </template>
 
-            <!-- Falta: pode cancelar -->
-            <button
-              v-else-if="session.status === 'absent'"
-              @click="confirmCancel(session)"
-              class="text-xs text-muted-foreground hover:underline whitespace-nowrap"
-            >
-              Cancelar sessão
-            </button>
-
-            <!-- Agendada: link do meet -->
-            <div v-else-if="!isSelectedDatePast && session.status === 'scheduled'" class="flex flex-col justify-end items-end gap-1">
+            <!-- Agendada (futura ou passada): falta + cancelar + meet (se futuro) -->
+            <template v-else-if="session.status === 'scheduled'">
               <a
-                v-if="session.patient?.google_meet_link"
+                v-if="!isSelectedDatePast && session.patient?.google_meet_link"
                 :href="session.patient.google_meet_link"
                 target="_blank"
+                rel="noopener noreferrer"
                 class="flex items-center gap-1 text-xs font-body font-medium text-secondary hover:underline"
               >
                 <Video class="w-3.5 h-3.5" />
                 Google Meet
               </a>
               <button
-                v-else
+                v-else-if="!isSelectedDatePast && !session.patient?.google_meet_link"
                 @click="emit('edit-patient', session.patient.id)"
                 class="flex items-center gap-1 text-xs font-body font-medium text-orange-500 hover:underline"
               >
@@ -197,12 +200,18 @@
                 Adicionar link do Meet
               </button>
               <button
+                @click="confirmAbsent(session)"
+                class="text-xs text-red-500 hover:underline whitespace-nowrap"
+              >
+                Registrar falta
+              </button>
+              <button
                 @click="confirmCancel(session)"
                 class="text-xs text-muted-foreground hover:underline whitespace-nowrap"
               >
                 Cancelar sessão
               </button>
-            </div>
+            </template>
           </div>
         </div>
       </div>
@@ -241,9 +250,10 @@
             </button>
             <button
               @click="handleSessionCancelled(cancelTarget.id)"
-              class="flex-1 py-2.5 rounded-lg bg-muted text-foreground font-body text-sm font-medium hover:bg-muted/80 transition"
+              :disabled="cancelLoading"
+              class="flex-1 py-2.5 rounded-lg bg-muted text-foreground font-body text-sm font-medium hover:bg-muted/80 disabled:opacity-50 transition"
             >
-              Cancelar sessão
+              {{ cancelLoading ? "Cancelando..." : "Cancelar sessão" }}
             </button>
           </div>
         </div>
@@ -255,7 +265,7 @@
       :date="selectedDate"
       :patients="patients"
       @close="closeCreateSessionModal"
-      @create="handleCreateSession"
+      @created="handleSessionCreated"
     />
   </div>
 </template>
@@ -289,7 +299,6 @@ import { ptBR } from "date-fns/locale";
 import {
   type CalendarSession,
   type PatientUser,
-  createSession,
   updateSessionStatus,
 } from "@/services/dashboard";
 import ConfirmAbsentModal from "@/components/dashboard/modals/ConfirmAbsentModal.vue";
@@ -343,17 +352,11 @@ const calendarCells = computed<CalendarCell[]>(() => {
   const cells: CalendarCell[] = [];
 
   for (let i = 0; i < offset; i++) {
-    cells.push({
-      day: null,
-      date: null,
-      isToday: false,
-      hasSession: false,
-    });
+    cells.push({ day: null, date: null, isToday: false, hasSession: false });
   }
 
   days.forEach((d) => {
     const key = format(d, "yyyy-MM-dd");
-
     cells.push({
       day: d.getDate(),
       date: d,
@@ -370,9 +373,9 @@ const sessionsOfSelectedDay = computed(() => {
   return sessionsByDate.value[key] ?? [];
 });
 
-const isSelectedDatePast = computed(() => {
-  return isBefore(startOfDay(selectedDate.value), startOfDay(new Date()));
-});
+const isSelectedDatePast = computed(() =>
+  isBefore(startOfDay(selectedDate.value), startOfDay(new Date())),
+);
 
 const paginatedSessions = computed(() => {
   const start = (currentPage.value - 1) * perPage;
@@ -383,45 +386,23 @@ const totalPages = computed(
   () => Math.ceil(sessionsOfSelectedDay.value.length / perPage) || 1,
 );
 
-const showAbsentModal = ref(false);
-const absentTarget = ref<CalendarSession | null>(null);
-
-const showCancelModal = ref(false);
-const cancelTarget = ref<CalendarSession | null>(null);
-
-const showCreateSessionModal = ref(false);
-const createSessionLoading = ref(false);
-const selectedPatientId = ref<number | null>(null);
-
-watch(selectedDate, () => {
-  currentPage.value = 1;
-});
+watch(selectedDate, () => { currentPage.value = 1; });
 
 function initials(name?: string) {
   if (!name) return "?";
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? "")
-    .join("");
+  return name.split(" ").filter(Boolean).slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "").join("");
 }
 
 function getCellClass(cell: CalendarCell) {
   if (!cell.day) return "cursor-default border-transparent";
-  if (cell.isToday)
-    return "bg-primary text-primary-foreground font-semibold border-transparent";
-  if (cell.hasSession)
-    return "bg-muted/60 text-foreground hover:bg-muted border-border/20";
+  if (cell.isToday) return "bg-primary text-primary-foreground font-semibold border-transparent";
+  if (cell.hasSession) return "bg-muted/60 text-foreground hover:bg-muted border-border/20";
   return "text-muted-foreground hover:bg-muted/40 border-transparent";
 }
 
-function prevMonth() {
-  calendarBase.value = subMonths(calendarBase.value, 1);
-}
-function nextMonth() {
-  calendarBase.value = addMonths(calendarBase.value, 1);
-}
+function prevMonth() { calendarBase.value = subMonths(calendarBase.value, 1); }
+function nextMonth() { calendarBase.value = addMonths(calendarBase.value, 1); }
 function selectDate(cell: CalendarCell) {
   if (!cell.date) return;
   selectedDate.value = cell.date;
@@ -430,6 +411,9 @@ function selectDate(cell: CalendarCell) {
 /* ---------------------------
    Absent Modal
 ---------------------------- */
+const showAbsentModal = ref(false);
+const absentTarget = ref<CalendarSession | null>(null);
+
 function confirmAbsent(session: CalendarSession) {
   absentTarget.value = session;
   showAbsentModal.value = true;
@@ -443,12 +427,8 @@ function closeAbsentModal() {
 async function handleSessionAbsent(sessionId: number) {
   try {
     const updated = await updateSessionStatus(sessionId, "absent");
-
     const session = sessionsOfSelectedDay.value.find((s) => s.id === sessionId);
-
-    if (session) {
-      session.status = updated.status;
-    }
+    if (session) session.status = updated.status;
   } catch (error) {
     console.error("Erro ao marcar falta:", error);
   } finally {
@@ -459,6 +439,10 @@ async function handleSessionAbsent(sessionId: number) {
 /* ---------------------------
    Cancel Modal
 ---------------------------- */
+const showCancelModal = ref(false);
+const cancelTarget = ref<CalendarSession | null>(null);
+const cancelLoading = ref(false);
+
 function confirmCancel(session: CalendarSession) {
   cancelTarget.value = session;
   showCancelModal.value = true;
@@ -467,15 +451,15 @@ function confirmCancel(session: CalendarSession) {
 function closeCancelModal() {
   showCancelModal.value = false;
   cancelTarget.value = null;
+  cancelLoading.value = false;
 }
 
 async function handleSessionCancelled(sessionId: number) {
+  cancelLoading.value = true;
   try {
     const updated = await updateSessionStatus(sessionId, "cancelled");
     const session = sessionsOfSelectedDay.value.find((s) => s.id === sessionId);
-    if (session) {
-      session.status = updated.status;
-    }
+    if (session) session.status = updated.status;
   } catch (error) {
     console.error("Erro ao cancelar sessão:", error);
   } finally {
@@ -486,8 +470,9 @@ async function handleSessionCancelled(sessionId: number) {
 /* ---------------------------
    Add Session Modal
 ---------------------------- */
+const showCreateSessionModal = ref(false);
+
 function openCreateSessionModal() {
-  selectedPatientId.value = null;
   showCreateSessionModal.value = true;
 }
 
@@ -495,22 +480,8 @@ function closeCreateSessionModal() {
   showCreateSessionModal.value = false;
 }
 
-async function handleCreateSession(payload: {
-  patientId: number;
-  datetime: string;
-}) {
-  try {
-    const newSession = await createSession({
-      patient_id: payload.patientId,
-      scheduled_at: payload.datetime,
-      session_type: "extra",
-    });
-
-    props.sessions.push(newSession);
-  } catch (error) {
-    console.error("Erro ao criar sessão:", error);
-  } finally {
-    emit("load-dashboard");
-  }
+function handleSessionCreated(newSession: CalendarSession) {
+  // Modal já criou a sessão na API — recarrega o dashboard para consistência
+  emit("load-dashboard");
 }
 </script>

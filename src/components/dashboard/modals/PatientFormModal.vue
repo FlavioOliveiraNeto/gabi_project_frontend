@@ -128,12 +128,12 @@
               v-model="modalForm.schedule_type"
               class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
             >
-              <option value="weekly">Semanal</option>
-              <option value="single">Avulso</option>
+              <option value="regular">Semanal</option>
+              <option value="extra">Avulso</option>
             </select>
           </div>
 
-          <div v-if="modalForm.schedule_type === 'weekly'" class="space-y-4">
+          <div v-if="modalForm.schedule_type === 'regular'" class="space-y-4">
             <div class="space-y-1.5">
               <label class="font-body text-sm font-medium text-foreground"
                 >Sessões por semana</label
@@ -171,7 +171,7 @@
             </div>
           </div>
 
-          <div v-if="modalForm.schedule_type === 'single'" class="space-y-4">
+          <div v-if="modalForm.schedule_type === 'extra'" class="space-y-4">
             <div class="space-y-1.5">
               <label class="font-body text-sm font-medium text-foreground">
                 Data da sessão
@@ -185,7 +185,7 @@
           </div>
 
           <!-- Horário semanal -->
-          <div v-if="modalForm.schedule_type === 'weekly'" class="space-y-1.5">
+          <div v-if="modalForm.schedule_type === 'regular'" class="space-y-1.5">
             <label class="font-body text-sm font-medium text-foreground">
               Horário da sessão
             </label>
@@ -197,7 +197,7 @@
           </div>
 
           <!-- Horário avulso -->
-          <div v-if="modalForm.schedule_type === 'single'" class="space-y-1.5">
+          <div v-if="modalForm.schedule_type === 'extra'" class="space-y-1.5">
             <label class="font-body text-sm font-medium text-foreground">
               Horário da sessão
             </label>
@@ -283,11 +283,14 @@ const showPasswordStep = ref(false);
 const generatedPassword = ref("");
 const copied = ref(false);
 
+// ID da sessão extra sendo editada (UPDATE em vez de CREATE)
+const editingSessionId = ref<number | null>(null);
+
 const modalForm = reactive({
   name: "",
   email: "",
   google_meet_link: "",
-  schedule_type: "weekly" as "weekly" | "single",
+  schedule_type: "regular" as "regular" | "extra",
   sessions_per_week: 0,
   weekdays: [] as string[],
   session_time: "",
@@ -305,9 +308,10 @@ function resetModal() {
   Object.keys(modalErrors).forEach((k) => delete modalErrors[k]);
   modalError.value = "";
   modalLoading.value = false;
-  modalForm.schedule_type = "weekly";
+  modalForm.schedule_type = "regular";
   modalForm.single_date = "";
   modalForm.single_time = "";
+  editingSessionId.value = null;
   showPasswordStep.value = false;
   generatedPassword.value = "";
   copied.value = false;
@@ -328,20 +332,21 @@ watch(
     modalForm.email = p.email;
     modalForm.google_meet_link = p.google_meet_link ?? "";
 
-    modalForm.schedule_type = p.schedule_type as "weekly" | "single";
+    modalForm.schedule_type = (p.schedule_type ?? "regular") as "regular" | "extra";
 
-    if (p.schedule_type === "weekly") {
+    if (p.schedule_type === "regular") {
       modalForm.sessions_per_week = p.sessions_per_week ?? 0;
       modalForm.weekdays = [...(p.session_days ?? [])];
       modalForm.session_time = p.session_time ?? "";
     }
 
-    if (p.schedule_type === "single") {
-      const firstSession = p.single_sessions?.[0];
+    if (p.schedule_type === "extra") {
+      const firstSession = p.extra_sessions?.[0];
 
       if (firstSession) {
         modalForm.single_date = firstSession.date ?? "";
         modalForm.single_time = firstSession.time ?? "";
+        editingSessionId.value = firstSession.id;
       }
     }
   },
@@ -373,16 +378,20 @@ async function handleSubmit() {
       schedule_type: modalForm.schedule_type,
     };
 
-    if (modalForm.schedule_type === "weekly") {
+    if (modalForm.schedule_type === "regular") {
       payload.sessions_per_week = modalForm.sessions_per_week || undefined;
       payload.weekdays =
         modalForm.weekdays.length > 0 ? modalForm.weekdays : undefined;
       payload.session_time = modalForm.session_time || undefined;
     }
 
-    if (modalForm.schedule_type === "single") {
+    if (modalForm.schedule_type === "extra") {
       payload.single_date = modalForm.single_date || undefined;
       payload.single_time = modalForm.single_time || undefined;
+      // Em edição: passa o session_id para que o backend faça UPDATE (não CREATE)
+      if (isEditing.value && editingSessionId.value) {
+        payload.session_id = editingSessionId.value;
+      }
     }
 
     if (isEditing.value && props.patientToEdit) {

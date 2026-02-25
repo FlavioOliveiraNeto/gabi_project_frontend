@@ -25,17 +25,15 @@
             class="font-body text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
           >
             {{
-              patient.schedule_type === "weekly"
+              patient.schedule_type === "regular"
                 ? "Agendamento semanal"
-                : patient.schedule_type === "monthly"
-                  ? "Agendamento mensal"
-                  : "Agendamento avulso"
+                : "Agendamento avulso"
             }}
           </span>
           <span
             v-if="
               patient.sessions_per_week > 0 &&
-              patient.schedule_type === 'weekly'
+              patient.schedule_type === 'regular'
             "
             class="font-body text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
           >
@@ -43,15 +41,15 @@
           </span>
           <!-- BADGE AVULSO COM TOOLTIP -->
           <div
-            v-else-if="patient.schedule_type === 'single'"
+            v-else-if="patient.schedule_type === 'extra'"
             class="relative group inline-block"
           >
             <span
               class="font-body text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-medium cursor-pointer"
             >
-              {{ (patient.single_sessions ?? []).length }}
+              {{ (patient.extra_sessions ?? []).length }}
               {{
-                (patient.single_sessions ?? []).length > 1
+                (patient.extra_sessions ?? []).length > 1
                   ? "sessões agendadas"
                   : "sessão agendada"
               }}
@@ -62,7 +60,7 @@
               class="absolute left-1/2 -translate-x-1/2 mt-2 w-max max-w-xs opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 bg-card border border-border rounded-lg shadow-lg p-3 z-50"
             >
               <div
-                v-for="s in patient.single_sessions ?? []"
+                v-for="s in patient.extra_sessions ?? []"
                 :key="s.id"
                 class="text-xs font-body text-foreground whitespace-nowrap flex items-center gap-2"
               >
@@ -76,7 +74,7 @@
             </div>
           </div>
           <span
-            v-if="patient.schedule_type === 'weekly'"
+            v-if="patient.schedule_type === 'regular'"
             v-for="day in patient.session_days"
             :key="day"
             class="font-body text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-medium"

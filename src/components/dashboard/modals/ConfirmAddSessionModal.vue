@@ -99,6 +99,13 @@
           />
         </div>
 
+        <p
+          v-if="errorMessage"
+          class="text-sm text-destructive font-body text-center bg-destructive/10 rounded-lg py-2 px-3 mb-4"
+        >
+          {{ errorMessage }}
+        </p>
+
         <div class="flex gap-3">
           <button
             @click="closeModal"
@@ -125,7 +132,7 @@ import { computed, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronDown } from "lucide-vue-next";
-import type { PatientUser } from "@/services/dashboard";
+import { createSession, type PatientUser, type CalendarSession } from "@/services/dashboard";
 
 const props = defineProps<{
   isOpen: boolean;
@@ -135,12 +142,13 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "close"): void;
-  (e: "create", payload: { patientId: number; datetime: string }): void;
+  (e: "created", session: CalendarSession): void;
 }>();
 
 const selectedPatientId = ref<number | "">("");
 const selectedTime = ref<string>("");
 const isLoading = ref(false);
+const errorMessage = ref("");
 
 const isDropdownOpen = ref(false);
 const search = ref("");
@@ -166,6 +174,7 @@ watch(
       search.value = "";
       isLoading.value = false;
       isDropdownOpen.value = false;
+      errorMessage.value = "";
     }
   },
 );
@@ -207,24 +216,33 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-function handleConfirm() {
+async function handleConfirm() {
   if (!selectedPatientId.value || !selectedTime.value) return;
 
   isLoading.value = true;
+  errorMessage.value = "";
 
-  const [hours, minutes] = selectedTime.value.split(":").map(Number);
+  try {
+    const [hours, minutes] = selectedTime.value.split(":").map(Number);
+    const sessionDate = new Date(props.date);
+    sessionDate.setHours(hours, minutes, 0, 0);
+    const scheduled_at = format(sessionDate, "yyyy-MM-dd HH:mm:ss");
 
-  const sessionDate = new Date(props.date);
-  sessionDate.setHours(hours, minutes, 0, 0);
+    const session = await createSession({
+      patient_id: Number(selectedPatientId.value),
+      scheduled_at,
+      session_type: "extra",
+    });
 
-  const formatted = format(sessionDate, "yyyy-MM-dd HH:mm:ss");
-
-  emit("create", {
-    patientId: Number(selectedPatientId.value),
-    datetime: formatted,
-  });
-
-  isLoading.value = false;
-  closeModal();
+    emit("created", session);
+    closeModal();
+  } catch (err: any) {
+    const msgs = err?.response?.data?.errors;
+    errorMessage.value = Array.isArray(msgs)
+      ? msgs.join(", ")
+      : "Erro ao criar sessão. Verifique o horário e tente novamente.";
+  } finally {
+    isLoading.value = false;
+  }
 }
 </script>
