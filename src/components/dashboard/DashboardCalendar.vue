@@ -106,19 +106,30 @@
         >
           <div class="flex items-center gap-3 min-w-0">
             <div class="shrink-0">
-              <Check
+              <IconWithTooltip
                 v-if="session.status === 'completed'"
-                class="w-4 h-4 text-green-500"
-              />
-              <X
+                text="Sessão realizada"
+              >
+                <Check class="w-4 h-4 text-green-500" />
+              </IconWithTooltip>
+
+              <IconWithTooltip
                 v-else-if="session.status === 'absent'"
-                class="w-4 h-4 text-red-500"
-              />
-              <Ban
+                text="Paciente ausente"
+              >
+                <X class="w-4 h-4 text-red-500" />
+              </IconWithTooltip>
+
+              <IconWithTooltip
                 v-else-if="session.status === 'cancelled'"
-                class="w-4 h-4 text-muted-foreground"
-              />
-              <Clock v-else class="w-4 h-4 text-yellow-500" />
+                text="Sessão cancelada"
+              >
+                <Ban class="w-4 h-4 text-muted-foreground" />
+              </IconWithTooltip>
+
+              <IconWithTooltip v-else text="Sessão agendada">
+                <Clock class="w-4 h-4 text-yellow-500" />
+              </IconWithTooltip>
             </div>
 
             <div
@@ -150,15 +161,6 @@
               <span class="text-xs text-muted-foreground italic"
                 >Cancelada</span
               >
-            </template>
-
-            <template v-else-if="session.status === 'absent'">
-              <button
-                @click="confirmCancel(session)"
-                class="text-xs text-muted-foreground hover:underline whitespace-nowrap"
-              >
-                Cancelar sessão
-              </button>
             </template>
 
             <template v-else-if="session.status === 'completed'">
@@ -300,6 +302,7 @@ import {
 } from "@/services/dashboard";
 import ConfirmAbsentModal from "@/components/dashboard/modals/ConfirmAbsentModal.vue";
 import ConfirmAddSessionModal from "@/components/dashboard/modals/ConfirmAddSessionModal.vue";
+import IconWithTooltip from "@/components/ui/IconWithTooltip.vue";
 
 interface CalendarCell {
   day: number | null;
