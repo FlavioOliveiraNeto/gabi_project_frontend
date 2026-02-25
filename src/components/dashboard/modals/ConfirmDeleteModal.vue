@@ -64,7 +64,7 @@ async function handleConfirm() {
     emit("deleted", props.target.id);
     closeModal();
   } catch {
-    // Tratar erro
+    // implementar toast de erro aqui
   } finally {
     isLoading.value = false;
     closeModal();

@@ -12,7 +12,6 @@
     </NavBar>
 
     <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-24 pb-12">
-      <!-- Header -->
       <div class="sm:flex sm:justify-between sm:items-center my-6">
         <h2 class="font-display text-2xl text-primary">
           Olá, {{ user?.name ?? "Terapeuta" }}!
@@ -22,10 +21,8 @@
         </p>
       </div>
 
-      <!-- Stats -->
       <DashboardStats :stats="stats" />
 
-      <!-- Calendar -->
       <DashboardCalendar
         :sessions="calendarSessions"
         :patients="patients"
@@ -33,7 +30,6 @@
         @load-dashboard="loadDashboard"
       />
 
-      <!-- Patients -->
       <PatientList
         :patients="patients"
         :is-loading="isLoading"
@@ -44,7 +40,6 @@
       />
     </main>
 
-    <!-- Create/Edit Modal -->
     <PatientFormModal
       :is-open="showFormModal"
       :patient-to-edit="editingPatient"
@@ -52,7 +47,6 @@
       @saved="handlePatientSaved"
     />
 
-    <!-- Delete Modal -->
     <ConfirmDeleteModal
       :is-open="showDeleteModal"
       :target="deleteTarget"

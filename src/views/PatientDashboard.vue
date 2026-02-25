@@ -12,7 +12,6 @@
     </NavBar>
 
     <main class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-12 pt-24 pb-12">
-      <!-- Header -->
       <div class="sm:flex sm:justify-between sm:items-center my-6">
         <h2 class="font-display text-2xl text-primary">
           Olá, {{ profile?.profile.name ?? "Paciente" }}!
@@ -22,15 +21,12 @@
         </p>
       </div>
 
-      <!-- Loading -->
       <div v-if="isLoading" class="text-center py-20">
         <p class="font-body text-sm text-muted-foreground">Carregando...</p>
       </div>
 
       <template v-else>
-        <!-- ================= STATS ================= -->
         <div class="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-8">
-          <!-- Próxima sessão -->
           <div
             class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3"
           >
@@ -59,7 +55,6 @@
             </div>
           </div>
 
-          <!-- Sessões realizadas -->
           <div
             class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3"
           >
@@ -77,7 +72,6 @@
             </p>
           </div>
 
-          <!-- Faltas -->
           <div
             class="border border-border/50 rounded-xl p-5 bg-card flex flex-col gap-3"
           >
@@ -103,7 +97,6 @@
           </div>
         </div>
 
-        <!-- ================= DETALHES DA SESSÃO ================= -->
         <div
           class="border border-border/50 rounded-xl p-6 bg-card mb-6 space-y-4"
         >
@@ -134,7 +127,6 @@
             Nenhuma sessão agendada. Entre em contato com sua terapeuta.
           </p>
 
-          <!-- Botão do Meet apenas se for HOJE -->
           <a
             v-if="canJoinSession"
             :href="profile?.profile.google_meet_link!"
@@ -155,7 +147,6 @@
           </p>
         </div>
 
-        <!-- ================= NOTAS PRIVADAS ================= -->
         <div class="border border-border/50 rounded-xl p-6 bg-card">
           <div class="flex items-center gap-3 mb-5">
             <FileText class="w-5 h-5 text-primary" />
@@ -184,7 +175,6 @@
             {{ savingNote ? "Salvando..." : "Salvar anotação" }}
           </button>
 
-          <!-- Histórico -->
           <div
             v-if="notes.length"
             class="mt-6 border-t border-border/30 pt-4 space-y-3"
@@ -194,7 +184,6 @@
               :key="note.id"
               class="border border-border/20 rounded-lg p-3 group relative"
             >
-              <!-- Modo edição -->
               <template v-if="editingNoteId === note.id">
                 <textarea
                   v-model="editingContent"
@@ -220,7 +209,6 @@
                 </div>
               </template>
 
-              <!-- Modo visualização -->
               <template v-else>
                 <div class="flex items-center justify-between mb-1">
                   <p class="text-xs text-muted-foreground font-body">
@@ -355,7 +343,6 @@ async function removeNote(id: number) {
   notes.value = notes.value.filter((n: PatientNote) => n.id !== id);
 }
 
-// ── Edição de notas ───────────────────────────────────────────────────────
 const editingNoteId = ref<number | null>(null);
 const editingContent = ref("");
 const savingEdit = ref(false);

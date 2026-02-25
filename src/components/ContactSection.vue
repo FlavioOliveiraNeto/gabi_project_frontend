@@ -5,7 +5,6 @@
     />
 
     <div class="container mx-auto px-6 lg:px-12 pt-12">
-      <!-- Header -->
       <div class="text-center mb-16 max-w-2xl mx-auto">
         <img
           src="@/assets/images/contact_image.jpg"
@@ -34,7 +33,6 @@
       <div
         class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto w-full"
       >
-        <!-- Contact Info -->
         <div class="space-y-8">
           <component
             :is="item.link ? 'a' : 'div'"
@@ -67,7 +65,6 @@
           </component>
         </div>
 
-        <!-- CTA Card -->
         <div
           class="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-10 text-primary-foreground flex flex-col justify-center items-center text-align: justify md:text-center shadow-2xl shadow-primary/20"
         >

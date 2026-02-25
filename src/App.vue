@@ -1,10 +1,5 @@
 <template>
-  <!-- TooltipProvider equivalente (depende da lib que você usar) -->
-
-  <!-- Toasters -->
   <Sonner />
-
-  <!-- Router -->
   <router-view />
 </template>
 

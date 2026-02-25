@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #4E2C1C; /* Dark Brown from logo */
-  --accent: #C17B34;  /* Warm Ochre from logo */
+  --primary: #4E2C1C;
+  --accent: #C17B34; 
   --bg-light: #FDFBF8;
   --white: #ffffff;
   --text-main: #2D241E;

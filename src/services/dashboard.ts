@@ -1,7 +1,5 @@
 import api from "./api";
 
-// ─── Types ─────────────────────────────────────────────────────────────────
-
 export interface ClinicalNote {
   id: number;
   content: string;
@@ -9,7 +7,6 @@ export interface ClinicalNote {
   created_at: string;
 }
 
-/** Sessão extra (avulsa) de um paciente. */
 export interface ExtraSession {
   id: number;
   date: string;
@@ -23,12 +20,10 @@ export interface PatientUser {
   email: string;
   google_meet_link: string | null;
   created_at?: string;
-  /** "regular" = paciente com agenda semanal; "extra" = paciente avulso */
   schedule_type?: "regular" | "extra" | null;
   sessions_per_week: number;
   session_days: string[];
   session_time: string | null;
-  /** Sessões extras visíveis para TODOS os pacientes (incluindo os de agenda regular) */
   extra_sessions: ExtraSession[];
   completed_sessions: number;
   absent_sessions: number;
@@ -80,14 +75,12 @@ export interface CreatePatientParams {
   name: string;
   email: string;
   google_meet_link?: string;
-  /** "regular" = semanal; "extra" = avulso */
   schedule_type?: "regular" | "extra";
   sessions_per_week?: number;
   weekdays?: string[];
   session_time?: string;
   single_date?: string;
   single_time?: string;
-  /** ID da sessão extra a ser atualizada (somente em edição de paciente avulso) */
   session_id?: number;
 }
 
@@ -110,10 +103,10 @@ export interface CreateSessionParams {
   session_type?: "regular" | "extra";
 }
 
-// ─── API calls – Terapeuta ────────────────────────────────────────────────
-
 export async function getTherapistDashboard(): Promise<TherapistDashboardData> {
-  const { data } = await api.get<TherapistDashboardData>("/therapists/dashboard");
+  const { data } = await api.get<TherapistDashboardData>(
+    "/therapists/dashboard",
+  );
   return data;
 }
 
@@ -129,7 +122,10 @@ export interface CreatePatientResponse extends PatientUser {
 export async function createPatient(
   params: CreatePatientParams,
 ): Promise<CreatePatientResponse> {
-  const { data } = await api.post<CreatePatientResponse>("/therapists/patients", params);
+  const { data } = await api.post<CreatePatientResponse>(
+    "/therapists/patients",
+    params,
+  );
   return data;
 }
 
@@ -137,7 +133,10 @@ export async function updatePatient(
   id: number,
   params: CreatePatientParams,
 ): Promise<PatientUser> {
-  const { data } = await api.put<PatientUser>(`/therapists/patients/${id}`, params);
+  const { data } = await api.put<PatientUser>(
+    `/therapists/patients/${id}`,
+    params,
+  );
   return data;
 }
 
@@ -175,11 +174,6 @@ export async function deleteClinicalNote(
   await api.delete(`/therapists/patients/${patientId}/notes/${noteId}`);
 }
 
-/**
- * Atualiza o status de uma sessão.
- * A terapeuta só pode usar: "absent" | "cancelled".
- * "completed" é gerenciado automaticamente pelo job de auto-complete.
- */
 export async function updateSessionStatus(
   sessionId: number,
   status: "absent" | "cancelled",
@@ -194,11 +188,12 @@ export async function updateSessionStatus(
 export async function createSession(
   params: CreateSessionParams,
 ): Promise<CalendarSession> {
-  const { data } = await api.post<CalendarSession>("/therapists/sessions", params);
+  const { data } = await api.post<CalendarSession>(
+    "/therapists/sessions",
+    params,
+  );
   return data;
 }
-
-// ─── API calls – Paciente ─────────────────────────────────────────────────
 
 export async function getClientDashboard(): Promise<ClientDashboardData> {
   const { data } = await api.get<ClientDashboardData>("/clients/dashboard");
@@ -211,7 +206,9 @@ export async function getPatientNotes(): Promise<PatientNote[]> {
 }
 
 export async function createPatientNote(content: string): Promise<PatientNote> {
-  const { data } = await api.post<PatientNote>("/clients/patient_notes", { content });
+  const { data } = await api.post<PatientNote>("/clients/patient_notes", {
+    content,
+  });
   return data;
 }
 
@@ -219,7 +216,10 @@ export async function updatePatientNote(
   id: number,
   content: string,
 ): Promise<PatientNote> {
-  const { data } = await api.patch<PatientNote>(`/clients/patient_notes/${id}`, { content });
+  const { data } = await api.patch<PatientNote>(
+    `/clients/patient_notes/${id}`,
+    { content },
+  );
   return data;
 }
 

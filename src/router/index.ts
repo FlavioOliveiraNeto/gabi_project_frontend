@@ -24,7 +24,6 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    // Rota pública: link enviado por e-mail para redefinição de senha
     path: "/reset-senha",
     name: "reset-password",
     component: () => import("../views/ResetPasswordView.vue"),

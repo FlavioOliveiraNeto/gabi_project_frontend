@@ -145,15 +145,13 @@
             </div>
           </div>
 
-          <!-- ── Ações por status ──────────────────────────────────────── -->
           <div class="flex flex-col items-end gap-1 shrink-0">
-
-            <!-- Cancelada: nenhuma ação -->
             <template v-if="session.status === 'cancelled'">
-              <span class="text-xs text-muted-foreground italic">Cancelada</span>
+              <span class="text-xs text-muted-foreground italic"
+                >Cancelada</span
+              >
             </template>
 
-            <!-- Falta: apenas cancelar -->
             <template v-else-if="session.status === 'absent'">
               <button
                 @click="confirmCancel(session)"
@@ -163,7 +161,6 @@
               </button>
             </template>
 
-            <!-- Completada: registrar falta ou cancelar -->
             <template v-else-if="session.status === 'completed'">
               <button
                 @click="confirmAbsent(session)"
@@ -179,7 +176,6 @@
               </button>
             </template>
 
-            <!-- Agendada (futura ou passada): falta + cancelar + meet (se futuro) -->
             <template v-else-if="session.status === 'scheduled'">
               <a
                 v-if="!isSelectedDatePast && session.patient?.google_meet_link"
@@ -192,7 +188,9 @@
                 Google Meet
               </a>
               <button
-                v-else-if="!isSelectedDatePast && !session.patient?.google_meet_link"
+                v-else-if="
+                  !isSelectedDatePast && !session.patient?.google_meet_link
+                "
                 @click="emit('edit-patient', session.patient.id)"
                 class="flex items-center gap-1 text-xs font-body font-medium text-orange-500 hover:underline"
               >
@@ -224,7 +222,6 @@
       @absent="handleSessionAbsent"
     />
 
-    <!-- Modal de confirmação de cancelamento -->
     <Teleport to="body">
       <div
         v-if="showCancelModal && cancelTarget"
@@ -386,23 +383,35 @@ const totalPages = computed(
   () => Math.ceil(sessionsOfSelectedDay.value.length / perPage) || 1,
 );
 
-watch(selectedDate, () => { currentPage.value = 1; });
+watch(selectedDate, () => {
+  currentPage.value = 1;
+});
 
 function initials(name?: string) {
   if (!name) return "?";
-  return name.split(" ").filter(Boolean).slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? "").join("");
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
 }
 
 function getCellClass(cell: CalendarCell) {
   if (!cell.day) return "cursor-default border-transparent";
-  if (cell.isToday) return "bg-primary text-primary-foreground font-semibold border-transparent";
-  if (cell.hasSession) return "bg-muted/60 text-foreground hover:bg-muted border-border/20";
+  if (cell.isToday)
+    return "bg-primary text-primary-foreground font-semibold border-transparent";
+  if (cell.hasSession)
+    return "bg-muted/60 text-foreground hover:bg-muted border-border/20";
   return "text-muted-foreground hover:bg-muted/40 border-transparent";
 }
 
-function prevMonth() { calendarBase.value = subMonths(calendarBase.value, 1); }
-function nextMonth() { calendarBase.value = addMonths(calendarBase.value, 1); }
+function prevMonth() {
+  calendarBase.value = subMonths(calendarBase.value, 1);
+}
+function nextMonth() {
+  calendarBase.value = addMonths(calendarBase.value, 1);
+}
 function selectDate(cell: CalendarCell) {
   if (!cell.date) return;
   selectedDate.value = cell.date;
@@ -481,7 +490,6 @@ function closeCreateSessionModal() {
 }
 
 function handleSessionCreated(newSession: CalendarSession) {
-  // Modal já criou a sessão na API — recarrega o dashboard para consistência
   emit("load-dashboard");
 }
 </script>

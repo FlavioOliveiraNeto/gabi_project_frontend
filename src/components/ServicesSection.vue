@@ -5,7 +5,6 @@
     />
 
     <div class="container mx-auto px-6 lg:px-25 pt-12">
-      <!-- Header -->
       <div class="text-center mb-16 max-w-2xl mx-auto">
         <span
           class="text-secondary font-body font-semibold text-sm uppercase tracking-widest"
@@ -24,7 +23,6 @@
         </p>
       </div>
 
-      <!-- Cards -->
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="(service, index) in services"

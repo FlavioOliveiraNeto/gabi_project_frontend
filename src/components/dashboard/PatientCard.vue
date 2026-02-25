@@ -39,7 +39,6 @@
           >
             {{ patient.sessions_per_week }}x/semana
           </span>
-          <!-- BADGE AVULSO COM TOOLTIP -->
           <div
             v-else-if="patient.schedule_type === 'extra'"
             class="relative group inline-block"
@@ -55,7 +54,6 @@
               }}
             </span>
 
-            <!-- Tooltip -->
             <div
               class="absolute left-1/2 -translate-x-1/2 mt-2 w-max max-w-xs opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 bg-card border border-border rounded-lg shadow-lg p-3 z-50"
             >
@@ -157,7 +155,6 @@
         Anotações clínicas (visíveis apenas para você)
       </p>
 
-      <!-- Nova anotação -->
       <div class="mb-3">
         <textarea
           v-model="newNote"
@@ -175,14 +172,12 @@
         </button>
       </div>
 
-      <!-- Lista de anotações -->
       <div v-if="localNotes.length > 0" class="space-y-2">
         <div
           v-for="note in localNotes"
           :key="note.id"
           class="border border-border/20 rounded-lg p-3 group"
         >
-          <!-- Modo edição -->
           <template v-if="editingNoteId === note.id">
             <textarea
               v-model="editingContent"
@@ -208,7 +203,6 @@
             </div>
           </template>
 
-          <!-- Modo visualização -->
           <template v-else>
             <div class="flex items-center justify-between mb-1.5">
               <div class="flex items-center gap-1.5">
@@ -217,7 +211,9 @@
                   {{ formatDate(note.created_at) }}
                 </span>
               </div>
-              <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition">
+              <div
+                class="flex gap-1 opacity-0 group-hover:opacity-100 transition"
+              >
                 <button
                   @click="startEdit(note)"
                   class="p-1 rounded hover:bg-muted transition"
@@ -294,10 +290,10 @@ const WEEKDAY_LABELS: Record<string, string> = {
   saturday: "Sáb",
 };
 
-// ── Estado local de notas (evita mutação direta da prop) ──────────────────
-const localNotes = ref<ClinicalNote[]>([...(props.patient.clinical_notes ?? [])]);
+const localNotes = ref<ClinicalNote[]>([
+  ...(props.patient.clinical_notes ?? []),
+]);
 
-// Sincroniza quando o painel reabre (parent pode ter recarregado os dados)
 watch(
   () => props.isOpen,
   (opened) => {
@@ -309,7 +305,6 @@ watch(
   },
 );
 
-// ── Criar nota ────────────────────────────────────────────────────────────
 const newNote = ref("");
 const savingNote = ref(false);
 
@@ -324,13 +319,12 @@ async function saveNote() {
     emit("note-saved", props.patient.id, note);
     newNote.value = "";
   } catch {
-    // silencioso — toast pode ser adicionado futuramente
+    // implementar toast de erro aqui
   } finally {
     savingNote.value = false;
   }
 }
 
-// ── Editar nota ───────────────────────────────────────────────────────────
 const editingNoteId = ref<number | null>(null);
 const editingContent = ref("");
 const savingEdit = ref(false);
@@ -356,23 +350,19 @@ async function confirmEdit(noteId: number) {
     if (idx !== -1) localNotes.value[idx] = updated;
     cancelEdit();
   } catch {
-    // silencioso
+    // implementar toast de erro aqui
   } finally {
     savingEdit.value = false;
   }
 }
 
-// ── Excluir nota ──────────────────────────────────────────────────────────
 async function deleteNote(noteId: number) {
   try {
     await deleteClinicalNote(props.patient.id, noteId);
     localNotes.value = localNotes.value.filter((n) => n.id !== noteId);
-  } catch {
-    // silencioso
-  }
+  } catch {}
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────
 function initials(name: string) {
   return name
     .split(" ")

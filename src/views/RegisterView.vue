@@ -1,7 +1,8 @@
 <template>
-  <div class="min-h-screen bg-lavender-light flex items-center justify-center px-4 py-12">
+  <div
+    class="min-h-screen bg-lavender-light flex items-center justify-center px-4 py-12"
+  >
     <div class="w-full max-w-md">
-      <!-- Logo / Header -->
       <div class="text-center mb-8">
         <LogoComponent class="mx-auto mb-4" />
         <h1 class="font-display text-2xl text-primary">Criar conta</h1>
@@ -10,10 +11,8 @@
         </p>
       </div>
 
-      <!-- Card -->
       <div class="bg-card border border-border/50 rounded-2xl p-8 shadow-sm">
         <form @submit.prevent="handleRegister" class="space-y-4">
-          <!-- Nome -->
           <div class="space-y-1.5">
             <label class="font-body text-sm font-medium text-foreground">
               Nome completo
@@ -31,7 +30,6 @@
             </p>
           </div>
 
-          <!-- E-mail -->
           <div class="space-y-1.5">
             <label class="font-body text-sm font-medium text-foreground">
               E-mail
@@ -49,7 +47,6 @@
             </p>
           </div>
 
-          <!-- Telefone -->
           <div class="space-y-1.5">
             <label class="font-body text-sm font-medium text-foreground">
               Telefone
@@ -67,7 +64,6 @@
             </p>
           </div>
 
-          <!-- Senha -->
           <div class="space-y-1.5">
             <label class="font-body text-sm font-medium text-foreground">
               Senha
@@ -91,12 +87,14 @@
                 <EyeOff v-else class="w-4 h-4" />
               </button>
             </div>
-            <p v-if="errors.password" class="text-xs text-destructive font-body">
+            <p
+              v-if="errors.password"
+              class="text-xs text-destructive font-body"
+            >
               {{ errors.password }}
             </p>
           </div>
 
-          <!-- Confirmar senha -->
           <div class="space-y-1.5">
             <label class="font-body text-sm font-medium text-foreground">
               Confirmar senha
@@ -128,7 +126,6 @@
             </p>
           </div>
 
-          <!-- Erro global -->
           <p
             v-if="globalError"
             class="text-sm text-destructive font-body text-center bg-destructive/10 rounded-lg py-2 px-3"
@@ -136,7 +133,6 @@
             {{ globalError }}
           </p>
 
-          <!-- Botão -->
           <button
             type="submit"
             :disabled="isLoading"
@@ -219,7 +215,6 @@ async function handleRegister() {
       password_confirmation: form.password_confirmation,
     });
 
-    // Login automático após registro
     await login(form.email.trim(), form.password);
     router.push("/paciente");
   } catch (err: any) {
@@ -227,7 +222,8 @@ async function handleRegister() {
     if (Array.isArray(msgs) && msgs.length > 0) {
       globalError.value = msgs.join(", ");
     } else {
-      globalError.value = "Erro ao criar conta. Verifique os dados e tente novamente.";
+      globalError.value =
+        "Erro ao criar conta. Verifique os dados e tente novamente.";
     }
   } finally {
     isLoading.value = false;

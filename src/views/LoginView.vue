@@ -23,7 +23,6 @@
         </div>
 
         <div class="p-6">
-          <!-- FORGOT PASSWORD -->
           <template v-if="showForgot">
             <div v-if="forgotSent" class="text-center space-y-4">
               <p class="font-body text-sm text-muted-foreground">
@@ -73,7 +72,9 @@
                 :disabled="forgotLoading"
                 class="w-full bg-primary text-white rounded-full py-2 font-body disabled:opacity-50"
               >
-                {{ forgotLoading ? "Enviando..." : "Enviar link de recuperação" }}
+                {{
+                  forgotLoading ? "Enviando..." : "Enviar link de recuperação"
+                }}
               </button>
 
               <button
@@ -86,7 +87,6 @@
             </form>
           </template>
 
-          <!-- LOGIN FORM -->
           <form v-else @submit.prevent="handleSubmit" class="space-y-4">
             <div
               v-if="error"
@@ -221,7 +221,6 @@ const handleForgotPassword = async () => {
 
   try {
     await requestPasswordReset(forgotEmail.value.trim());
-    // Sempre exibe a mensagem genérica — não revelamos se o e-mail existe ou não
     forgotSent.value = true;
   } catch (e: any) {
     const msgs = e?.response?.data?.errors;

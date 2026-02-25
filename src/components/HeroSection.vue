@@ -2,7 +2,6 @@
   <section
     class="relative min-h-screen flex flex-col justify-start lg:justify-center bg-lavender-light"
   >
-    <!-- Decorative shapes -->
     <div
       class="hidden md:block absolute bottom-40 right-20 w-24 h-24 rounded-full bg-primary/10 animate-float"
       style="animation-delay: 2s"
@@ -32,7 +31,6 @@
           />
         </div>
 
-        <!-- Paper decorations -->
         <div
           class="absolute -bottom-6 -left-6 w-28 h-28 bg-sage rounded-full opacity-60"
         />
@@ -41,7 +39,6 @@
         />
       </div>
 
-      <!-- TEXTO -->
       <div class="order-2 lg:order-1 space-y-6 lg:space-y-8 animate-fade-in-up">
         <h1
           class="text-3xl sm:text-4xl lg:text-6xl font-display font-bold text-foreground leading-tight"
@@ -83,7 +80,6 @@
       </div>
     </div>
 
-    <!-- Scroll indicator -->
     <button
       class="mt-12 lg:mt-0 lg:absolute lg:bottom-8 left-1/2 lg:-translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
       aria-label="Rolar para baixo"

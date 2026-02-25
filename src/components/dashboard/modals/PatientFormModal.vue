@@ -8,13 +8,14 @@
       <div
         class="bg-card rounded-2xl shadow-lg w-full max-w-lg p-6 overflow-y-auto max-h-[90vh]"
       >
-        <!-- ── Passo 2: exibição da senha gerada ─────────────────────── -->
         <div v-if="showPasswordStep" class="space-y-5">
           <div class="flex items-center gap-3">
             <div class="p-2 rounded-full bg-green-100">
               <KeyRound class="w-5 h-5 text-green-600" />
             </div>
-            <h2 class="font-display text-xl text-foreground">Paciente cadastrado!</h2>
+            <h2 class="font-display text-xl text-foreground">
+              Paciente cadastrado!
+            </h2>
           </div>
 
           <p class="font-body text-sm text-muted-foreground">
@@ -22,12 +23,18 @@
             <strong class="text-foreground">não será exibida novamente</strong>.
           </p>
 
-          <div class="rounded-xl border border-amber-300 bg-amber-50 p-4 space-y-2">
-            <p class="font-body text-xs font-semibold text-amber-700 uppercase tracking-wide">
+          <div
+            class="rounded-xl border border-amber-300 bg-amber-50 p-4 space-y-2"
+          >
+            <p
+              class="font-body text-xs font-semibold text-amber-700 uppercase tracking-wide"
+            >
               Senha temporária
             </p>
             <div class="flex items-center gap-3">
-              <code class="font-mono text-2xl font-bold tracking-widest text-amber-900 select-all">
+              <code
+                class="font-mono text-2xl font-bold tracking-widest text-amber-900 select-all"
+              >
                 {{ generatedPassword }}
               </code>
               <button
@@ -55,189 +62,189 @@
           </button>
         </div>
 
-        <!-- ── Passo 1: formulário ────────────────────────────────────── -->
         <template v-else>
-        <div class="flex items-center justify-between mb-5">
-          <h2 class="font-display text-xl text-foreground">
-            {{ isEditing ? "Editar paciente" : "Adicionar paciente" }}
-          </h2>
-          <button
-            @click="closeModal"
-            class="p-1.5 rounded-lg hover:bg-muted transition"
-          >
-            <X class="w-4 h-4" />
-          </button>
-        </div>
-
-        <form @submit.prevent="handleSubmit" class="space-y-4">
-          <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground"
-              >Nome completo *</label
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="font-display text-xl text-foreground">
+              {{ isEditing ? "Editar paciente" : "Adicionar paciente" }}
+            </h2>
+            <button
+              @click="closeModal"
+              class="p-1.5 rounded-lg hover:bg-muted transition"
             >
-            <input
-              v-model="modalForm.name"
-              type="text"
-              placeholder="Nome do paciente"
-              class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-              :class="{ 'border-destructive': modalErrors.name }"
-            />
-            <p
-              v-if="modalErrors.name"
-              class="text-xs text-destructive font-body"
-            >
-              {{ modalErrors.name }}
-            </p>
+              <X class="w-4 h-4" />
+            </button>
           </div>
 
-          <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground"
-              >E-mail *</label
-            >
-            <input
-              v-model="modalForm.email"
-              type="email"
-              placeholder="paciente@email.com"
-              class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-              :class="{ 'border-destructive': modalErrors.email }"
-            />
-            <p
-              v-if="modalErrors.email"
-              class="text-xs text-destructive font-body"
-            >
-              {{ modalErrors.email }}
-            </p>
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground"
-              >Link do Google Meet</label
-            >
-            <input
-              v-model="modalForm.google_meet_link"
-              type="url"
-              placeholder="https://meet.google.com/..."
-              class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-            />
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground">
-              Tipo de agendamento
-            </label>
-            <select
-              v-model="modalForm.schedule_type"
-              class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-            >
-              <option value="regular">Semanal</option>
-              <option value="extra">Avulso</option>
-            </select>
-          </div>
-
-          <div v-if="modalForm.schedule_type === 'regular'" class="space-y-4">
+          <form @submit.prevent="handleSubmit" class="space-y-4">
             <div class="space-y-1.5">
               <label class="font-body text-sm font-medium text-foreground"
-                >Sessões por semana</label
+                >Nome completo *</label
               >
-              <select
-                v-model.number="modalForm.sessions_per_week"
-                class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-              >
-                <option :value="0">Não definido</option>
-                <option v-for="n in 7" :key="n" :value="n">
-                  {{ n }}x por semana
-                </option>
-              </select>
-            </div>
-
-            <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground"
-                >Dias das sessões</label
-              >
-              <div class="flex flex-wrap gap-3">
-                <label
-                  v-for="(label, day) in WEEKDAY_LABELS"
-                  :key="day"
-                  class="flex items-center gap-1.5 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    :value="day"
-                    v-model="modalForm.weekdays"
-                    class="accent-primary w-4 h-4 cursor-pointer"
-                  />
-                  <span class="font-body text-sm">{{ label }}</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="modalForm.schedule_type === 'extra'" class="space-y-4">
-            <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">
-                Data da sessão
-              </label>
               <input
-                v-model="modalForm.single_date"
-                type="date"
+                v-model="modalForm.name"
+                type="text"
+                placeholder="Nome do paciente"
+                class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+                :class="{ 'border-destructive': modalErrors.name }"
+              />
+              <p
+                v-if="modalErrors.name"
+                class="text-xs text-destructive font-body"
+              >
+                {{ modalErrors.name }}
+              </p>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="font-body text-sm font-medium text-foreground"
+                >E-mail *</label
+              >
+              <input
+                v-model="modalForm.email"
+                type="email"
+                placeholder="paciente@email.com"
+                class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+                :class="{ 'border-destructive': modalErrors.email }"
+              />
+              <p
+                v-if="modalErrors.email"
+                class="text-xs text-destructive font-body"
+              >
+                {{ modalErrors.email }}
+              </p>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="font-body text-sm font-medium text-foreground"
+                >Link do Google Meet</label
+              >
+              <input
+                v-model="modalForm.google_meet_link"
+                type="url"
+                placeholder="https://meet.google.com/..."
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               />
             </div>
-          </div>
 
-          <!-- Horário semanal -->
-          <div v-if="modalForm.schedule_type === 'regular'" class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground">
-              Horário da sessão
-            </label>
-            <input
-              v-model="modalForm.session_time"
-              type="time"
-              class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-            />
-          </div>
+            <div class="space-y-1.5">
+              <label class="font-body text-sm font-medium text-foreground">
+                Tipo de agendamento
+              </label>
+              <select
+                v-model="modalForm.schedule_type"
+                class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+              >
+                <option value="regular">Semanal</option>
+                <option value="extra">Avulso</option>
+              </select>
+            </div>
 
-          <!-- Horário avulso -->
-          <div v-if="modalForm.schedule_type === 'extra'" class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground">
-              Horário da sessão
-            </label>
-            <input
-              v-model="modalForm.single_time"
-              type="time"
-              class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-            />
-          </div>
+            <div v-if="modalForm.schedule_type === 'regular'" class="space-y-4">
+              <div class="space-y-1.5">
+                <label class="font-body text-sm font-medium text-foreground"
+                  >Sessões por semana</label
+                >
+                <select
+                  v-model.number="modalForm.sessions_per_week"
+                  class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+                >
+                  <option :value="0">Não definido</option>
+                  <option v-for="n in 7" :key="n" :value="n">
+                    {{ n }}x por semana
+                  </option>
+                </select>
+              </div>
 
-          <p
-            v-if="modalError"
-            class="text-sm text-destructive font-body text-center bg-destructive/10 rounded-lg py-2 px-3"
-          >
-            {{ modalError }}
-          </p>
+              <div class="space-y-1.5">
+                <label class="font-body text-sm font-medium text-foreground"
+                  >Dias das sessões</label
+                >
+                <div class="flex flex-wrap gap-3">
+                  <label
+                    v-for="(label, day) in WEEKDAY_LABELS"
+                    :key="day"
+                    class="flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      :value="day"
+                      v-model="modalForm.weekdays"
+                      class="accent-primary w-4 h-4 cursor-pointer"
+                    />
+                    <span class="font-body text-sm">{{ label }}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
 
-          <div class="flex gap-3 pt-2">
-            <button
-              type="button"
-              @click="closeModal"
-              class="flex-1 py-2.5 rounded-lg border border-border/60 font-body text-sm font-medium hover:bg-muted transition"
+            <div v-if="modalForm.schedule_type === 'extra'" class="space-y-4">
+              <div class="space-y-1.5">
+                <label class="font-body text-sm font-medium text-foreground">
+                  Data da sessão
+                </label>
+                <input
+                  v-model="modalForm.single_date"
+                  type="date"
+                  class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+                />
+              </div>
+            </div>
+
+            <div
+              v-if="modalForm.schedule_type === 'regular'"
+              class="space-y-1.5"
             >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              :disabled="modalLoading"
-              class="flex-1 py-2.5 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition"
+              <label class="font-body text-sm font-medium text-foreground">
+                Horário da sessão
+              </label>
+              <input
+                v-model="modalForm.session_time"
+                type="time"
+                class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+              />
+            </div>
+
+            <div v-if="modalForm.schedule_type === 'extra'" class="space-y-1.5">
+              <label class="font-body text-sm font-medium text-foreground">
+                Horário da sessão
+              </label>
+              <input
+                v-model="modalForm.single_time"
+                type="time"
+                class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+              />
+            </div>
+
+            <p
+              v-if="modalError"
+              class="text-sm text-destructive font-body text-center bg-destructive/10 rounded-lg py-2 px-3"
             >
-              {{
-                modalLoading
-                  ? "Salvando..."
-                  : isEditing
-                    ? "Salvar alterações"
-                    : "Cadastrar paciente"
-              }}
-            </button>
-          </div>
-        </form>
+              {{ modalError }}
+            </p>
+
+            <div class="flex gap-3 pt-2">
+              <button
+                type="button"
+                @click="closeModal"
+                class="flex-1 py-2.5 rounded-lg border border-border/60 font-body text-sm font-medium hover:bg-muted transition"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                :disabled="modalLoading"
+                class="flex-1 py-2.5 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition"
+              >
+                {{
+                  modalLoading
+                    ? "Salvando..."
+                    : isEditing
+                      ? "Salvar alterações"
+                      : "Cadastrar paciente"
+                }}
+              </button>
+            </div>
+          </form>
         </template>
       </div>
     </div>
@@ -278,12 +285,10 @@ const modalLoading = ref(false);
 const modalError = ref("");
 const modalErrors = reactive<Record<string, string>>({});
 
-// Passo de exibição da senha gerada
 const showPasswordStep = ref(false);
 const generatedPassword = ref("");
 const copied = ref(false);
 
-// ID da sessão extra sendo editada (UPDATE em vez de CREATE)
 const editingSessionId = ref<number | null>(null);
 
 const modalForm = reactive({
@@ -332,7 +337,9 @@ watch(
     modalForm.email = p.email;
     modalForm.google_meet_link = p.google_meet_link ?? "";
 
-    modalForm.schedule_type = (p.schedule_type ?? "regular") as "regular" | "extra";
+    modalForm.schedule_type = (p.schedule_type ?? "regular") as
+      | "regular"
+      | "extra";
 
     if (p.schedule_type === "regular") {
       modalForm.sessions_per_week = p.sessions_per_week ?? 0;
@@ -388,7 +395,6 @@ async function handleSubmit() {
     if (modalForm.schedule_type === "extra") {
       payload.single_date = modalForm.single_date || undefined;
       payload.single_time = modalForm.single_time || undefined;
-      // Em edição: passa o session_id para que o backend faça UPDATE (não CREATE)
       if (isEditing.value && editingSessionId.value) {
         payload.session_id = editingSessionId.value;
       }
@@ -400,7 +406,6 @@ async function handleSubmit() {
       closeModal();
     } else {
       const created = await createPatient(payload);
-      // Exibe a senha gerada antes de fechar — spec item 7
       generatedPassword.value = created.generated_password;
       showPasswordStep.value = true;
       emit("saved", created, true);
@@ -421,7 +426,7 @@ async function copyPassword() {
     copied.value = true;
     setTimeout(() => (copied.value = false), 2000);
   } catch {
-    // fallback silencioso se clipboard API não estiver disponível
+    // implementar toast de erro aqui
   }
 }
 

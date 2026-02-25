@@ -1,8 +1,11 @@
 <template>
-  <div class="min-h-screen bg-lavender-light flex items-center justify-center px-4">
+  <div
+    class="min-h-screen bg-lavender-light flex items-center justify-center px-4"
+  >
     <div class="w-full max-w-md">
-      <div class="bg-card border border-border/50 rounded-2xl p-8 shadow-sm space-y-5">
-        <!-- Token ausente -->
+      <div
+        class="bg-card border border-border/50 rounded-2xl p-8 shadow-sm space-y-5"
+      >
         <div v-if="!token" class="text-center space-y-4">
           <p class="font-display text-lg text-foreground">Link inválido</p>
           <p class="font-body text-sm text-muted-foreground">
@@ -16,10 +19,11 @@
           </router-link>
         </div>
 
-        <!-- Formulário de nova senha -->
         <template v-else-if="!success">
           <div>
-            <h2 class="font-display text-2xl text-primary text-center">Redefinir senha</h2>
+            <h2 class="font-display text-2xl text-primary text-center">
+              Redefinir senha
+            </h2>
             <p class="font-body text-sm text-muted-foreground text-center mt-1">
               Crie uma nova senha para sua conta
             </p>
@@ -27,7 +31,9 @@
 
           <form @submit.prevent="handleReset" class="space-y-4">
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">Nova senha</label>
+              <label class="font-body text-sm font-medium text-foreground"
+                >Nova senha</label
+              >
               <input
                 v-model="newPassword"
                 type="password"
@@ -38,7 +44,9 @@
             </div>
 
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">Confirme a nova senha</label>
+              <label class="font-body text-sm font-medium text-foreground"
+                >Confirme a nova senha</label
+              >
               <input
                 v-model="confirmPassword"
                 type="password"
@@ -65,12 +73,21 @@
           </form>
         </template>
 
-        <!-- Confirmação de sucesso -->
         <div v-else class="text-center space-y-4">
           <div class="flex justify-center">
             <div class="p-3 rounded-full bg-green-100">
-              <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              <svg
+                class="w-6 h-6 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
           </div>
@@ -142,7 +159,8 @@ const handleReset = async () => {
     if (Array.isArray(msgs)) {
       error.value = msgs.join(", ");
     } else {
-      error.value = "Link de recuperação inválido ou expirado. Solicite um novo.";
+      error.value =
+        "Link de recuperação inválido ou expirado. Solicite um novo.";
     }
   } finally {
     isLoading.value = false;

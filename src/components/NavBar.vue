@@ -3,12 +3,10 @@
     <div
       class="container mx-auto px-3 py-6 lg:px-25 lg:py-auto flex items-center justify-between"
     >
-      <!-- Logo -->
       <button class="font-display text-xl text-primary" @click="scrollTop">
         <LogoComponent />
       </button>
 
-      <!-- Desktop -->
       <nav
         v-if="variant === 'landing'"
         class="hidden md:flex items-center gap-8"
@@ -39,12 +37,10 @@
         </router-link>
       </nav>
 
-      <!-- Área customizável (ex: área logada) -->
       <div v-else class="flex items-center gap-4">
         <slot name="right" />
       </div>
 
-      <!-- Mobile toggle (apenas landing) -->
       <button
         v-if="variant === 'landing'"
         class="md:hidden text-foreground"
@@ -54,7 +50,6 @@
       </button>
     </div>
 
-    <!-- Mobile menu -->
     <div
       v-if="open && variant === 'landing'"
       class="md:hidden bg-background/95 backdrop-blur-lg border-t border-border"

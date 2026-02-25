@@ -32,10 +32,9 @@ const login = async (email: string, password: string) => {
 
 const logout = async () => {
   try {
-    // Revoga o JWT no backend para que o token não possa ser reutilizado
     await api.delete("/users/sign_out");
   } catch {
-    // Falha silenciosa: limpa a sessão local mesmo se a chamada falhar
+    // implementar toast de erro aqui
   } finally {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("auth_user");

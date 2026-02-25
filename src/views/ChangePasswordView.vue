@@ -1,18 +1,29 @@
 <template>
-  <div class="min-h-screen bg-lavender-light flex items-center justify-center px-4">
+  <div
+    class="min-h-screen bg-lavender-light flex items-center justify-center px-4"
+  >
     <div class="w-full max-w-md">
-      <div class="bg-card border border-border/50 rounded-2xl p-8 shadow-sm space-y-5">
+      <div
+        class="bg-card border border-border/50 rounded-2xl p-8 shadow-sm space-y-5"
+      >
         <div>
-          <h2 class="font-display text-2xl text-primary text-center">Trocar senha</h2>
+          <h2 class="font-display text-2xl text-primary text-center">
+            Trocar senha
+          </h2>
           <p class="font-body text-sm text-muted-foreground text-center mt-1">
             Crie uma senha pessoal para continuar
           </p>
         </div>
 
-        <!-- Passo: formulário -->
-        <form v-if="!success" @submit.prevent="handleChangePassword" class="space-y-4">
+        <form
+          v-if="!success"
+          @submit.prevent="handleChangePassword"
+          class="space-y-4"
+        >
           <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground">Nova senha</label>
+            <label class="font-body text-sm font-medium text-foreground"
+              >Nova senha</label
+            >
             <input
               v-model="newPassword"
               type="password"
@@ -23,7 +34,9 @@
           </div>
 
           <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground">Confirme a nova senha</label>
+            <label class="font-body text-sm font-medium text-foreground"
+              >Confirme a nova senha</label
+            >
             <input
               v-model="confirmPassword"
               type="password"
@@ -49,16 +62,27 @@
           </button>
         </form>
 
-        <!-- Passo: confirmação — informa que deve fazer login novamente -->
         <div v-else class="text-center space-y-4">
           <div class="flex justify-center">
             <div class="p-3 rounded-full bg-green-100">
-              <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              <svg
+                class="w-6 h-6 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
           </div>
-          <p class="font-display text-lg text-foreground">Senha alterada com sucesso!</p>
+          <p class="font-display text-lg text-foreground">
+            Senha alterada com sucesso!
+          </p>
           <p class="font-body text-sm text-muted-foreground">
             Por segurança, faça login novamente com sua nova senha.
           </p>
@@ -110,14 +134,11 @@ const handleChangePassword = async () => {
       password_confirmation: confirmPassword.value,
     });
 
-    // O backend revogou o JWT atual — limpar sessão local imediatamente.
-    // Qualquer tentativa de usar o token antigo resultará em 401.
     localStorage.removeItem("auth_token");
     localStorage.removeItem("auth_user");
 
     success.value = true;
 
-    // Countdown e redirect para login
     countdownInterval = setInterval(() => {
       countdown.value -= 1;
       if (countdown.value <= 0) {
