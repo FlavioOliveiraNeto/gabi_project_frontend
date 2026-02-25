@@ -132,7 +132,11 @@ import { computed, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronDown } from "lucide-vue-next";
-import { createSession, type PatientUser, type CalendarSession } from "@/services/dashboard";
+import {
+  createSession,
+  type PatientUser,
+  type CalendarSession,
+} from "@/services/dashboard";
 
 const props = defineProps<{
   isOpen: boolean;
@@ -235,6 +239,7 @@ async function handleConfirm() {
     });
 
     emit("created", session);
+    isLoading.value = false;
     closeModal();
   } catch (err: any) {
     const msgs = err?.response?.data?.errors;
