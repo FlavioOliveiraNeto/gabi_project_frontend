@@ -200,12 +200,6 @@
                 Adicionar link do Meet
               </button>
               <button
-                @click="confirmAbsent(session)"
-                class="text-xs text-red-500 hover:underline whitespace-nowrap"
-              >
-                Registrar falta
-              </button>
-              <button
                 @click="confirmCancel(session)"
                 class="text-xs text-muted-foreground hover:underline whitespace-nowrap"
               >
