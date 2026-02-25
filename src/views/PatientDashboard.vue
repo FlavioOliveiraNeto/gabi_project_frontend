@@ -281,8 +281,8 @@ import {
 const router = useRouter();
 const { user, logout } = useAuth();
 
-const handleLogout = () => {
-  logout();
+const handleLogout = async () => {
+  await logout();
   router.push("/login");
 };
 
