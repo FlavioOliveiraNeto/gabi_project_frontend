@@ -257,6 +257,7 @@ import { X, KeyRound, Clipboard, ClipboardCheck } from "lucide-vue-next";
 import {
   createPatient,
   updatePatient,
+  updatePatientSchedule,
   type PatientUser,
 } from "@/services/dashboard";
 
@@ -374,10 +375,61 @@ function validateModal(): boolean {
 
 async function handleSubmit() {
   if (!validateModal()) return;
+
   modalLoading.value = true;
   modalError.value = "";
 
   try {
+    if (isEditing.value && props.patientToEdit) {
+      const original = props.patientToEdit;
+
+      const basicData = {
+        name: modalForm.name.trim(),
+        email: modalForm.email.trim(),
+        google_meet_link: modalForm.google_meet_link.trim() || undefined,
+      };
+
+      const updatedPatient = await updatePatient(original.id, basicData);
+
+      const originalDays = [...(original.session_days ?? [])].sort();
+      const newDays = [...modalForm.weekdays].sort();
+
+      const weeklyScheduleChanged =
+        modalForm.schedule_type === "regular" &&
+        (modalForm.schedule_type !== original.schedule_type ||
+          modalForm.session_time !== original.session_time ||
+          modalForm.sessions_per_week !== original.sessions_per_week ||
+          JSON.stringify(newDays) !== JSON.stringify(originalDays));
+
+      const extraSessionChanged =
+        modalForm.schedule_type === "extra" &&
+        (modalForm.single_date !== original.extra_sessions?.[0]?.date ||
+          modalForm.single_time !== original.extra_sessions?.[0]?.time);
+
+      if (weeklyScheduleChanged) {
+        await updatePatientSchedule(original.id, {
+          schedule_type: "regular",
+          sessions_per_week: modalForm.sessions_per_week || undefined,
+          weekdays:
+            modalForm.weekdays.length > 0 ? modalForm.weekdays : undefined,
+          session_time: modalForm.session_time || undefined,
+        });
+      }
+
+      if (extraSessionChanged) {
+        await updatePatientSchedule(original.id, {
+          schedule_type: "extra",
+          single_date: modalForm.single_date || undefined,
+          single_time: modalForm.single_time || undefined,
+          session_id: editingSessionId.value || undefined,
+        });
+      }
+
+      emit("saved", updatedPatient, false);
+      closeModal();
+      return;
+    }
+
     const payload: any = {
       name: modalForm.name.trim(),
       email: modalForm.email.trim(),
@@ -387,31 +439,28 @@ async function handleSubmit() {
 
     if (modalForm.schedule_type === "regular") {
       payload.sessions_per_week = modalForm.sessions_per_week || undefined;
+
       payload.weekdays =
         modalForm.weekdays.length > 0 ? modalForm.weekdays : undefined;
+
       payload.session_time = modalForm.session_time || undefined;
     }
 
     if (modalForm.schedule_type === "extra") {
       payload.single_date = modalForm.single_date || undefined;
+
       payload.single_time = modalForm.single_time || undefined;
-      if (isEditing.value && editingSessionId.value) {
-        payload.session_id = editingSessionId.value;
-      }
     }
 
-    if (isEditing.value && props.patientToEdit) {
-      const updated = await updatePatient(props.patientToEdit.id, payload);
-      emit("saved", updated, false);
-      closeModal();
-    } else {
-      const created = await createPatient(payload);
-      generatedPassword.value = created.generated_password;
-      showPasswordStep.value = true;
-      emit("saved", created, true);
-    }
+    const created = await createPatient(payload);
+
+    generatedPassword.value = created.generated_password;
+    showPasswordStep.value = true;
+
+    emit("saved", created, true);
   } catch (err: any) {
     const msgs = err?.response?.data?.errors;
+
     modalError.value = Array.isArray(msgs)
       ? msgs.join(", ")
       : "Erro ao salvar paciente.";

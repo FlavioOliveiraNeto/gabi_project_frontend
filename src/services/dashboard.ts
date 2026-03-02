@@ -75,6 +75,7 @@ export interface CreatePatientParams {
   name: string;
   email: string;
   google_meet_link?: string;
+
   schedule_type?: "regular" | "extra";
   sessions_per_week?: number;
   weekdays?: string[];
@@ -82,6 +83,27 @@ export interface CreatePatientParams {
   single_date?: string;
   single_time?: string;
   session_id?: number;
+}
+
+export interface CreatePatientResponse extends PatientUser {
+  generated_password: string;
+}
+
+export interface UpdatePatientParams {
+  name?: string;
+  email?: string;
+  google_meet_link?: string;
+}
+
+export interface UpdateScheduleParams {
+  schedule_type: "regular" | "extra";
+  sessions_per_week?: number;
+  weekdays?: string[];
+  session_time?: string;
+  single_date?: string;
+  single_time?: string;
+  session_id?: number;
+  effective_from?: string;
 }
 
 export interface CalendarSession {
@@ -115,10 +137,6 @@ export async function getPatients(): Promise<PatientUser[]> {
   return data;
 }
 
-export interface CreatePatientResponse extends PatientUser {
-  generated_password: string;
-}
-
 export async function createPatient(
   params: CreatePatientParams,
 ): Promise<CreatePatientResponse> {
@@ -131,10 +149,21 @@ export async function createPatient(
 
 export async function updatePatient(
   id: number,
-  params: CreatePatientParams,
+  params: UpdatePatientParams,
 ): Promise<PatientUser> {
   const { data } = await api.put<PatientUser>(
     `/therapists/patients/${id}`,
+    params,
+  );
+  return data;
+}
+
+export async function updatePatientSchedule(
+  id: number,
+  params: UpdateScheduleParams,
+): Promise<PatientUser> {
+  const { data } = await api.put<PatientUser>(
+    `/therapists/patients/${id}/update_schedule`,
     params,
   );
   return data;
