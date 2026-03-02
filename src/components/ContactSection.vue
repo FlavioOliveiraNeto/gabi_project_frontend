@@ -72,9 +72,10 @@
             Vamos dar o primeiro passo?
           </h3>
 
-          <p class="font-body text-primary-foreground/80 mb-8 max-w-sm">
-            A terapia é um presente que você se dá. Agende sua primeira sessão e
-            comece sua jornada.
+          <p
+            class="font-body text-primary-foreground/80 mb-8 max-w-sm flex items-center justify-center gap-2"
+          >
+            Agende sua primeira sessão e comece sua jornada.
           </p>
 
           <Button
@@ -85,8 +86,9 @@
               href="https://wa.me/5562996195671?text=Olá%20gostaria%20de%20agendar%20uma%20sessão"
               target="_blank"
               rel="noopener noreferrer"
-              class="whitespace-break-spaces"
+              class="whitespace-break-spaces flex items-center"
             >
+              <FontAwesomeIcon :icon="faWhatsapp" class="text-lg" />
               Agendar pelo WhatsApp
             </a>
           </Button>
@@ -98,6 +100,8 @@
 
 <script setup lang="ts">
 import { MapPin, Phone, Mail, Instagram, Clock } from "lucide-vue-next";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
 import Button from "@/components/ui/button/Button.vue";
 
