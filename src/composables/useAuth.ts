@@ -1,27 +1,35 @@
 import { ref, computed } from "vue";
-import { loginRequest, type User } from "@/services/auth";
+import { loginRequest, getMeRequest, type User } from "@/services/auth";
+import { setCsrfToken } from "@/services/api";
 import api from "@/services/api";
 
-const user = ref<User | null>(
-  localStorage.getItem("auth_user")
-    ? JSON.parse(localStorage.getItem("auth_user") as string)
-    : null,
-);
-
+const user = ref<User | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 
-const login = async (email: string, password: string) => {
+const initialize = async (): Promise<void> => {
+  isLoading.value = true;
+  try {
+    const { user: apiUser, csrf_token: token } = await getMeRequest();
+    user.value = apiUser;
+    setCsrfToken(token);
+  } catch {
+    user.value = null;
+    setCsrfToken(null);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const login = async (email: string, password: string): Promise<void> => {
   isLoading.value = true;
   error.value = null;
 
   try {
-    const { user: apiUser, token } = await loginRequest(email, password);
-
-    localStorage.setItem("auth_token", token);
-    localStorage.setItem("auth_user", JSON.stringify(apiUser));
+    const { user: apiUser, csrf_token: token } = await loginRequest(email, password);
 
     user.value = apiUser;
+    setCsrfToken(token);
   } catch (err) {
     error.value = "E-mail ou senha inválidos.";
     throw err;
@@ -30,24 +38,30 @@ const login = async (email: string, password: string) => {
   }
 };
 
-const logout = async () => {
+const logout = async (): Promise<void> => {
   try {
     await api.delete("/users/sign_out");
   } catch {
-    // implementar toast de erro aqui
+    // If the logout request fails (e.g., network error), clear local state
+    // anyway so the user is not stuck logged in on the client side.
   } finally {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("auth_user");
-    user.value = null;
+    clearAuthState();
   }
+};
+
+const clearAuthState = (): void => {
+  user.value = null;
+  setCsrfToken(null);
 };
 
 export function useAuth() {
   return {
-    user: computed(() => user.value),
-    isLoading: computed(() => isLoading.value),
-    error: computed(() => error.value),
+    user:           computed(() => user.value),
+    isLoading:      computed(() => isLoading.value),
+    error:          computed(() => error.value),
+    initialize,
     login,
     logout,
+    clearAuthState,
   };
 }

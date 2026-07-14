@@ -12,6 +12,7 @@ import PsychDashboard from "../views/PsychDashboard.vue";
 import NotFound from "../views/NotFound.vue";
 
 import type { Role } from "@/services/auth";
+import { useAuth } from "@/composables/useAuth";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -74,44 +75,29 @@ const router = createRouter({
 });
 
 router.beforeEach((to) => {
-  const token = localStorage.getItem("auth_token");
-  const userRaw = localStorage.getItem("auth_user");
+  const { user } = useAuth();
+  const currentUser = user.value;
 
-  let user = null;
-
-  try {
-    user = userRaw ? JSON.parse(userRaw) : null;
-  } catch {
-    localStorage.removeItem("auth_user");
+  if (to.meta.requiresAuth && !currentUser) {
+    return { name: "login", query: { redirect: to.fullPath } };
   }
 
-  if (to.meta.requiresAuth && !token) {
-    return {
-      name: "login",
-      query: { redirect: to.fullPath },
-    };
-  }
-
-  if (to.meta.role && user?.role !== to.meta.role) {
+  if (to.meta.role && currentUser?.role !== to.meta.role) {
     return { name: "login" };
   }
 
   if (
-    user?.role === "client" &&
-    user?.must_change_password &&
+    currentUser?.role === "client" &&
+    currentUser?.must_change_password &&
     to.name !== "change-password" &&
     to.name !== "reset-password"
   ) {
     return { name: "change-password" };
   }
 
-  if (to.name === "login" && token) {
-    if (user?.role === "therapist") {
-      return { name: "terapeuta" };
-    }
-    if (user?.role === "client") {
-      return { name: "paciente" };
-    }
+  if (to.name === "login" && currentUser) {
+    if (currentUser.role === "therapist") return { name: "terapeuta" };
+    if (currentUser.role === "client")    return { name: "paciente" };
   }
 
   return true;

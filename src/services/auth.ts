@@ -12,7 +12,12 @@ export interface User {
 
 export interface LoginResult {
   user: User;
-  token: string;
+  csrf_token: string;
+}
+
+export interface MeResult {
+  user: User;
+  csrf_token: string;
 }
 
 export interface RegisterParams {
@@ -49,19 +54,21 @@ export async function loginRequest(
   email: string,
   password: string,
 ): Promise<LoginResult> {
-  const response = await api.post("/users/sign_in", {
-    user: { email, password },
-  });
-
-  const authHeader = response.headers["authorization"] as string | undefined;
-  if (!authHeader) {
-    throw new Error("Authorization header not found");
-  }
-
-  const token = authHeader.split(" ")[1];
+  const response = await api.post<{ user: User; csrf_token: string }>(
+    "/users/sign_in",
+    { user: { email, password } },
+  );
 
   return {
-    token,
-    user: response.data.user as User,
+    user:       response.data.user,
+    csrf_token: response.data.csrf_token,
+  };
+}
+
+export async function getMeRequest(): Promise<MeResult> {
+  const response = await api.get<{ user: User; csrf_token: string }>("/auth/me");
+  return {
+    user:       response.data.user,
+    csrf_token: response.data.csrf_token,
   };
 }

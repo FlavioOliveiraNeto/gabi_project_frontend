@@ -99,8 +99,10 @@
 import { ref, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import api from "@/services/api";
+import { useAuth } from "@/composables/useAuth";
 
 const router = useRouter();
+const { clearAuthState } = useAuth();
 const newPassword = ref("");
 const confirmPassword = ref("");
 const error = ref("");
@@ -134,8 +136,7 @@ const handleChangePassword = async () => {
       password_confirmation: confirmPassword.value,
     });
 
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("auth_user");
+    clearAuthState();
 
     success.value = true;
 
