@@ -3,13 +3,26 @@
     <NavBar variant="internal">
       <template #right>
         <button
-          @click="handleLogout"
           class="p-2 hover:bg-muted rounded-md transition"
+          title="Trocar senha"
+          @click="showChangePassword = true"
+        >
+          <KeyRound class="w-4 h-4" />
+        </button>
+        <button
+          class="p-2 hover:bg-muted rounded-md transition"
+          title="Sair"
+          @click="handleLogout"
         >
           <LogOut class="w-4 h-4" />
         </button>
       </template>
     </NavBar>
+
+    <ChangePasswordModal
+      :is-open="showChangePassword"
+      @close="showChangePassword = false"
+    />
 
     <main class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-12 pt-24 pb-12">
       <div class="sm:flex sm:justify-between sm:items-center my-6">
@@ -21,8 +34,13 @@
         </p>
       </div>
 
-      <div v-if="isLoading" class="text-center py-20">
-        <p class="font-body text-sm text-muted-foreground">Carregando...</p>
+      <div
+        v-if="isLoading"
+        class="text-center py-20"
+      >
+        <p class="font-body text-sm text-muted-foreground">
+          Carregando...
+        </p>
       </div>
 
       <template v-else>
@@ -107,7 +125,10 @@
             </h3>
           </div>
 
-          <div v-if="profile?.next_session" class="space-y-2">
+          <div
+            v-if="profile?.next_session"
+            class="space-y-2"
+          >
             <p class="font-body text-sm text-muted-foreground">
               Data:
               <span class="text-foreground font-medium">
@@ -123,7 +144,10 @@
             </p>
           </div>
 
-          <p v-else class="font-body text-sm text-muted-foreground">
+          <p
+            v-else
+            class="font-body text-sm text-muted-foreground"
+          >
             Nenhuma sessão agendada. Entre em contato com sua terapeuta.
           </p>
 
@@ -165,12 +189,12 @@
             rows="3"
             placeholder="Escreva algo importante sobre seu processo..."
             class="w-full border border-border/50 rounded-lg p-3 text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none bg-background"
-          ></textarea>
+          />
 
           <button
-            @click="saveNote"
             :disabled="!newNote.trim() || savingNote"
             class="mt-3 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 disabled:opacity-40 transition"
+            @click="saveNote"
           >
             {{ savingNote ? "Salvando..." : "Salvar anotação" }}
           </button>
@@ -189,19 +213,19 @@
                   v-model="editingContent"
                   rows="3"
                   class="w-full text-sm font-body border border-border/50 rounded-lg p-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition mb-2"
-                ></textarea>
+                />
                 <div class="flex gap-2">
                   <button
-                    @click="confirmEdit(note.id)"
                     :disabled="!editingContent.trim() || savingEdit"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-body text-xs font-medium hover:bg-primary/90 disabled:opacity-40 transition"
+                    @click="confirmEdit(note.id)"
                   >
                     <Save class="w-3 h-3" />
                     {{ savingEdit ? "Salvando..." : "Salvar" }}
                   </button>
                   <button
-                    @click="cancelEdit"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/60 font-body text-xs font-medium hover:bg-muted transition"
+                    @click="cancelEdit"
                   >
                     <X class="w-3 h-3" />
                     Cancelar
@@ -218,16 +242,16 @@
                     class="flex gap-1 opacity-0 group-hover:opacity-100 transition"
                   >
                     <button
-                      @click="startEdit(note)"
                       class="p-1 rounded hover:bg-muted transition"
                       title="Editar anotação"
+                      @click="startEdit(note)"
                     >
                       <Pencil class="w-3.5 h-3.5 text-muted-foreground" />
                     </button>
                     <button
-                      @click="removeNote(note.id)"
                       class="p-1 rounded hover:bg-destructive/10 transition"
                       title="Excluir anotação"
+                      @click="removeNote(note.id)"
                     >
                       <Trash2 class="w-3.5 h-3.5 text-destructive" />
                     </button>
@@ -240,7 +264,10 @@
             </div>
           </div>
 
-          <div v-else class="mt-4 text-sm text-muted-foreground font-body">
+          <div
+            v-else
+            class="mt-4 text-sm text-muted-foreground font-body"
+          >
             Nenhuma anotação ainda.
           </div>
         </div>
@@ -255,6 +282,7 @@ import { useRouter } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import {
   LogOut,
+  KeyRound,
   Calendar as CalendarIcon,
   AlertCircle,
   Clock,
@@ -267,6 +295,7 @@ import {
   X,
 } from "lucide-vue-next";
 import NavBar from "@/components/NavBar.vue";
+import ChangePasswordModal from "@/components/dashboard/modals/ChangePasswordModal.vue";
 import { format, parseISO, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
@@ -280,6 +309,8 @@ import {
 
 const router = useRouter();
 const { user, logout } = useAuth();
+
+const showChangePassword = ref(false);
 
 const handleLogout = async () => {
   await logout();

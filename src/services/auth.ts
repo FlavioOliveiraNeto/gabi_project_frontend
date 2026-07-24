@@ -50,6 +50,18 @@ export async function confirmPasswordReset(
   });
 }
 
+export async function changePasswordRequest(
+  currentPassword: string,
+  password: string,
+  passwordConfirmation: string,
+): Promise<void> {
+  await api.put("/users/change_password", {
+    current_password: currentPassword,
+    password,
+    password_confirmation: passwordConfirmation,
+  });
+}
+
 export async function loginRequest(
   email: string,
   password: string,

@@ -3,13 +3,26 @@
     <NavBar variant="internal">
       <template #right>
         <button
-          @click="handleLogout"
           class="p-2 hover:bg-muted rounded-md transition"
+          title="Trocar senha"
+          @click="showChangePassword = true"
+        >
+          <KeyRound class="w-4 h-4" />
+        </button>
+        <button
+          class="p-2 hover:bg-muted rounded-md transition"
+          title="Sair"
+          @click="handleLogout"
         >
           <LogOut class="w-4 h-4" />
         </button>
       </template>
     </NavBar>
+
+    <ChangePasswordModal
+      :is-open="showChangePassword"
+      @close="showChangePassword = false"
+    />
 
     <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 pt-24 pb-12">
       <div class="sm:flex sm:justify-between sm:items-center my-6">
@@ -32,6 +45,7 @@
 
       <PatientList
         :patients="patients"
+        :sessions="calendarSessions"
         :is-loading="isLoading"
         @add="openCreateModal"
         @edit="openEditModal"
@@ -60,7 +74,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
-import { LogOut } from "lucide-vue-next";
+import { LogOut, KeyRound } from "lucide-vue-next";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -70,6 +84,7 @@ import DashboardCalendar from "@/components/dashboard/DashboardCalendar.vue";
 import PatientList from "@/components/dashboard/PatientList.vue";
 import PatientFormModal from "@/components/dashboard/modals/PatientFormModal.vue";
 import ConfirmDeleteModal from "@/components/dashboard/modals/ConfirmDeleteModal.vue";
+import ChangePasswordModal from "@/components/dashboard/modals/ChangePasswordModal.vue";
 
 import {
   getTherapistDashboard,
@@ -83,6 +98,8 @@ import {
 ---------------------------- */
 const router = useRouter();
 const { user, logout } = useAuth();
+
+const showChangePassword = ref(false);
 
 const handleLogout = async () => {
   await logout();
