@@ -25,7 +25,7 @@
             src="@/assets/images/hero_image.jpg"
             alt="Arte de colagem com formas orgânicas em roxo, verde e branco representando acolhimento e psicologia"
             class="w-full h-72 sm:h-96 md:h-[32rem] lg:h-[40rem] object-cover"
-          />
+          >
           <div
             class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"
           />

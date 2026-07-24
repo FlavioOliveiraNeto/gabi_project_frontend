@@ -1,13 +1,13 @@
 <template>
   <RouterLink
+    v-slot="{ href, navigate, isActive, isExactActive }"
     :to="to"
     custom
-    v-slot="{ href, navigate, isActive, isExactActive }"
   >
     <a
       :href="href"
-      @click="navigate"
       :class="computedClass(isActive || isExactActive)"
+      @click="navigate"
     >
       <slot />
     </a>

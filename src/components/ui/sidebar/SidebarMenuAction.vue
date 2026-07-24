@@ -8,6 +8,7 @@ const props = withDefaults(defineProps<PrimitiveProps & {
   showOnHover?: boolean
   class?: HTMLAttributes["class"]
 }>(), {
+  class: undefined,
   as: "button",
 })
 </script>

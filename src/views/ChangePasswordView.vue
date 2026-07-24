@@ -17,33 +17,29 @@
 
         <form
           v-if="!success"
-          @submit.prevent="handleChangePassword"
           class="space-y-4"
+          @submit.prevent="handleChangePassword"
         >
           <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground"
-              >Nova senha</label
-            >
+            <label class="font-body text-sm font-medium text-foreground">Nova senha</label>
             <input
               v-model="newPassword"
               type="password"
               placeholder="Mínimo 6 caracteres"
               class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               required
-            />
+            >
           </div>
 
           <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground"
-              >Confirme a nova senha</label
-            >
+            <label class="font-body text-sm font-medium text-foreground">Confirme a nova senha</label>
             <input
               v-model="confirmPassword"
               type="password"
               placeholder="Repita a senha"
               class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               required
-            />
+            >
           </div>
 
           <p
@@ -62,7 +58,10 @@
           </button>
         </form>
 
-        <div v-else class="text-center space-y-4">
+        <div
+          v-else
+          class="text-center space-y-4"
+        >
           <div class="flex justify-center">
             <div class="p-3 rounded-full bg-green-100">
               <svg

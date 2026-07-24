@@ -6,8 +6,13 @@
       <div
         class="bg-card border border-border/50 rounded-2xl p-8 shadow-sm space-y-5"
       >
-        <div v-if="!token" class="text-center space-y-4">
-          <p class="font-display text-lg text-foreground">Link inválido</p>
+        <div
+          v-if="!token"
+          class="text-center space-y-4"
+        >
+          <p class="font-display text-lg text-foreground">
+            Link inválido
+          </p>
           <p class="font-body text-sm text-muted-foreground">
             O link de recuperação está incompleto ou expirado.
           </p>
@@ -29,31 +34,30 @@
             </p>
           </div>
 
-          <form @submit.prevent="handleReset" class="space-y-4">
+          <form
+            class="space-y-4"
+            @submit.prevent="handleReset"
+          >
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground"
-                >Nova senha</label
-              >
+              <label class="font-body text-sm font-medium text-foreground">Nova senha</label>
               <input
                 v-model="newPassword"
                 type="password"
                 placeholder="Mínimo 6 caracteres"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 required
-              />
+              >
             </div>
 
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground"
-                >Confirme a nova senha</label
-              >
+              <label class="font-body text-sm font-medium text-foreground">Confirme a nova senha</label>
               <input
                 v-model="confirmPassword"
                 type="password"
                 placeholder="Repita a senha"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 required
-              />
+              >
             </div>
 
             <p
@@ -73,7 +77,10 @@
           </form>
         </template>
 
-        <div v-else class="text-center space-y-4">
+        <div
+          v-else
+          class="text-center space-y-4"
+        >
           <div class="flex justify-center">
             <div class="p-3 rounded-full bg-green-100">
               <svg
@@ -91,7 +98,9 @@
               </svg>
             </div>
           </div>
-          <p class="font-display text-lg text-foreground">Senha redefinida!</p>
+          <p class="font-display text-lg text-foreground">
+            Senha redefinida!
+          </p>
           <p class="font-body text-sm text-muted-foreground">
             Sua senha foi alterada com sucesso. Faça login com a nova senha.
           </p>

@@ -10,22 +10,30 @@
           Tem certeza que deseja marcar esta falta?
         </p>
         <div class="flex flex-col gap-2 mb-4">
-          <p class="font-bold">Dados da sessão:</p>
-          <p class="ml-4">Paciente: {{ target.patient?.name }}</p>
-          <p class="ml-4">Data: {{ target.date }}</p>
-          <p class="ml-4">Horário: {{ target.time }}</p>
+          <p class="font-bold">
+            Dados da sessão:
+          </p>
+          <p class="ml-4">
+            Paciente: {{ target.patient?.name }}
+          </p>
+          <p class="ml-4">
+            Data: {{ target.date }}
+          </p>
+          <p class="ml-4">
+            Horário: {{ target.time }}
+          </p>
         </div>
         <div class="flex gap-3">
           <button
-            @click="closeModal"
             class="flex-1 py-2.5 rounded-lg border border-border/60 font-body text-sm font-medium hover:bg-muted transition"
+            @click="closeModal"
           >
             Cancelar
           </button>
           <button
-            @click="handleConfirm"
             :disabled="isLoading"
             class="flex-1 py-2.5 rounded-lg bg-destructive text-destructive-foreground font-body text-sm font-medium hover:bg-destructive/90 disabled:opacity-50 transition"
+            @click="handleConfirm"
           >
             {{ isLoading ? "Marcando falta..." : "Marcar falta" }}
           </button>

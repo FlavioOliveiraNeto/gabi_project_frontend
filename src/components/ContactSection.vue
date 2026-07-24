@@ -1,5 +1,8 @@
 <template>
-  <section id="contato" class="py-16 bg-background relative overflow-x-hidden">
+  <section
+    id="contato"
+    class="py-16 bg-background relative overflow-x-hidden"
+  >
     <div
       class="absolute top-0 left-0 right-0 h-10 md:h-20 bg-sage-light torn-edge-bottom z-10"
     />
@@ -11,7 +14,7 @@
           alt="Imagem de contato"
           class="w-32 h-32 md:w-50 md:h-50 mx-auto rounded-full object-cover mb-6"
           loading="lazy"
-        />
+        >
         <span
           class="text-secondary font-body font-semibold text-sm uppercase tracking-widest"
         >
@@ -49,7 +52,10 @@
                 item.bg,
               ]"
             >
-              <component :is="item.icon" :class="['w-5 h-5', item.iconColor]" />
+              <component
+                :is="item.icon"
+                :class="['w-5 h-5', item.iconColor]"
+              />
             </div>
 
             <div>
@@ -88,7 +94,10 @@
               rel="noopener noreferrer"
               class="whitespace-break-spaces flex items-center"
             >
-              <FontAwesomeIcon :icon="faWhatsapp" class="text-lg" />
+              <FontAwesomeIcon
+                :icon="faWhatsapp"
+                class="text-lg"
+              />
               Agendar pelo WhatsApp
             </a>
           </Button>

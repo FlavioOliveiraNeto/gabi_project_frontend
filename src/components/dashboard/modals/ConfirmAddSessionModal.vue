@@ -17,21 +17,27 @@
           </strong>
         </p>
 
-        <div class="mb-4 relative" ref="dropdownRef">
+        <div
+          ref="dropdownRef"
+          class="mb-4 relative"
+        >
           <label class="text-sm font-medium text-muted-foreground mb-1 block">
             Paciente
           </label>
 
           <div
-            @click="toggleDropdown"
             :class="[
               'w-full rounded-xl px-3 py-2 text-sm bg-background flex items-center justify-between cursor-pointer transition-all duration-150',
               isDropdownOpen
                 ? 'border border-primary ring-2 ring-primary/20'
                 : 'border border-border hover:border-primary',
             ]"
+            @click="toggleDropdown"
           >
-            <span v-if="selectedPatient" class="flex items-center gap-2">
+            <span
+              v-if="selectedPatient"
+              class="flex items-center gap-2"
+            >
               <div
                 class="w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center"
               >
@@ -40,7 +46,10 @@
               {{ selectedPatient.name }}
             </span>
 
-            <span v-else class="text-muted-foreground">
+            <span
+              v-else
+              class="text-muted-foreground"
+            >
               Selecione um paciente
             </span>
 
@@ -60,15 +69,15 @@
                 type="text"
                 placeholder="Buscar paciente..."
                 class="w-full px-2 py-1.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"
-              />
+              >
             </div>
 
             <div class="max-h-48 overflow-y-auto custom-scroll">
               <div
                 v-for="patient in filteredPatients"
                 :key="patient.id"
-                @click="selectPatient(patient)"
                 class="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-muted transition"
+                @click="selectPatient(patient)"
               >
                 <div
                   class="w-8 h-8 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center"
@@ -93,10 +102,10 @@
             Horário
           </label>
           <input
-            type="time"
             v-model="selectedTime"
+            type="time"
             class="w-full border border-border rounded-lg p-2 text-sm bg-background focus:ring-1 focus:ring-primary focus:outline-none"
-          />
+          >
         </div>
 
         <p
@@ -108,16 +117,16 @@
 
         <div class="flex gap-3">
           <button
-            @click="closeModal"
             class="flex-1 py-2.5 rounded-lg border border-border/60 font-body text-sm font-medium hover:bg-muted transition"
+            @click="closeModal"
           >
             Cancelar
           </button>
 
           <button
-            @click="handleConfirm"
             :disabled="isLoading || !selectedPatientId || !selectedTime"
             class="flex-1 py-2.5 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            @click="handleConfirm"
           >
             {{ isLoading ? "Criando..." : "Criar sessão" }}
           </button>

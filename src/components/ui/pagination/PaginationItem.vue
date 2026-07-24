@@ -12,6 +12,7 @@ const props = withDefaults(defineProps<PaginationListItemProps & {
   class?: HTMLAttributes["class"]
   isActive?: boolean
 }>(), {
+  class: undefined,
   size: "icon",
 })
 

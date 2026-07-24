@@ -5,14 +5,19 @@
     <div class="w-full max-w-md">
       <div class="text-center mb-8">
         <LogoComponent class="mx-auto mb-4" />
-        <h1 class="font-display text-2xl text-primary">Criar conta</h1>
+        <h1 class="font-display text-2xl text-primary">
+          Criar conta
+        </h1>
         <p class="font-body text-sm text-muted-foreground mt-1">
           Preencha os dados abaixo para se cadastrar
         </p>
       </div>
 
       <div class="bg-card border border-border/50 rounded-2xl p-8 shadow-sm">
-        <form @submit.prevent="handleRegister" class="space-y-4">
+        <form
+          class="space-y-4"
+          @submit.prevent="handleRegister"
+        >
           <div class="space-y-1.5">
             <label class="font-body text-sm font-medium text-foreground">
               Nome completo
@@ -24,8 +29,11 @@
               autocomplete="name"
               class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               :class="{ 'border-destructive': errors.name }"
-            />
-            <p v-if="errors.name" class="text-xs text-destructive font-body">
+            >
+            <p
+              v-if="errors.name"
+              class="text-xs text-destructive font-body"
+            >
               {{ errors.name }}
             </p>
           </div>
@@ -41,8 +49,11 @@
               autocomplete="email"
               class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               :class="{ 'border-destructive': errors.email }"
-            />
-            <p v-if="errors.email" class="text-xs text-destructive font-body">
+            >
+            <p
+              v-if="errors.email"
+              class="text-xs text-destructive font-body"
+            >
               {{ errors.email }}
             </p>
           </div>
@@ -58,8 +69,11 @@
               autocomplete="tel"
               class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               :class="{ 'border-destructive': errors.phone }"
-            />
-            <p v-if="errors.phone" class="text-xs text-destructive font-body">
+            >
+            <p
+              v-if="errors.phone"
+              class="text-xs text-destructive font-body"
+            >
               {{ errors.phone }}
             </p>
           </div>
@@ -76,15 +90,21 @@
                 autocomplete="new-password"
                 class="w-full px-4 py-2.5 pr-10 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 :class="{ 'border-destructive': errors.password }"
-              />
+              >
               <button
                 type="button"
-                @click="showPassword = !showPassword"
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
                 tabindex="-1"
+                @click="showPassword = !showPassword"
               >
-                <Eye v-if="!showPassword" class="w-4 h-4" />
-                <EyeOff v-else class="w-4 h-4" />
+                <Eye
+                  v-if="!showPassword"
+                  class="w-4 h-4"
+                />
+                <EyeOff
+                  v-else
+                  class="w-4 h-4"
+                />
               </button>
             </div>
             <p
@@ -107,15 +127,21 @@
                 autocomplete="new-password"
                 class="w-full px-4 py-2.5 pr-10 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 :class="{ 'border-destructive': errors.password_confirmation }"
-              />
+              >
               <button
                 type="button"
-                @click="showPasswordConfirm = !showPasswordConfirm"
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
                 tabindex="-1"
+                @click="showPasswordConfirm = !showPasswordConfirm"
               >
-                <Eye v-if="!showPasswordConfirm" class="w-4 h-4" />
-                <EyeOff v-else class="w-4 h-4" />
+                <Eye
+                  v-if="!showPasswordConfirm"
+                  class="w-4 h-4"
+                />
+                <EyeOff
+                  v-else
+                  class="w-4 h-4"
+                />
               </button>
             </div>
             <p

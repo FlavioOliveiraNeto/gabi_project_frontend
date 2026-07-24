@@ -25,6 +25,7 @@ const props = withDefaults(
     class?: HTMLAttributes["class"];
   }>(),
   {
+    class: undefined,
     defaultOpen: !defaultDocument?.cookie.includes(
       `${SIDEBAR_COOKIE_NAME}=false`,
     ),

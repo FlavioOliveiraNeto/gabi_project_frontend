@@ -9,6 +9,7 @@ const props = withDefaults(defineProps<PrimitiveProps & {
   isActive?: boolean
   class?: HTMLAttributes["class"]
 }>(), {
+  class: undefined,
   as: "a",
   size: "md",
 })

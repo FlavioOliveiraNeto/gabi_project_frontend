@@ -1,5 +1,8 @@
 <template>
-  <section id="servicos" class="py-16 bg-sage-light relative overflow-hidden">
+  <section
+    id="servicos"
+    class="py-16 bg-sage-light relative overflow-hidden"
+  >
     <div
       class="absolute top-0 left-0 right-0 h-10 md:h-20 bg-background torn-edge-bottom z-10"
     />
@@ -36,7 +39,10 @@
               service.color,
             ]"
           >
-            <component :is="service.icon" class="w-6 h-6" />
+            <component
+              :is="service.icon"
+              class="w-6 h-6"
+            />
           </div>
 
           <h3 class="text-xl font-display font-semibold text-foreground mb-3">

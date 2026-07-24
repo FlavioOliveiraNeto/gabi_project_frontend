@@ -11,20 +11,19 @@
         </h2>
         <p class="font-body text-sm text-muted-foreground mb-6">
           Tem certeza que deseja excluir
-          <strong class="text-foreground">{{ target.name }}</strong
-          >? Todas as anotações e sessões serão removidas permanentemente.
+          <strong class="text-foreground">{{ target.name }}</strong>? Todas as anotações e sessões serão removidas permanentemente.
         </p>
         <div class="flex gap-3">
           <button
-            @click="closeModal"
             class="flex-1 py-2.5 rounded-lg border border-border/60 font-body text-sm font-medium hover:bg-muted transition"
+            @click="closeModal"
           >
             Cancelar
           </button>
           <button
-            @click="handleConfirm"
             :disabled="isLoading"
             class="flex-1 py-2.5 rounded-lg bg-destructive text-destructive-foreground font-body text-sm font-medium hover:bg-destructive/90 disabled:opacity-50 transition"
+            @click="handleConfirm"
           >
             {{ isLoading ? "Excluindo..." : "Excluir" }}
           </button>

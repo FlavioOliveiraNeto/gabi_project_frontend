@@ -10,14 +10,14 @@
         </h3>
         <div class="flex items-center gap-1 ml-auto">
           <button
-            @click="prevMonth"
             class="p-1.5 hover:bg-muted rounded-lg transition"
+            @click="prevMonth"
           >
             <ChevronLeft class="w-4 h-4 text-muted-foreground" />
           </button>
           <button
-            @click="nextMonth"
             class="p-1.5 hover:bg-muted rounded-lg transition"
+            @click="nextMonth"
           >
             <ChevronRight class="w-4 h-4 text-muted-foreground" />
           </button>
@@ -38,23 +38,23 @@
         <div
           v-for="(cell, idx) in calendarCells"
           :key="idx"
-          @click="selectDate(cell)"
           class="relative min-w-0 aspect-square flex items-center justify-center rounded-lg text-sm font-body transition-colors border cursor-pointer"
           :class="[
             getCellClass(cell),
             selectedDate &&
-            cell.date &&
-            format(cell.date, 'yyyy-MM-dd') ===
+              cell.date &&
+              format(cell.date, 'yyyy-MM-dd') ===
               format(selectedDate, 'yyyy-MM-dd')
               ? 'ring-2 ring-primary'
               : '',
           ]"
+          @click="selectDate(cell)"
         >
           <span v-if="cell.day">{{ cell.day }}</span>
           <span
             v-if="cell.day && cell.hasSession && !cell.isToday"
             class="w-full h-full absolute rounded-lg bg-secondary opacity-40"
-          ></span>
+          />
         </div>
       </div>
     </div>
@@ -66,39 +66,46 @@
         <h3 class="font-display text-xl text-foreground">
           {{ format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR }) }}
         </h3>
-        <div v-if="totalPages > 1" class="flex items-center gap-1 ml-auto mr-4">
+        <div
+          v-if="totalPages > 1"
+          class="flex items-center gap-1 ml-auto mr-4"
+        >
           <button
-            @click="currentPage--"
             :disabled="currentPage === 1"
             class="p-1.5 hover:bg-muted rounded-lg transition disabled:cursor-not-allowed disabled:opacity-50"
+            @click="currentPage--"
           >
             <ChevronLeft class="w-4 h-4 text-muted-foreground" />
           </button>
-          <span class="text-xs font-body"
-            >{{ currentPage }} / {{ totalPages }}</span
-          >
+          <span class="text-xs font-body">{{ currentPage }} / {{ totalPages }}</span>
           <button
-            @click="currentPage++"
             :disabled="currentPage === totalPages"
             class="p-1.5 hover:bg-muted rounded-lg transition disabled:cursor-not-allowed disabled:opacity-50"
+            @click="currentPage++"
           >
             <ChevronRight class="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
         <CalendarPlus
-          @click="openCreateSessionModal"
           class="w-5 h-5 text-primary cursor-pointer hover:rotate-10 transition"
           title="Adicionar sessão extra neste dia"
+          @click="openCreateSessionModal"
         />
       </div>
 
-      <div v-if="sessionsOfSelectedDay.length === 0" class="text-center py-6">
+      <div
+        v-if="sessionsOfSelectedDay.length === 0"
+        class="text-center py-6"
+      >
         <p class="font-body text-sm text-muted-foreground">
           Nenhum atendimento neste dia.
         </p>
       </div>
 
-      <div v-else class="space-y-3 overflow-y-auto flex-1 pr-2">
+      <div
+        v-else
+        class="space-y-3 overflow-y-auto flex-1 pr-2"
+      >
         <div
           v-for="session in paginatedSessions"
           :key="session.id"
@@ -127,7 +134,10 @@
                 <Ban class="w-4 h-4 text-muted-foreground" />
               </IconWithTooltip>
 
-              <IconWithTooltip v-else text="Sessão agendada">
+              <IconWithTooltip
+                v-else
+                text="Sessão agendada"
+              >
                 <Clock class="w-4 h-4 text-yellow-500" />
               </IconWithTooltip>
             </div>
@@ -158,21 +168,19 @@
 
           <div class="flex flex-col items-end gap-1 shrink-0">
             <template v-if="session.status === 'cancelled'">
-              <span class="text-xs text-muted-foreground italic"
-                >Cancelada</span
-              >
+              <span class="text-xs text-muted-foreground italic">Cancelada</span>
             </template>
 
             <template v-else-if="session.status === 'completed'">
               <button
-                @click="confirmAbsent(session)"
                 class="text-xs text-red-500 hover:underline whitespace-nowrap"
+                @click="confirmAbsent(session)"
               >
                 Registrar falta
               </button>
               <button
-                @click="confirmCancel(session)"
                 class="text-xs text-muted-foreground hover:underline whitespace-nowrap"
+                @click="confirmCancel(session)"
               >
                 Cancelar sessão
               </button>
@@ -193,15 +201,15 @@
                 v-else-if="
                   !isSelectedDatePast && !session.patient?.google_meet_link
                 "
-                @click="emit('edit-patient', session.patient.id)"
                 class="flex items-center gap-1 text-xs font-body font-medium text-orange-500 hover:underline"
+                @click="emit('edit-patient', session.patient.id)"
               >
                 <Video class="w-3.5 h-3.5" />
                 Adicionar link do Meet
               </button>
               <button
-                @click="confirmCancel(session)"
                 class="text-xs text-muted-foreground hover:underline whitespace-nowrap"
+                @click="confirmCancel(session)"
               >
                 Cancelar sessão
               </button>
@@ -229,22 +237,30 @@
             Tem certeza que deseja cancelar esta sessão?
           </p>
           <div class="flex flex-col gap-2 mb-4">
-            <p class="font-bold">Dados da sessão:</p>
-            <p class="ml-4">Paciente: {{ cancelTarget.patient?.name }}</p>
-            <p class="ml-4">Data: {{ cancelTarget.date }}</p>
-            <p class="ml-4">Horário: {{ cancelTarget.time }}</p>
+            <p class="font-bold">
+              Dados da sessão:
+            </p>
+            <p class="ml-4">
+              Paciente: {{ cancelTarget.patient?.name }}
+            </p>
+            <p class="ml-4">
+              Data: {{ cancelTarget.date }}
+            </p>
+            <p class="ml-4">
+              Horário: {{ cancelTarget.time }}
+            </p>
           </div>
           <div class="flex gap-3">
             <button
-              @click="closeCancelModal"
               class="flex-1 py-2.5 rounded-lg border border-border/60 font-body text-sm font-medium hover:bg-muted transition"
+              @click="closeCancelModal"
             >
               Voltar
             </button>
             <button
-              @click="handleSessionCancelled(cancelTarget.id)"
               :disabled="cancelLoading"
               class="flex-1 py-2.5 rounded-lg bg-muted text-foreground font-body text-sm font-medium hover:bg-muted/80 disabled:opacity-50 transition"
+              @click="handleSessionCancelled(cancelTarget.id)"
             >
               {{ cancelLoading ? "Cancelando..." : "Cancelar sessão" }}
             </button>

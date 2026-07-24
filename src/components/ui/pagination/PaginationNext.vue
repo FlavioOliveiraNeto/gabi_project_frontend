@@ -12,6 +12,7 @@ const props = withDefaults(defineProps<PaginationNextProps & {
   size?: ButtonVariants["size"]
   class?: HTMLAttributes["class"]
 }>(), {
+  class: undefined,
   size: "default",
 })
 

@@ -1,5 +1,8 @@
 <template>
-  <section id="sobre" class="py-20 bg-background relative overflow-hidden">
+  <section
+    id="sobre"
+    class="py-20 bg-background relative overflow-hidden"
+  >
     <div
       class="absolute top-0 left-0 right-0 h-10 md:h-20 bg-lavender-light torn-edge-bottom z-10"
     />
@@ -30,7 +33,7 @@
                 :src="aboutImage"
                 alt="Arte de colagem representando introspecção e cuidado em psicologia"
                 class="w-full h-[450px] object-cover"
-              />
+              >
             </div>
 
             <div
@@ -88,7 +91,10 @@
               <div
                 class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4"
               >
-                <component :is="item.icon" class="w-5 h-5 text-primary" />
+                <component
+                  :is="item.icon"
+                  class="w-5 h-5 text-primary"
+                />
               </div>
 
               <h3 class="font-display font-semibold text-foreground">

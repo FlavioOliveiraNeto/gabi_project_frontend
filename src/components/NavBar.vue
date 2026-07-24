@@ -3,7 +3,10 @@
     <div
       class="container mx-auto px-3 py-6 lg:px-25 lg:py-auto flex items-center justify-between"
     >
-      <button class="font-display text-xl text-primary" @click="scrollTop">
+      <button
+        class="font-display text-xl text-primary"
+        @click="scrollTop"
+      >
         <LogoComponent />
       </button>
 
@@ -37,7 +40,10 @@
         </router-link>
       </nav>
 
-      <div v-else class="flex items-center gap-4">
+      <div
+        v-else
+        class="flex items-center gap-4"
+      >
         <slot name="right" />
       </div>
 
@@ -46,7 +52,10 @@
         class="md:hidden text-foreground"
         @click="open = !open"
       >
-        <component :is="open ? X : Menu" class="w-6 h-6" />
+        <component
+          :is="open ? X : Menu"
+          class="w-6 h-6"
+        />
       </button>
     </div>
 

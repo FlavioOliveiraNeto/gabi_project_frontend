@@ -8,7 +8,10 @@
       <div
         class="bg-card rounded-2xl shadow-lg w-full max-w-lg p-6 overflow-y-auto max-h-[90vh]"
       >
-        <div v-if="showPasswordStep" class="space-y-5">
+        <div
+          v-if="showPasswordStep"
+          class="space-y-5"
+        >
           <div class="flex items-center gap-3">
             <div class="p-2 rounded-full bg-green-100">
               <KeyRound class="w-5 h-5 text-green-600" />
@@ -39,12 +42,18 @@
               </code>
               <button
                 type="button"
-                @click="copyPassword"
                 class="ml-auto p-2 rounded-lg hover:bg-amber-100 transition"
                 :title="copied ? 'Copiado!' : 'Copiar senha'"
+                @click="copyPassword"
               >
-                <ClipboardCheck v-if="copied" class="w-4 h-4 text-green-600" />
-                <Clipboard v-else class="w-4 h-4 text-amber-700" />
+                <ClipboardCheck
+                  v-if="copied"
+                  class="w-4 h-4 text-green-600"
+                />
+                <Clipboard
+                  v-else
+                  class="w-4 h-4 text-amber-700"
+                />
               </button>
             </div>
           </div>
@@ -55,8 +64,8 @@
 
           <button
             type="button"
-            @click="confirmPasswordCopied"
             class="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 transition"
+            @click="confirmPasswordCopied"
           >
             Entendi, fechar
           </button>
@@ -68,25 +77,26 @@
               {{ isEditing ? "Editar paciente" : "Adicionar paciente" }}
             </h2>
             <button
-              @click="closeModal"
               class="p-1.5 rounded-lg hover:bg-muted transition"
+              @click="closeModal"
             >
               <X class="w-4 h-4" />
             </button>
           </div>
 
-          <form @submit.prevent="handleSubmit" class="space-y-4">
+          <form
+            class="space-y-4"
+            @submit.prevent="handleSubmit"
+          >
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground"
-                >Nome completo *</label
-              >
+              <label class="font-body text-sm font-medium text-foreground">Nome completo *</label>
               <input
                 v-model="modalForm.name"
                 type="text"
                 placeholder="Nome do paciente"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 :class="{ 'border-destructive': modalErrors.name }"
-              />
+              >
               <p
                 v-if="modalErrors.name"
                 class="text-xs text-destructive font-body"
@@ -96,16 +106,14 @@
             </div>
 
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground"
-                >E-mail *</label
-              >
+              <label class="font-body text-sm font-medium text-foreground">E-mail *</label>
               <input
                 v-model="modalForm.email"
                 type="email"
                 placeholder="paciente@email.com"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 :class="{ 'border-destructive': modalErrors.email }"
-              />
+              >
               <p
                 v-if="modalErrors.email"
                 class="text-xs text-destructive font-body"
@@ -115,15 +123,13 @@
             </div>
 
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground"
-                >Link do Google Meet</label
-              >
+              <label class="font-body text-sm font-medium text-foreground">Link do Google Meet</label>
               <input
                 v-model="modalForm.google_meet_link"
                 type="url"
                 placeholder="https://meet.google.com/..."
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-              />
+              >
             </div>
 
             <div class="space-y-1.5">
@@ -134,31 +140,40 @@
                 v-model="modalForm.schedule_type"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               >
-                <option value="regular">Semanal</option>
-                <option value="extra">Avulso</option>
+                <option value="regular">
+                  Semanal
+                </option>
+                <option value="extra">
+                  Avulso
+                </option>
               </select>
             </div>
 
-            <div v-if="modalForm.schedule_type === 'regular'" class="space-y-4">
+            <div
+              v-if="modalForm.schedule_type === 'regular'"
+              class="space-y-4"
+            >
               <div class="space-y-1.5">
-                <label class="font-body text-sm font-medium text-foreground"
-                  >Sessões por semana</label
-                >
+                <label class="font-body text-sm font-medium text-foreground">Sessões por semana</label>
                 <select
                   v-model.number="modalForm.sessions_per_week"
                   class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 >
-                  <option :value="0">Não definido</option>
-                  <option v-for="n in 7" :key="n" :value="n">
+                  <option :value="0">
+                    Não definido
+                  </option>
+                  <option
+                    v-for="n in 7"
+                    :key="n"
+                    :value="n"
+                  >
                     {{ n }}x por semana
                   </option>
                 </select>
               </div>
 
               <div class="space-y-1.5">
-                <label class="font-body text-sm font-medium text-foreground"
-                  >Dias das sessões</label
-                >
+                <label class="font-body text-sm font-medium text-foreground">Dias das sessões</label>
                 <div class="flex flex-wrap gap-3">
                   <label
                     v-for="(label, day) in WEEKDAY_LABELS"
@@ -166,18 +181,21 @@
                     class="flex items-center gap-1.5 cursor-pointer"
                   >
                     <input
+                      v-model="modalForm.weekdays"
                       type="checkbox"
                       :value="day"
-                      v-model="modalForm.weekdays"
                       class="accent-primary w-4 h-4 cursor-pointer"
-                    />
+                    >
                     <span class="font-body text-sm">{{ label }}</span>
                   </label>
                 </div>
               </div>
             </div>
 
-            <div v-if="modalForm.schedule_type === 'extra'" class="space-y-4">
+            <div
+              v-if="modalForm.schedule_type === 'extra'"
+              class="space-y-4"
+            >
               <div class="space-y-1.5">
                 <label class="font-body text-sm font-medium text-foreground">
                   Data da sessão
@@ -186,7 +204,7 @@
                   v-model="modalForm.single_date"
                   type="date"
                   class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-                />
+                >
               </div>
             </div>
 
@@ -201,10 +219,13 @@
                 v-model="modalForm.session_time"
                 type="time"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-              />
+              >
             </div>
 
-            <div v-if="modalForm.schedule_type === 'extra'" class="space-y-1.5">
+            <div
+              v-if="modalForm.schedule_type === 'extra'"
+              class="space-y-1.5"
+            >
               <label class="font-body text-sm font-medium text-foreground">
                 Horário da sessão
               </label>
@@ -212,7 +233,7 @@
                 v-model="modalForm.single_time"
                 type="time"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-              />
+              >
             </div>
 
             <p
@@ -225,8 +246,8 @@
             <div class="flex gap-3 pt-2">
               <button
                 type="button"
-                @click="closeModal"
                 class="flex-1 py-2.5 rounded-lg border border-border/60 font-body text-sm font-medium hover:bg-muted transition"
+                @click="closeModal"
               >
                 Cancelar
               </button>
