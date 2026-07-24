@@ -2,8 +2,8 @@
   <div class="min-h-screen bg-background flex items-center justify-center px-4">
     <div class="w-full max-w-md">
       <button
-        @click="router.push('/')"
         class="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8 font-body text-sm"
+        @click="router.push('/')"
       >
         ← Voltar ao site
       </button>
@@ -24,7 +24,10 @@
 
         <div class="p-6">
           <template v-if="showForgot">
-            <div v-if="forgotSent" class="text-center space-y-4">
+            <div
+              v-if="forgotSent"
+              class="text-center space-y-4"
+            >
               <p class="font-body text-sm text-muted-foreground">
                 Se o e-mail <strong>{{ forgotEmail }}</strong> estiver
                 cadastrado, você receberá as instruções de recuperação.
@@ -46,18 +49,18 @@
 
             <form
               v-else
-              @submit.prevent="handleForgotPassword"
               class="space-y-4"
+              @submit.prevent="handleForgotPassword"
             >
               <div class="space-y-2">
                 <label class="font-body">E-mail</label>
                 <input
-                  type="email"
                   v-model="forgotEmail"
+                  type="email"
                   required
                   placeholder="seu@email.com"
                   class="w-full border rounded-md p-2 font-body"
-                />
+                >
               </div>
 
               <p
@@ -87,7 +90,11 @@
             </form>
           </template>
 
-          <form v-else @submit.prevent="handleSubmit" class="space-y-4">
+          <form
+            v-else
+            class="space-y-4"
+            @submit.prevent="handleSubmit"
+          >
             <div
               v-if="error"
               class="bg-red-100 text-red-600 text-sm font-body p-3 rounded-md"
@@ -98,12 +105,12 @@
             <div class="space-y-2">
               <label class="font-body">E-mail</label>
               <input
-                type="email"
                 v-model="email"
+                type="email"
                 required
                 placeholder="seu@email.com"
                 class="w-full border rounded-md p-2 font-body"
-              />
+              >
             </div>
 
             <div class="space-y-2">
@@ -111,20 +118,26 @@
 
               <div class="relative">
                 <input
-                  :type="showPassword ? 'text' : 'password'"
                   v-model="password"
+                  :type="showPassword ? 'text' : 'password'"
                   required
                   placeholder="••••••••••••"
                   class="w-full border rounded-md p-2 pr-10 font-body"
-                />
+                >
 
                 <button
                   type="button"
-                  @click="showPassword = !showPassword"
                   class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  @click="showPassword = !showPassword"
                 >
-                  <Eye v-if="!showPassword" class="w-4 h-4" />
-                  <EyeOff v-else class="w-4 h-4" />
+                  <Eye
+                    v-if="!showPassword"
+                    class="w-4 h-4"
+                  />
+                  <EyeOff
+                    v-else
+                    class="w-4 h-4"
+                  />
                 </button>
               </div>
             </div>
@@ -132,8 +145,8 @@
             <div class="flex justify-between items-center">
               <button
                 type="button"
-                @click="showForgot = true"
                 class="text-sm font-body text-primary hover:underline"
+                @click="showForgot = true"
               >
                 Esqueceu a senha?
               </button>
@@ -165,6 +178,7 @@
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
+import { resolveLoginRedirect } from "@/router/loginRedirect";
 import { requestPasswordReset } from "@/services/auth";
 import { Eye, EyeOff } from "lucide-vue-next";
 import LogoComponent from "@/components/LogoComponent.vue";
@@ -173,7 +187,7 @@ import Button from "@/components/ui/button/Button.vue";
 const router = useRouter();
 const route = useRoute();
 
-const { login, isLoading, error } = useAuth();
+const { login, user, isLoading, error } = useAuth();
 
 const email = ref("");
 const password = ref("");
@@ -187,24 +201,8 @@ const handleSubmit = async () => {
   try {
     await login(email.value, password.value);
 
-    const userRaw = localStorage.getItem("auth_user");
-    const user = userRaw ? JSON.parse(userRaw) : null;
-
-    if (user?.must_change_password && user?.role === "client") {
-      router.push("/trocar-senha");
-      return;
-    }
-
     const redirect = route.query.redirect as string | undefined;
-    if (redirect) {
-      router.push(redirect);
-    } else {
-      if (user?.role === "therapist") {
-        router.push("/terapeuta");
-      } else {
-        router.push("/paciente");
-      }
-    }
+    router.push(resolveLoginRedirect(user.value, redirect));
   } catch {
     console.error("Erro ao fazer login");
   }

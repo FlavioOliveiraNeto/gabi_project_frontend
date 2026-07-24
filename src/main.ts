@@ -9,10 +9,10 @@ import { useAuth } from "./composables/useAuth";
 const queryClient = new QueryClient();
 
 const app = createApp(App);
-app.use(router);
 app.use(VueQueryPlugin, { queryClient });
 
 const { initialize } = useAuth();
-await initialize();
-
-app.mount("#app");
+initialize().finally(() => {
+  app.use(router);
+  app.mount("#app");
+});

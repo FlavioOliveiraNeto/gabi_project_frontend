@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance } from "axios";
+import axios, { type AxiosError, type AxiosInstance } from "axios";
 import router from "@/router";
 
 const api: AxiosInstance = axios.create({
@@ -27,22 +27,23 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      setCsrfToken(null);
+export function onResponseError(error: AxiosError): Promise<never> {
+  const isSessionProbe = error.config?.url?.includes("/auth/me");
 
-      if (router.currentRoute.value.name !== "login") {
-        router.push({
-          name: "login",
-          query: { redirect: router.currentRoute.value.fullPath },
-        });
-      }
+  if (error.response?.status === 401 && !isSessionProbe) {
+    setCsrfToken(null);
+
+    if (router.currentRoute.value.name !== "login") {
+      router.push({
+        name: "login",
+        query: { redirect: router.currentRoute.value.fullPath },
+      });
     }
+  }
 
-    return Promise.reject(error);
-  },
-);
+  return Promise.reject(error);
+}
+
+api.interceptors.response.use((response) => response, onResponseError);
 
 export default api;
