@@ -11,6 +11,12 @@ dist
 dist-ssr
 *.local
 /.env*
+# TokenSave MCP local cache
+.tokensave/
+
+# Cypress artifacts
+cypress/screenshots/
+cypress/videos/
 
 .vscode/*
 !.vscode/extensions.json
