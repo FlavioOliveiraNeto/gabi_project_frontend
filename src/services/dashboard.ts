@@ -175,11 +175,12 @@ export async function deletePatient(id: number): Promise<void> {
 
 export async function createClinicalNote(
   patientId: number,
+  sessionId: number,
   content: string,
 ): Promise<ClinicalNote> {
   const { data } = await api.post<ClinicalNote>(
     `/therapists/patients/${patientId}/notes`,
-    { content },
+    { session_id: sessionId, content },
   );
   return data;
 }

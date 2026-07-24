@@ -33,7 +33,7 @@
           <span
             v-if="
               patient.sessions_per_week > 0 &&
-              patient.schedule_type === 'regular'
+                patient.schedule_type === 'regular'
             "
             class="font-body text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
           >
@@ -71,14 +71,15 @@
               </div>
             </div>
           </div>
-          <span
-            v-if="patient.schedule_type === 'regular'"
-            v-for="day in patient.session_days"
-            :key="day"
-            class="font-body text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-medium"
-          >
-            {{ WEEKDAY_LABELS[day] ?? day }}
-          </span>
+          <template v-if="patient.schedule_type === 'regular'">
+            <span
+              v-for="day in patient.session_days"
+              :key="day"
+              class="font-body text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-medium"
+            >
+              {{ WEEKDAY_LABELS[day] ?? day }}
+            </span>
+          </template>
           <span
             v-if="patient.session_time"
             class="font-body text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-medium"
@@ -117,7 +118,10 @@
           >
             <Video class="w-3.5 h-3.5" /> Google Meet
           </a>
-          <span v-else class="font-body text-xs text-muted-foreground italic">
+          <span
+            v-else
+            class="font-body text-xs text-muted-foreground italic"
+          >
             Sem link de Meet
           </span>
         </div>
@@ -125,30 +129,33 @@
 
       <div class="flex items-center gap-2 shrink-0">
         <button
-          @click="$emit('toggle-notes')"
           class="p-1.5 rounded-lg hover:bg-muted transition"
           :title="isOpen ? 'Fechar anotações' : 'Ver anotações'"
+          @click="$emit('toggle-notes')"
         >
           <FileText class="w-4 h-4 text-muted-foreground" />
         </button>
         <button
-          @click="$emit('edit', patient)"
           class="p-1.5 rounded-lg hover:bg-muted transition"
           title="Editar paciente"
+          @click="$emit('edit', patient)"
         >
           <Pencil class="w-4 h-4 text-muted-foreground" />
         </button>
         <button
-          @click="$emit('delete', patient)"
           class="p-1.5 rounded-lg hover:bg-destructive/10 transition"
           title="Excluir paciente"
+          @click="$emit('delete', patient)"
         >
           <Trash2 class="w-4 h-4 text-destructive" />
         </button>
       </div>
     </div>
 
-    <div v-if="isOpen" class="mt-4 border-t border-border/30 pt-4">
+    <div
+      v-if="isOpen"
+      class="mt-4 border-t border-border/30 pt-4"
+    >
       <p
         class="font-body text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3"
       >
@@ -156,23 +163,44 @@
       </p>
 
       <div class="mb-3">
+        <select
+          v-model="selectedSessionId"
+          class="w-full mb-2 text-sm font-body border border-border/50 rounded-lg p-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+        >
+          <option
+            v-if="sessions.length === 0"
+            :value="null"
+          >
+            Nenhuma sessão disponível
+          </option>
+          <option
+            v-for="session in sortedSessions"
+            :key="session.id"
+            :value="session.id"
+          >
+            {{ formatDate(session.date) }} às {{ session.time }}
+          </option>
+        </select>
         <textarea
           v-model="newNote"
           placeholder="Nova anotação clínica..."
           rows="3"
           class="w-full text-sm font-body border border-border/50 rounded-lg p-3 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition"
-        ></textarea>
+        />
         <button
-          @click="saveNote"
-          :disabled="!newNote.trim() || savingNote"
+          :disabled="!newNote.trim() || savingNote || selectedSessionId === null"
           class="mt-2 flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 disabled:opacity-40 transition"
+          @click="saveNote"
         >
           <Save class="w-3.5 h-3.5" />
           {{ savingNote ? "Salvando..." : "Salvar anotação" }}
         </button>
       </div>
 
-      <div v-if="localNotes.length > 0" class="space-y-2">
+      <div
+        v-if="localNotes.length > 0"
+        class="space-y-2"
+      >
         <div
           v-for="note in localNotes"
           :key="note.id"
@@ -183,19 +211,19 @@
               v-model="editingContent"
               rows="3"
               class="w-full text-sm font-body border border-border/50 rounded-lg p-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition mb-2"
-            ></textarea>
+            />
             <div class="flex gap-2">
               <button
-                @click="confirmEdit(note.id)"
                 :disabled="!editingContent.trim() || savingEdit"
                 class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-body text-xs font-medium hover:bg-primary/90 disabled:opacity-40 transition"
+                @click="confirmEdit(note.id)"
               >
                 <Save class="w-3 h-3" />
                 {{ savingEdit ? "Salvando..." : "Salvar" }}
               </button>
               <button
-                @click="cancelEdit"
                 class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/60 font-body text-xs font-medium hover:bg-muted transition"
+                @click="cancelEdit"
               >
                 <X class="w-3 h-3" />
                 Cancelar
@@ -215,16 +243,16 @@
                 class="flex gap-1 opacity-0 group-hover:opacity-100 transition"
               >
                 <button
-                  @click="startEdit(note)"
                   class="p-1 rounded hover:bg-muted transition"
                   title="Editar anotação"
+                  @click="startEdit(note)"
                 >
                   <Pencil class="w-3 h-3 text-muted-foreground" />
                 </button>
                 <button
-                  @click="deleteNote(note.id)"
                   class="p-1 rounded hover:bg-destructive/10 transition"
                   title="Excluir anotação"
+                  @click="deleteNote(note.id)"
                 >
                   <Trash2 class="w-3 h-3 text-destructive" />
                 </button>
@@ -236,7 +264,10 @@
           </template>
         </div>
       </div>
-      <div v-else class="text-center py-4">
+      <div
+        v-else
+        class="text-center py-4"
+      >
         <p class="font-body text-xs text-muted-foreground">
           Nenhuma anotação ainda.
         </p>
@@ -246,7 +277,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import {
   CheckCircle,
   AlertCircle,
@@ -266,10 +297,12 @@ import {
   deleteClinicalNote,
   type PatientUser,
   type ClinicalNote,
+  type CalendarSession,
 } from "@/services/dashboard";
 
 const props = defineProps<{
   patient: PatientUser;
+  sessions: CalendarSession[];
   isOpen: boolean;
 }>();
 
@@ -308,13 +341,36 @@ watch(
 const newNote = ref("");
 const savingNote = ref(false);
 
+// mais recentes primeiro
+const sortedSessions = computed(() =>
+  [...props.sessions].sort((a, b) =>
+    `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`),
+  ),
+);
+
+const selectedSessionId = ref<number | null>(null);
+
+watch(
+  sortedSessions,
+  (list) => {
+    if (!list.some((s) => s.id === selectedSessionId.value)) {
+      selectedSessionId.value = list[0]?.id ?? null;
+    }
+  },
+  { immediate: true },
+);
+
 async function saveNote() {
   const text = newNote.value.trim();
-  if (!text || savingNote.value) return;
+  if (!text || savingNote.value || selectedSessionId.value === null) return;
 
   savingNote.value = true;
   try {
-    const note = await createClinicalNote(props.patient.id, text);
+    const note = await createClinicalNote(
+      props.patient.id,
+      selectedSessionId.value,
+      text,
+    );
     localNotes.value.unshift(note);
     emit("note-saved", props.patient.id, note);
     newNote.value = "";

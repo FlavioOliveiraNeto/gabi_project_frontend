@@ -2,7 +2,9 @@
   <div class="border border-border/50 rounded-xl p-6 bg-card">
     <div class="flex items-center gap-3 mb-5 flex-wrap">
       <FileText class="w-5 h-5 text-primary" />
-      <h3 class="font-display text-xl text-foreground">Pacientes</h3>
+      <h3 class="font-display text-xl text-foreground">
+        Pacientes
+      </h3>
       <span
         class="ml-auto font-body text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full"
       >
@@ -11,8 +13,8 @@
         }}
       </span>
       <button
-        @click="$emit('add')"
         class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 transition"
+        @click="$emit('add')"
       >
         <Plus class="w-4 h-4" /> Adicionar paciente
       </button>
@@ -27,16 +29,22 @@
         type="text"
         placeholder="Buscar paciente..."
         class="w-full pl-9 pr-4 py-2.5 text-sm font-body border border-border/50 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-      />
+      >
     </div>
 
-    <div v-if="isLoading" class="text-center py-10">
+    <div
+      v-if="isLoading"
+      class="text-center py-10"
+    >
       <p class="font-body text-sm text-muted-foreground">
         Carregando pacientes...
       </p>
     </div>
 
-    <div v-else-if="filteredPatients.length === 0" class="text-center py-10">
+    <div
+      v-else-if="filteredPatients.length === 0"
+      class="text-center py-10"
+    >
       <p class="font-body text-sm text-muted-foreground">
         {{
           patientSearch
@@ -46,25 +54,26 @@
       </p>
     </div>
 
-    <div v-else class="space-y-2">
+    <div
+      v-else
+      class="space-y-2"
+    >
       <div
         v-if="totalPages > 1"
         class="flex justify-end items-center gap-1 ml-auto"
       >
         <button
-          @click="currentPage--"
           :disabled="currentPage === 1"
           class="p-1.5 hover:bg-muted rounded-lg transition"
+          @click="currentPage--"
         >
           <ChevronLeft class="w-4 h-4 text-muted-foreground" />
         </button>
-        <span class="text-xs font-body"
-          >{{ currentPage }} / {{ totalPages }}</span
-        >
+        <span class="text-xs font-body">{{ currentPage }} / {{ totalPages }}</span>
         <button
-          @click="currentPage++"
           :disabled="currentPage === totalPages"
           class="p-1.5 hover:bg-muted rounded-lg transition"
+          @click="currentPage++"
         >
           <ChevronRight class="w-4 h-4 text-muted-foreground" />
         </button>
@@ -74,6 +83,7 @@
         v-for="patient in paginatedPatients"
         :key="patient.id"
         :patient="patient"
+        :sessions="sessions.filter((s) => s.patient.id === patient.id)"
         :is-open="selectedPatient === patient.id"
         @toggle-notes="togglePatient(patient.id)"
         @edit="$emit('edit', patient)"
@@ -94,10 +104,11 @@ import {
   Search,
 } from "lucide-vue-next";
 import PatientCard from "./PatientCard.vue";
-import type { PatientUser } from "@/services/dashboard";
+import type { CalendarSession, PatientUser } from "@/services/dashboard";
 
 const props = defineProps<{
   patients: PatientUser[];
+  sessions: CalendarSession[];
   isLoading: boolean;
 }>();
 
