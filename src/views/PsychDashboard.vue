@@ -200,13 +200,10 @@ async function handlePatientDeleted(patientId: number) {
   await loadDashboard();
 }
 
-/* ---------------------------
-   Notes Update
----------------------------- */
-function handleNoteSaved(patientId: number, note: any) {
+function handleNoteSaved(patientId: number, _note: unknown) {
   const patient = patients.value.find((p) => p.id === patientId);
   if (patient) {
-    patient.clinical_notes.unshift(note);
+    patient.clinical_notes_count += 1;
   }
 }
 </script>

@@ -197,8 +197,22 @@
         </button>
       </div>
 
+      <p
+        v-if="loadingNotes"
+        class="text-sm font-body text-muted-foreground"
+      >
+        Carregando anotações...
+      </p>
+
+      <p
+        v-else-if="notesError"
+        class="text-sm font-body text-destructive"
+      >
+        {{ notesError }}
+      </p>
+
       <div
-        v-if="localNotes.length > 0"
+        v-if="!loadingNotes && localNotes.length > 0"
         class="space-y-2"
       >
         <div
@@ -265,7 +279,7 @@
         </div>
       </div>
       <div
-        v-else
+        v-else-if="!loadingNotes && !notesError"
         class="text-center py-4"
       >
         <p class="font-body text-xs text-muted-foreground">
@@ -292,6 +306,7 @@ import {
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
+  getClinicalNotes,
   createClinicalNote,
   updateClinicalNote,
   deleteClinicalNote,
@@ -323,15 +338,30 @@ const WEEKDAY_LABELS: Record<string, string> = {
   saturday: "Sáb",
 };
 
-const localNotes = ref<ClinicalNote[]>([
-  ...(props.patient.clinical_notes ?? []),
-]);
+// As notas clínicas não vêm no payload do dashboard: prontuário é PHI e não
+// trafega em listagem. São buscadas quando a terapeuta abre a ficha.
+const localNotes = ref<ClinicalNote[]>([]);
+const loadingNotes = ref(false);
+const notesError = ref("");
+
+async function loadNotes() {
+  loadingNotes.value = true;
+  notesError.value = "";
+  try {
+    localNotes.value = await getClinicalNotes(props.patient.id);
+  } catch {
+    notesError.value = "Não foi possível carregar as anotações.";
+    localNotes.value = [];
+  } finally {
+    loadingNotes.value = false;
+  }
+}
 
 watch(
   () => props.isOpen,
   (opened) => {
     if (opened) {
-      localNotes.value = [...(props.patient.clinical_notes ?? [])];
+      loadNotes();
     }
     newNote.value = "";
     cancelEdit();

@@ -27,7 +27,7 @@ export interface PatientUser {
   extra_sessions: ExtraSession[];
   completed_sessions: number;
   absent_sessions: number;
-  clinical_notes: ClinicalNote[];
+  clinical_notes_count: number;
 }
 
 export interface TherapistStats {
@@ -171,6 +171,15 @@ export async function updatePatientSchedule(
 
 export async function deletePatient(id: number): Promise<void> {
   await api.delete(`/therapists/patients/${id}`);
+}
+
+export async function getClinicalNotes(
+  patientId: number,
+): Promise<ClinicalNote[]> {
+  const { data } = await api.get<ClinicalNote[]>(
+    `/therapists/patients/${patientId}/notes`,
+  );
+  return data;
 }
 
 export async function createClinicalNote(
