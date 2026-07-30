@@ -20,18 +20,6 @@ export interface MeResult {
   csrf_token: string;
 }
 
-export interface RegisterParams {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-  password_confirmation: string;
-}
-
-export async function registerRequest(params: RegisterParams): Promise<void> {
-  await api.post("/users", { user: params });
-}
-
 export async function requestPasswordReset(email: string): Promise<void> {
   await api.post("/users/password", { user: { email } });
 }

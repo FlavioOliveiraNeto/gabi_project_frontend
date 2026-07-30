@@ -6,7 +6,6 @@ import {
 
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
-import RegisterView from "../views/RegisterView.vue";
 import PatientDashboard from "../views/PatientDashboard.vue";
 import PsychDashboard from "../views/PsychDashboard.vue";
 import NotFound from "../views/NotFound.vue";
@@ -38,11 +37,6 @@ const routes: RouteRecordRaw[] = [
     path: "/login",
     name: "login",
     component: LoginView,
-  },
-  {
-    path: "/cadastro",
-    name: "register",
-    component: RegisterView,
   },
   {
     path: "/paciente",

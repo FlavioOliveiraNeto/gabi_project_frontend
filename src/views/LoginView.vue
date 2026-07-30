@@ -150,13 +150,6 @@
               >
                 Esqueceu a senha?
               </button>
-
-              <router-link
-                to="/cadastro"
-                class="text-sm font-body text-primary hover:underline"
-              >
-                Não tem uma conta?
-              </router-link>
             </div>
 
             <Button
