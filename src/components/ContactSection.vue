@@ -10,7 +10,7 @@
     <div class="container mx-auto px-6 lg:px-12 pt-12">
       <div class="text-center mb-16 max-w-2xl mx-auto">
         <img
-          src="@/assets/images/contact_image.jpg"
+          src="@/assets/images/contact_image.webp"
           alt="Imagem de contato"
           class="w-32 h-32 md:w-50 md:h-50 mx-auto rounded-full object-cover mb-6"
           loading="lazy"

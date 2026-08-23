@@ -11,8 +11,7 @@ const queryClient = new QueryClient();
 const app = createApp(App);
 app.use(VueQueryPlugin, { queryClient });
 
-const { initialize } = useAuth();
-initialize().finally(() => {
-  app.use(router);
-  app.mount("#app");
-});
+useAuth().ready();
+
+app.use(router);
+app.mount("#app");

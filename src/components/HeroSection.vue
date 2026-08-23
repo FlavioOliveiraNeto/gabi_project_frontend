@@ -22,7 +22,7 @@
           class="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-primary/20 rotate-2 hover:rotate-0 transition-transform duration-500"
         >
           <img
-            src="@/assets/images/hero_image.jpg"
+            src="@/assets/images/hero_image.webp"
             alt="Arte de colagem com formas orgânicas em roxo, verde e branco representando acolhimento e psicologia"
             class="w-full h-72 sm:h-96 md:h-[32rem] lg:h-[40rem] object-cover"
           >

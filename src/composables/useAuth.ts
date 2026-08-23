@@ -7,6 +7,11 @@ const user = ref<User | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 
+// ponytail: promessa única da sessão — o app monta na hora e só as rotas
+// protegidas esperam por ela (ver router/index.ts).
+let readyPromise: Promise<void> | null = null;
+const ready = (): Promise<void> => (readyPromise ??= initialize());
+
 const initialize = async (): Promise<void> => {
   isLoading.value = true;
   try {
@@ -60,6 +65,7 @@ export function useAuth() {
     isLoading:      computed(() => isLoading.value),
     error:          computed(() => error.value),
     initialize,
+    ready,
     login,
     logout,
     clearAuthState,

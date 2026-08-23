@@ -68,8 +68,11 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to) => {
-  const { user } = useAuth();
+router.beforeEach(async (to) => {
+  const { user, ready } = useAuth();
+
+  if (to.meta.requiresAuth || to.name === "login") await ready();
+
   const currentUser = user.value;
 
   if (to.meta.requiresAuth && !currentUser) {
