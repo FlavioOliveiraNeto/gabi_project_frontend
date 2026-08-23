@@ -4,14 +4,11 @@ import App from "./App.vue";
 import router from "./router";
 import "./index.css";
 import "./App.css";
-import { useAuth } from "./composables/useAuth";
 
 const queryClient = new QueryClient();
 
 const app = createApp(App);
 app.use(VueQueryPlugin, { queryClient });
-
-useAuth().ready();
 
 app.use(router);
 app.mount("#app");
