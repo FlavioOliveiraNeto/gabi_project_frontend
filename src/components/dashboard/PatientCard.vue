@@ -33,7 +33,7 @@
           <span
             v-if="
               patient.sessions_per_week > 0 &&
-                patient.schedule_type === 'regular'
+              patient.schedule_type === 'regular'
             "
             class="font-body text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground"
           >
@@ -113,10 +113,7 @@
           >
             <Video class="w-3.5 h-3.5" /> Google Meet
           </a>
-          <span
-            v-else
-            class="font-body text-xs text-muted-foreground italic"
-          >
+          <span v-else class="font-body text-xs text-muted-foreground italic">
             Sem link de Meet
           </span>
         </div>
@@ -147,10 +144,7 @@
       </div>
     </div>
 
-    <div
-      v-if="isOpen"
-      class="mt-4 border-t border-border/30 pt-4"
-    >
+    <div v-if="isOpen" class="mt-4 border-t border-border/30 pt-4">
       <p
         class="font-body text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3"
       >
@@ -162,10 +156,7 @@
           v-model="selectedSessionId"
           class="w-full mb-2 text-sm font-body border border-border/50 rounded-lg p-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
         >
-          <option
-            v-if="sessions.length === 0"
-            :value="null"
-          >
+          <option v-if="sessions.length === 0" :value="null">
             Nenhuma sessão disponível
           </option>
           <option
@@ -183,7 +174,9 @@
           class="w-full text-sm font-body border border-border/50 rounded-lg p-3 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition"
         />
         <button
-          :disabled="!newNote.trim() || savingNote || selectedSessionId === null"
+          :disabled="
+            !newNote.trim() || savingNote || selectedSessionId === null
+          "
           class="mt-2 flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:bg-primary/90 disabled:opacity-40 transition"
           @click="saveNote"
         >
@@ -192,24 +185,15 @@
         </button>
       </div>
 
-      <p
-        v-if="loadingNotes"
-        class="text-sm font-body text-muted-foreground"
-      >
+      <p v-if="loadingNotes" class="text-sm font-body text-muted-foreground">
         Carregando anotações...
       </p>
 
-      <p
-        v-else-if="notesError"
-        class="text-sm font-body text-destructive"
-      >
+      <p v-else-if="notesError" class="text-sm font-body text-destructive">
         {{ notesError }}
       </p>
 
-      <div
-        v-if="!loadingNotes && localNotes.length > 0"
-        class="space-y-2"
-      >
+      <div v-if="!loadingNotes && localNotes.length > 0" class="space-y-2">
         <div
           v-for="note in localNotes"
           :key="note.id"
@@ -273,10 +257,7 @@
           </template>
         </div>
       </div>
-      <div
-        v-else-if="!loadingNotes && !notesError"
-        class="text-center py-4"
-      >
+      <div v-else-if="!loadingNotes && !notesError" class="text-center py-4">
         <p class="font-body text-xs text-muted-foreground">
           Nenhuma anotação ainda.
         </p>
@@ -326,8 +307,6 @@ const emit = defineEmits<{
   (e: "note-saved", patientId: number, note: any): void;
 }>();
 
-// Aceita a resposta legada (session_days + session_time) enquanto backends
-// antigos estiverem no ar.
 const scheduleSlots = computed<ScheduleSlot[]>(() => {
   const p = props.patient;
 
@@ -341,8 +320,6 @@ const scheduleSlots = computed<ScheduleSlot[]>(() => {
   );
 });
 
-// As notas clínicas não vêm no payload do dashboard: prontuário é PHI e não
-// trafega em listagem. São buscadas quando a terapeuta abre a ficha.
 const localNotes = ref<ClinicalNote[]>([]);
 const loadingNotes = ref(false);
 const notesError = ref("");
@@ -374,7 +351,6 @@ watch(
 const newNote = ref("");
 const savingNote = ref(false);
 
-// mais recentes primeiro
 const sortedSessions = computed(() =>
   [...props.sessions].sort((a, b) =>
     `${b.date} ${b.time}`.localeCompare(`${a.date} ${a.time}`),

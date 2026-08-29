@@ -8,10 +8,7 @@
       <div
         class="bg-card rounded-2xl shadow-lg w-full max-w-lg p-6 overflow-y-auto max-h-[90vh]"
       >
-        <div
-          v-if="showPasswordStep"
-          class="space-y-5"
-        >
+        <div v-if="showPasswordStep" class="space-y-5">
           <div class="flex items-center gap-3">
             <div class="p-2 rounded-full bg-green-100">
               <KeyRound class="w-5 h-5 text-green-600" />
@@ -46,14 +43,8 @@
                 :title="copied ? 'Copiado!' : 'Copiar senha'"
                 @click="copyPassword"
               >
-                <ClipboardCheck
-                  v-if="copied"
-                  class="w-4 h-4 text-green-600"
-                />
-                <Clipboard
-                  v-else
-                  class="w-4 h-4 text-amber-700"
-                />
+                <ClipboardCheck v-if="copied" class="w-4 h-4 text-green-600" />
+                <Clipboard v-else class="w-4 h-4 text-amber-700" />
               </button>
             </div>
           </div>
@@ -84,19 +75,18 @@
             </button>
           </div>
 
-          <form
-            class="space-y-4"
-            @submit.prevent="handleSubmit"
-          >
+          <form class="space-y-4" @submit.prevent="handleSubmit">
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">Nome completo *</label>
+              <label class="font-body text-sm font-medium text-foreground"
+                >Nome completo *</label
+              >
               <input
                 v-model="modalForm.name"
                 type="text"
                 placeholder="Nome do paciente"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 :class="{ 'border-destructive': modalErrors.name }"
-              >
+              />
               <p
                 v-if="modalErrors.name"
                 class="text-xs text-destructive font-body"
@@ -106,14 +96,16 @@
             </div>
 
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">E-mail *</label>
+              <label class="font-body text-sm font-medium text-foreground"
+                >E-mail *</label
+              >
               <input
                 v-model="modalForm.email"
                 type="email"
                 placeholder="paciente@email.com"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 :class="{ 'border-destructive': modalErrors.email }"
-              >
+              />
               <p
                 v-if="modalErrors.email"
                 class="text-xs text-destructive font-body"
@@ -123,13 +115,15 @@
             </div>
 
             <div class="space-y-1.5">
-              <label class="font-body text-sm font-medium text-foreground">Link do Google Meet</label>
+              <label class="font-body text-sm font-medium text-foreground"
+                >Link do Google Meet</label
+              >
               <input
                 v-model="modalForm.google_meet_link"
                 type="url"
                 placeholder="https://meet.google.com/..."
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-              >
+              />
             </div>
 
             <div class="space-y-1.5">
@@ -140,25 +134,18 @@
                 v-model="modalForm.schedule_type"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               >
-                <option value="regular">
-                  Semanal
-                </option>
-                <option value="extra">
-                  Avulso
-                </option>
+                <option value="regular">Semanal</option>
+                <option value="extra">Avulso</option>
               </select>
             </div>
 
-            <div
-              v-if="modalForm.schedule_type === 'regular'"
-              class="space-y-2"
-            >
+            <div v-if="modalForm.schedule_type === 'regular'" class="space-y-2">
               <label class="font-body text-sm font-medium text-foreground">
                 Dias e horários das sessões
               </label>
               <p class="font-body text-xs text-muted-foreground">
-                Marque os dias e defina o horário de cada um. Cada sessão dura 50
-                minutos, com 10 minutos de intervalo até a próxima.
+                Marque os dias e defina o horário de cada um. Cada sessão dura
+                50 minutos, com 10 minutos de intervalo até a próxima.
               </p>
 
               <div class="space-y-1.5">
@@ -172,14 +159,18 @@
                       : ''
                   "
                 >
-                  <label class="flex items-center gap-2 cursor-pointer w-24 shrink-0">
+                  <label
+                    class="flex items-center gap-2 cursor-pointer w-24 shrink-0"
+                  >
                     <input
                       type="checkbox"
                       class="accent-primary w-4 h-4 cursor-pointer"
                       :checked="day in slotTimes"
                       @change="toggleDay(day)"
-                    >
-                    <span class="font-body text-sm">{{ WEEKDAY_LABELS[day] }}</span>
+                    />
+                    <span class="font-body text-sm">{{
+                      WEEKDAY_LABELS[day]
+                    }}</span>
                   </label>
 
                   <input
@@ -189,7 +180,7 @@
                     :aria-label="`Horário de ${WEEKDAY_LABELS[day]}`"
                     class="flex-1 px-3 py-1.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                     :class="{ 'border-destructive': conflictedDays.has(day) }"
-                  >
+                  />
                   <span
                     v-else
                     class="flex-1 font-body text-xs text-muted-foreground"
@@ -207,10 +198,7 @@
               </p>
             </div>
 
-            <div
-              v-if="modalForm.schedule_type === 'extra'"
-              class="space-y-4"
-            >
+            <div v-if="modalForm.schedule_type === 'extra'" class="space-y-4">
               <div class="space-y-1.5">
                 <label class="font-body text-sm font-medium text-foreground">
                   Data da sessão
@@ -219,14 +207,11 @@
                   v-model="modalForm.single_date"
                   type="date"
                   class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-                >
+                />
               </div>
             </div>
 
-            <div
-              v-if="modalForm.schedule_type === 'extra'"
-              class="space-y-1.5"
-            >
+            <div v-if="modalForm.schedule_type === 'extra'" class="space-y-1.5">
               <label class="font-body text-sm font-medium text-foreground">
                 Horário da sessão
               </label>
@@ -234,7 +219,7 @@
                 v-model="modalForm.single_time"
                 type="time"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-              >
+              />
             </div>
 
             <p
@@ -428,7 +413,8 @@ function validateModal(): boolean {
     if (slots.length === 0)
       modalErrors.schedule_slots = "Marque ao menos um dia da semana.";
     else if (slots.some((slot) => !/^([01]\d|2[0-3]):[0-5]\d$/.test(slot.time)))
-      modalErrors.schedule_slots = "Informe o horário de todos os dias marcados.";
+      modalErrors.schedule_slots =
+        "Informe o horário de todos os dias marcados.";
   }
 
   return Object.keys(modalErrors).length === 0;
@@ -508,7 +494,6 @@ async function handleSubmit() {
 
     emit("saved", created, true);
   } catch (err: unknown) {
-    // Conflito de agenda: o backend não gravou nada e devolve os slots a corrigir.
     conflictedDays.value = new Set(conflictSlots(err).map((c) => c.weekday));
     modalError.value = apiErrorMessage(err, "Erro ao salvar paciente.");
   } finally {

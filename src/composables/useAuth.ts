@@ -7,8 +7,6 @@ const user = ref<User | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 
-// ponytail: promessa única da sessão — o app monta na hora e só as rotas
-// protegidas esperam por ela (ver router/index.ts).
 let readyPromise: Promise<void> | null = null;
 const ready = (): Promise<void> => (readyPromise ??= initialize());
 
@@ -31,7 +29,10 @@ const login = async (email: string, password: string): Promise<void> => {
   error.value = null;
 
   try {
-    const { user: apiUser, csrf_token: token } = await loginRequest(email, password);
+    const { user: apiUser, csrf_token: token } = await loginRequest(
+      email,
+      password,
+    );
 
     user.value = apiUser;
     setCsrfToken(token);
@@ -61,9 +62,9 @@ const clearAuthState = (): void => {
 
 export function useAuth() {
   return {
-    user:           computed(() => user.value),
-    isLoading:      computed(() => isLoading.value),
-    error:          computed(() => error.value),
+    user: computed(() => user.value),
+    isLoading: computed(() => isLoading.value),
+    error: computed(() => error.value),
     initialize,
     ready,
     login,

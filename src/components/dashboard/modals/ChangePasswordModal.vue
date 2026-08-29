@@ -6,46 +6,47 @@
       @click.self="closeModal"
     >
       <div class="bg-card rounded-2xl shadow-lg w-full max-w-sm p-6">
-        <h2 class="font-display text-lg text-foreground mb-1">
-          Trocar senha
-        </h2>
+        <h2 class="font-display text-lg text-foreground mb-1">Trocar senha</h2>
         <p class="font-body text-sm text-muted-foreground mb-5">
           Confirme sua senha atual e defina uma nova.
         </p>
 
-        <form
-          class="space-y-4"
-          @submit.prevent="handleSubmit"
-        >
+        <form class="space-y-4" @submit.prevent="handleSubmit">
           <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground">Senha atual</label>
+            <label class="font-body text-sm font-medium text-foreground"
+              >Senha atual</label
+            >
             <input
               v-model="currentPassword"
               type="password"
               class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               required
-            >
+            />
           </div>
 
           <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground">Nova senha</label>
+            <label class="font-body text-sm font-medium text-foreground"
+              >Nova senha</label
+            >
             <input
               v-model="newPassword"
               type="password"
               placeholder="Mínimo 6 caracteres"
               class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               required
-            >
+            />
           </div>
 
           <div class="space-y-1.5">
-            <label class="font-body text-sm font-medium text-foreground">Confirme a nova senha</label>
+            <label class="font-body text-sm font-medium text-foreground"
+              >Confirme a nova senha</label
+            >
             <input
               v-model="confirmPassword"
               type="password"
               class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
               required
-            >
+            />
           </div>
 
           <p
@@ -127,7 +128,6 @@ async function handleSubmit() {
       newPassword.value,
       confirmPassword.value,
     );
-    // O backend revoga o JWT e limpa o cookie (sessão morre)
     clearAuthState();
     router.push({ name: "login" });
   } catch (e: any) {
