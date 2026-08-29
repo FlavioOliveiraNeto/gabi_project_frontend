@@ -14,6 +14,24 @@ export interface ExtraSession {
   status: string;
 }
 
+export interface ScheduleSlot {
+  weekday: string;
+  time: string;
+}
+
+/** Um slot que já está ocupado, devolvido em 422 pelo backend. */
+export interface ScheduleConflict {
+  weekday: string;
+  time: string;
+  scheduled_at: string;
+  reason: string;
+}
+
+export interface ConflictResponse {
+  error: string;
+  conflicts: ScheduleConflict[];
+}
+
 export interface PatientUser {
   id: number;
   name: string;
@@ -23,7 +41,9 @@ export interface PatientUser {
   schedule_type?: "regular" | "extra" | null;
   sessions_per_week: number;
   session_days: string[];
+  /** @deprecated horário do primeiro dia; use schedule_slots. */
   session_time: string | null;
+  schedule_slots?: ScheduleSlot[];
   extra_sessions: ExtraSession[];
   completed_sessions: number;
   absent_sessions: number;
@@ -77,8 +97,11 @@ export interface CreatePatientParams {
   google_meet_link?: string;
 
   schedule_type?: "regular" | "extra";
+  schedule_slots?: ScheduleSlot[];
   sessions_per_week?: number;
+  /** @deprecated payload legado; prefira schedule_slots. */
   weekdays?: string[];
+  /** @deprecated payload legado; prefira schedule_slots. */
   session_time?: string;
   single_date?: string;
   single_time?: string;
@@ -97,8 +120,11 @@ export interface UpdatePatientParams {
 
 export interface UpdateScheduleParams {
   schedule_type: "regular" | "extra";
+  schedule_slots?: ScheduleSlot[];
   sessions_per_week?: number;
+  /** @deprecated payload legado; prefira schedule_slots. */
   weekdays?: string[];
+  /** @deprecated payload legado; prefira schedule_slots. */
   session_time?: string;
   single_date?: string;
   single_time?: string;
@@ -264,4 +290,58 @@ export async function updatePatientNote(
 
 export async function deletePatientNote(id: number): Promise<void> {
   await api.delete(`/clients/patient_notes/${id}`);
+}
+
+export const WEEKDAY_LABELS: Record<string, string> = {
+  sunday: "Dom",
+  monday: "Seg",
+  tuesday: "Ter",
+  wednesday: "Qua",
+  thursday: "Qui",
+  friday: "Sex",
+  saturday: "Sáb",
+};
+
+export const WEEKDAY_ORDER = [
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+] as const;
+
+export function sortSlots(slots: ScheduleSlot[]): ScheduleSlot[] {
+  return [...slots].sort(
+    (a, b) =>
+      WEEKDAY_ORDER.indexOf(a.weekday as (typeof WEEKDAY_ORDER)[number]) -
+      WEEKDAY_ORDER.indexOf(b.weekday as (typeof WEEKDAY_ORDER)[number]),
+  );
+}
+
+/**
+ * Mensagem de erro da API em uma string. Cobre os três formatos do backend:
+ * conflito de agenda ({ error, conflicts }), erro de domínio ({ error }) e
+ * validação do ActiveRecord ({ errors: [] }).
+ */
+export function apiErrorMessage(err: unknown, fallback: string): string {
+  const data = (err as { response?: { data?: unknown } })?.response?.data as
+    | Partial<ConflictResponse> & { errors?: string[] }
+    | undefined;
+
+  if (!data) return fallback;
+  if (Array.isArray(data.errors) && data.errors.length > 0)
+    return data.errors.join(", ");
+  if (typeof data.error === "string" && data.error) return data.error;
+
+  return fallback;
+}
+
+/** Slots em conflito devolvidos pelo backend, para destacar no formulário. */
+export function conflictSlots(err: unknown): ScheduleConflict[] {
+  const data = (err as { response?: { data?: ConflictResponse } })?.response
+    ?.data;
+
+  return Array.isArray(data?.conflicts) ? data.conflicts : [];
 }

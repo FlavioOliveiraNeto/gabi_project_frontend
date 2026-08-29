@@ -151,45 +151,60 @@
 
             <div
               v-if="modalForm.schedule_type === 'regular'"
-              class="space-y-4"
+              class="space-y-2"
             >
-              <div class="space-y-1.5">
-                <label class="font-body text-sm font-medium text-foreground">Sessões por semana</label>
-                <select
-                  v-model.number="modalForm.sessions_per_week"
-                  class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-                >
-                  <option :value="0">
-                    Não definido
-                  </option>
-                  <option
-                    v-for="n in 7"
-                    :key="n"
-                    :value="n"
-                  >
-                    {{ n }}x por semana
-                  </option>
-                </select>
-              </div>
+              <label class="font-body text-sm font-medium text-foreground">
+                Dias e horários das sessões
+              </label>
+              <p class="font-body text-xs text-muted-foreground">
+                Marque os dias e defina o horário de cada um. Cada sessão dura 50
+                minutos, com 10 minutos de intervalo até a próxima.
+              </p>
 
               <div class="space-y-1.5">
-                <label class="font-body text-sm font-medium text-foreground">Dias das sessões</label>
-                <div class="flex flex-wrap gap-3">
-                  <label
-                    v-for="(label, day) in WEEKDAY_LABELS"
-                    :key="day"
-                    class="flex items-center gap-1.5 cursor-pointer"
-                  >
+                <div
+                  v-for="day in WEEKDAY_ORDER"
+                  :key="day"
+                  class="flex items-center gap-3 rounded-lg px-2 py-1.5 transition"
+                  :class="
+                    conflictedDays.has(day)
+                      ? 'bg-destructive/10 ring-1 ring-destructive/40'
+                      : ''
+                  "
+                >
+                  <label class="flex items-center gap-2 cursor-pointer w-24 shrink-0">
                     <input
-                      v-model="modalForm.weekdays"
                       type="checkbox"
-                      :value="day"
                       class="accent-primary w-4 h-4 cursor-pointer"
+                      :checked="day in slotTimes"
+                      @change="toggleDay(day)"
                     >
-                    <span class="font-body text-sm">{{ label }}</span>
+                    <span class="font-body text-sm">{{ WEEKDAY_LABELS[day] }}</span>
                   </label>
+
+                  <input
+                    v-if="day in slotTimes"
+                    v-model="slotTimes[day]"
+                    type="time"
+                    :aria-label="`Horário de ${WEEKDAY_LABELS[day]}`"
+                    class="flex-1 px-3 py-1.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+                    :class="{ 'border-destructive': conflictedDays.has(day) }"
+                  >
+                  <span
+                    v-else
+                    class="flex-1 font-body text-xs text-muted-foreground"
+                  >
+                    Sem sessão
+                  </span>
                 </div>
               </div>
+
+              <p
+                v-if="modalErrors.schedule_slots"
+                class="text-xs text-destructive font-body"
+              >
+                {{ modalErrors.schedule_slots }}
+              </p>
             </div>
 
             <div
@@ -206,20 +221,6 @@
                   class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 >
               </div>
-            </div>
-
-            <div
-              v-if="modalForm.schedule_type === 'regular'"
-              class="space-y-1.5"
-            >
-              <label class="font-body text-sm font-medium text-foreground">
-                Horário da sessão
-              </label>
-              <input
-                v-model="modalForm.session_time"
-                type="time"
-                class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
-              >
             </div>
 
             <div
@@ -279,7 +280,13 @@ import {
   createPatient,
   updatePatient,
   updatePatientSchedule,
+  apiErrorMessage,
+  conflictSlots,
+  sortSlots,
+  WEEKDAY_LABELS,
+  WEEKDAY_ORDER,
   type PatientUser,
+  type ScheduleSlot,
 } from "@/services/dashboard";
 
 const props = defineProps<{
@@ -291,16 +298,6 @@ const emit = defineEmits<{
   (e: "close"): void;
   (e: "saved", patient: PatientUser, isNew: boolean): void;
 }>();
-
-const WEEKDAY_LABELS: Record<string, string> = {
-  sunday: "Dom",
-  monday: "Seg",
-  tuesday: "Ter",
-  wednesday: "Qua",
-  thursday: "Qui",
-  friday: "Sex",
-  saturday: "Sáb",
-};
 
 const isEditing = computed(() => !!props.patientToEdit);
 const modalLoading = ref(false);
@@ -318,20 +315,53 @@ const modalForm = reactive({
   email: "",
   google_meet_link: "",
   schedule_type: "regular" as "regular" | "extra",
-  sessions_per_week: 0,
-  weekdays: [] as string[],
-  session_time: "",
   single_date: "",
   single_time: "",
 });
+
+/** Horário por dia da semana. A chave presente = dia marcado. */
+const slotTimes = reactive<Record<string, string>>({});
+
+/** Dias recusados pelo backend no último envio, para destacar no formulário. */
+const conflictedDays = ref(new Set<string>());
+
+const DEFAULT_SLOT_TIME = "09:00";
+
+function toggleDay(day: string) {
+  if (day in slotTimes) delete slotTimes[day];
+  else slotTimes[day] = DEFAULT_SLOT_TIME;
+
+  conflictedDays.value.delete(day);
+}
+
+function currentSlots(): ScheduleSlot[] {
+  return sortSlots(
+    Object.entries(slotTimes).map(([weekday, time]) => ({ weekday, time })),
+  );
+}
+
+function slotsEqual(a: ScheduleSlot[], b: ScheduleSlot[]): boolean {
+  return JSON.stringify(sortSlots(a)) === JSON.stringify(sortSlots(b));
+}
+
+/** Slots do paciente, aceitando a resposta legada (session_days + session_time). */
+function slotsFromPatient(p: PatientUser): ScheduleSlot[] {
+  if (p.schedule_slots?.length) return sortSlots(p.schedule_slots);
+
+  return sortSlots(
+    (p.session_days ?? []).map((weekday) => ({
+      weekday,
+      time: p.session_time ?? "",
+    })),
+  );
+}
 
 function resetModal() {
   modalForm.name = "";
   modalForm.email = "";
   modalForm.google_meet_link = "";
-  modalForm.sessions_per_week = 0;
-  modalForm.weekdays = [];
-  modalForm.session_time = "";
+  Object.keys(slotTimes).forEach((k) => delete slotTimes[k]);
+  conflictedDays.value = new Set();
   Object.keys(modalErrors).forEach((k) => delete modalErrors[k]);
   modalError.value = "";
   modalLoading.value = false;
@@ -364,9 +394,9 @@ watch(
       | "extra";
 
     if (p.schedule_type === "regular") {
-      modalForm.sessions_per_week = p.sessions_per_week ?? 0;
-      modalForm.weekdays = [...(p.session_days ?? [])];
-      modalForm.session_time = p.session_time ?? "";
+      slotsFromPatient(p).forEach((slot) => {
+        slotTimes[slot.weekday] = slot.time;
+      });
     }
 
     if (p.schedule_type === "extra") {
@@ -391,6 +421,16 @@ function validateModal(): boolean {
   if (!modalForm.email.trim()) modalErrors.email = "E-mail é obrigatório.";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(modalForm.email))
     modalErrors.email = "E-mail inválido.";
+
+  if (modalForm.schedule_type === "regular") {
+    const slots = currentSlots();
+
+    if (slots.length === 0)
+      modalErrors.schedule_slots = "Marque ao menos um dia da semana.";
+    else if (slots.some((slot) => !/^([01]\d|2[0-3]):[0-5]\d$/.test(slot.time)))
+      modalErrors.schedule_slots = "Informe o horário de todos os dias marcados.";
+  }
+
   return Object.keys(modalErrors).length === 0;
 }
 
@@ -399,6 +439,7 @@ async function handleSubmit() {
 
   modalLoading.value = true;
   modalError.value = "";
+  conflictedDays.value = new Set();
 
   try {
     if (isEditing.value && props.patientToEdit) {
@@ -412,15 +453,10 @@ async function handleSubmit() {
 
       const updatedPatient = await updatePatient(original.id, basicData);
 
-      const originalDays = [...(original.session_days ?? [])].sort();
-      const newDays = [...modalForm.weekdays].sort();
-
       const weeklyScheduleChanged =
         modalForm.schedule_type === "regular" &&
         (modalForm.schedule_type !== original.schedule_type ||
-          modalForm.session_time !== original.session_time ||
-          modalForm.sessions_per_week !== original.sessions_per_week ||
-          JSON.stringify(newDays) !== JSON.stringify(originalDays));
+          !slotsEqual(currentSlots(), slotsFromPatient(original)));
 
       const extraSessionChanged =
         modalForm.schedule_type === "extra" &&
@@ -430,10 +466,7 @@ async function handleSubmit() {
       if (weeklyScheduleChanged) {
         await updatePatientSchedule(original.id, {
           schedule_type: "regular",
-          sessions_per_week: modalForm.sessions_per_week || undefined,
-          weekdays:
-            modalForm.weekdays.length > 0 ? modalForm.weekdays : undefined,
-          session_time: modalForm.session_time || undefined,
+          schedule_slots: currentSlots(),
         });
       }
 
@@ -459,12 +492,7 @@ async function handleSubmit() {
     };
 
     if (modalForm.schedule_type === "regular") {
-      payload.sessions_per_week = modalForm.sessions_per_week || undefined;
-
-      payload.weekdays =
-        modalForm.weekdays.length > 0 ? modalForm.weekdays : undefined;
-
-      payload.session_time = modalForm.session_time || undefined;
+      payload.schedule_slots = currentSlots();
     }
 
     if (modalForm.schedule_type === "extra") {
@@ -479,12 +507,10 @@ async function handleSubmit() {
     showPasswordStep.value = true;
 
     emit("saved", created, true);
-  } catch (err: any) {
-    const msgs = err?.response?.data?.errors;
-
-    modalError.value = Array.isArray(msgs)
-      ? msgs.join(", ")
-      : "Erro ao salvar paciente.";
+  } catch (err: unknown) {
+    // Conflito de agenda: o backend não gravou nada e devolve os slots a corrigir.
+    conflictedDays.value = new Set(conflictSlots(err).map((c) => c.weekday));
+    modalError.value = apiErrorMessage(err, "Erro ao salvar paciente.");
   } finally {
     modalLoading.value = false;
   }

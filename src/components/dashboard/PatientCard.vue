@@ -73,19 +73,14 @@
           </div>
           <template v-if="patient.schedule_type === 'regular'">
             <span
-              v-for="day in patient.session_days"
-              :key="day"
+              v-for="slot in scheduleSlots"
+              :key="slot.weekday"
               class="font-body text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-medium"
             >
-              {{ WEEKDAY_LABELS[day] ?? day }}
+              {{ WEEKDAY_LABELS[slot.weekday] ?? slot.weekday }}
+              <template v-if="slot.time">{{ " " + slot.time }}</template>
             </span>
           </template>
-          <span
-            v-if="patient.session_time"
-            class="font-body text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-medium"
-          >
-            {{ patient.session_time }}
-          </span>
         </div>
 
         <div class="flex flex-wrap gap-4 mt-3">
@@ -310,9 +305,12 @@ import {
   createClinicalNote,
   updateClinicalNote,
   deleteClinicalNote,
+  sortSlots,
+  WEEKDAY_LABELS,
   type PatientUser,
   type ClinicalNote,
   type CalendarSession,
+  type ScheduleSlot,
 } from "@/services/dashboard";
 
 const props = defineProps<{
@@ -328,15 +326,20 @@ const emit = defineEmits<{
   (e: "note-saved", patientId: number, note: any): void;
 }>();
 
-const WEEKDAY_LABELS: Record<string, string> = {
-  sunday: "Dom",
-  monday: "Seg",
-  tuesday: "Ter",
-  wednesday: "Qua",
-  thursday: "Qui",
-  friday: "Sex",
-  saturday: "Sáb",
-};
+// Aceita a resposta legada (session_days + session_time) enquanto backends
+// antigos estiverem no ar.
+const scheduleSlots = computed<ScheduleSlot[]>(() => {
+  const p = props.patient;
+
+  if (p.schedule_slots?.length) return sortSlots(p.schedule_slots);
+
+  return sortSlots(
+    (p.session_days ?? []).map((weekday) => ({
+      weekday,
+      time: p.session_time ?? "",
+    })),
+  );
+});
 
 // As notas clínicas não vêm no payload do dashboard: prontuário é PHI e não
 // trafega em listagem. São buscadas quando a terapeuta abre a ficha.
