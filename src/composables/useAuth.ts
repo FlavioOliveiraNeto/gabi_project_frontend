@@ -1,9 +1,9 @@
 import { ref, computed } from "vue";
-import { loginRequest, getMeRequest, type User } from "@/services/auth";
+import { loginRequest, getMeRequest } from "@/services/auth";
 import { setCsrfToken } from "@/services/api";
 import api from "@/services/api";
+import { user } from "./authState";
 
-const user = ref<User | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 

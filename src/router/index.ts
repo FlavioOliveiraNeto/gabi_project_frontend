@@ -1,5 +1,6 @@
 import {
   createRouter,
+  createMemoryHistory,
   createWebHistory,
   type RouteRecordRaw,
 } from "vue-router";
@@ -7,7 +8,7 @@ import {
 import HomeView from "../views/HomeView.vue";
 
 import type { Role } from "@/services/auth";
-import { useAuth } from "@/composables/useAuth";
+import { user } from "@/composables/authState";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -60,14 +61,17 @@ const routes: RouteRecordRaw[] = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  // Memory history no pré-render do build (scripts/prerender.mjs), onde não há window.
+  history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
   routes,
 });
 
 router.beforeEach(async (to) => {
-  const { user, ready } = useAuth();
-
-  if (to.meta.requiresAuth) await ready();
+  // useAuth (e o axios) só é carregado quando a rota exige autenticação.
+  if (to.meta.requiresAuth) {
+    const { useAuth } = await import("@/composables/useAuth");
+    await useAuth().ready();
+  }
 
   const currentUser = user.value;
 
