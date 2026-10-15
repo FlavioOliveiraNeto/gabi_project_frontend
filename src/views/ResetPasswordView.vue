@@ -43,7 +43,7 @@
               <input
                 v-model="newPassword"
                 type="password"
-                placeholder="Mínimo 6 caracteres"
+                placeholder="Mínimo 12 caracteres"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
                 required
               >
@@ -122,6 +122,8 @@ const route = useRoute();
 const router = useRouter();
 
 const token = route.query.token as string | undefined;
+// Tira o token da URL (histórico, Referer, prints); ele segue só em memória.
+if (token) router.replace({ query: {} });
 
 const newPassword = ref("");
 const confirmPassword = ref("");
@@ -137,6 +139,7 @@ onUnmounted(() => {
 });
 
 const handleReset = async () => {
+  if (isLoading.value) return;
   error.value = "";
 
   if (newPassword.value !== confirmPassword.value) {
@@ -144,8 +147,8 @@ const handleReset = async () => {
     return;
   }
 
-  if (newPassword.value.length < 6) {
-    error.value = "A senha deve ter pelo menos 6 caracteres.";
+  if (newPassword.value.length < 12) {
+    error.value = "A senha deve ter pelo menos 12 caracteres.";
     return;
   }
 
