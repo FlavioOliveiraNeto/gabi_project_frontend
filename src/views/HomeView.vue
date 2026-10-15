@@ -1,10 +1,12 @@
 <template>
   <div class="min-h-screen bg-background">
     <Navbar />
-    <Hero />
-    <About />
-    <Services />
-    <Contact />
+    <main>
+      <Hero />
+      <About />
+      <Services />
+      <Contact />
+    </main>
     <Footer />
   </div>
 </template>
