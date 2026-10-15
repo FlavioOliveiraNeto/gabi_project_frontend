@@ -148,7 +148,7 @@
       <p
         class="font-body text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3"
       >
-        Anotações clínicas (visíveis apenas para você)
+        Ficha de evolução (visível apenas para você)
       </p>
 
       <div class="mb-3">
