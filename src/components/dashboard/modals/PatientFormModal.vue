@@ -82,6 +82,7 @@
               >
               <input
                 v-model="modalForm.name"
+                maxlength="120"
                 type="text"
                 placeholder="Nome do paciente"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
@@ -101,6 +102,7 @@
               >
               <input
                 v-model="modalForm.email"
+                maxlength="160"
                 type="email"
                 placeholder="paciente@email.com"
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
@@ -120,6 +122,7 @@
               >
               <input
                 v-model="modalForm.google_meet_link"
+                maxlength="300"
                 type="url"
                 placeholder="https://meet.google.com/..."
                 class="w-full px-4 py-2.5 border border-border/60 rounded-lg text-sm font-body bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition"

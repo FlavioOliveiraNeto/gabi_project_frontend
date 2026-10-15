@@ -186,6 +186,7 @@
 
           <textarea
             v-model="newNote"
+            maxlength="10000"
             rows="3"
             placeholder="Escreva algo importante sobre seu processo..."
             class="w-full border border-border/50 rounded-lg p-3 text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none bg-background"
@@ -211,6 +212,7 @@
               <template v-if="editingNoteId === note.id">
                 <textarea
                   v-model="editingContent"
+                  maxlength="10000"
                   rows="3"
                   class="w-full text-sm font-body border border-border/50 rounded-lg p-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none transition mb-2"
                 />

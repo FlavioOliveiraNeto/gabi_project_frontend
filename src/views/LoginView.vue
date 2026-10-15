@@ -191,6 +191,7 @@ const forgotEmail = ref("");
 const forgotSent = ref(false);
 
 const handleSubmit = async () => {
+  if (isLoading.value) return;
   try {
     await login(email.value, password.value);
 
@@ -205,7 +206,7 @@ const forgotLoading = ref(false);
 const forgotError = ref("");
 
 const handleForgotPassword = async () => {
-  if (!forgotEmail.value.trim()) return;
+  if (!forgotEmail.value.trim() || forgotLoading.value) return;
 
   forgotLoading.value = true;
   forgotError.value = "";
