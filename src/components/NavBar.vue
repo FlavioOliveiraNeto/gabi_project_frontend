@@ -5,6 +5,7 @@
     >
       <button
         class="font-display text-xl text-primary"
+        aria-label="Psi. Gabriella — voltar ao topo"
         @click="scrollTop"
       >
         <LogoComponent />
@@ -34,6 +35,7 @@
         <router-link
           v-if="showLoginButton"
           to="/login"
+          aria-label="Entrar na área restrita"
           class="flex items-center justify-center w-10 h-10 rounded-full border border-primary text-primary hover:bg-primary/10 transition-colors"
         >
           <User class="w-5 h-5" />
@@ -49,7 +51,9 @@
 
       <button
         v-if="variant === 'landing'"
-        class="md:hidden text-foreground"
+        class="md:hidden text-foreground p-2.5 -m-2.5"
+        :aria-label="open ? 'Fechar menu' : 'Abrir menu'"
+        :aria-expanded="open"
         @click="open = !open"
       >
         <component
@@ -84,6 +88,7 @@
         <router-link
           v-if="showLoginButton"
           to="/login"
+          aria-label="Entrar na área restrita"
           class="flex items-center justify-center w-12 h-12 rounded-full border border-primary text-primary hover:bg-primary/10 transition-colors"
         >
           <User class="w-6 h-6" />

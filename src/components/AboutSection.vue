@@ -31,6 +31,9 @@
             >
               <img
                 :src="aboutImage"
+                width="800"
+                height="800"
+                loading="lazy"
                 alt="Arte de colagem representando introspecção e cuidado em psicologia"
                 class="w-full h-[450px] object-cover"
               >

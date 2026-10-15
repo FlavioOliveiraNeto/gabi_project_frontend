@@ -10,7 +10,9 @@
     <div class="container mx-auto px-6 lg:px-12 pt-12">
       <div class="text-center mb-16 max-w-2xl mx-auto">
         <img
-          src="@/assets/images/contact_image.webp"
+          src="@/assets/images/contact_image-400.webp"
+          width="400"
+          height="600"
           alt="Imagem de contato"
           class="w-32 h-32 md:w-50 md:h-50 mx-auto rounded-full object-cover mb-6"
           loading="lazy"
@@ -79,25 +81,31 @@
           </h3>
 
           <p
-            class="font-body text-primary-foreground/80 mb-8 max-w-sm flex items-center justify-center gap-2"
+            class="font-body text-primary-foreground mb-8 max-w-sm flex items-center justify-center gap-2"
           >
             Agende sua primeira sessão e comece sua jornada.
           </p>
 
           <Button
+            as-child
             size="lg"
-            class="w-fit h-fit bg-card text-primary hover:bg-card/90 font-body text-base px-4 md:px-10 py-2 md:py-6 rounded-full shadow-lg transition-all hover:-translate-y-0.5 wrap-break-word"
+            class="w-fit h-fit bg-card text-primary hover:bg-card/90 font-body text-base px-4 md:px-10 py-2 md:py-6 rounded-full shadow-lg transition-all hover:-translate-y-0.5 wrap-break-word whitespace-break-spaces gap-0"
           >
             <a
               href="https://wa.me/5562996195671?text=Olá%20gostaria%20de%20agendar%20uma%20sessão"
               target="_blank"
               rel="noopener noreferrer"
-              class="whitespace-break-spaces flex items-center"
             >
-              <FontAwesomeIcon
-                :icon="faWhatsapp"
+              <!-- Só o path do ícone (pacote free-brands, CC BY 4.0), sem o runtime do FontAwesome -->
+              <svg
+                :viewBox="`0 0 ${faWhatsapp.icon[0]} ${faWhatsapp.icon[1]}`"
                 class="text-lg"
-              />
+                style="width: 1.25em; height: 1em"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path :d="String(faWhatsapp.icon[4])" />
+              </svg>
               Agendar pelo WhatsApp
             </a>
           </Button>
@@ -109,7 +117,6 @@
 
 <script setup lang="ts">
 import { MapPin, Phone, Mail, Instagram, Clock } from "lucide-vue-next";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
 import Button from "@/components/ui/button/Button.vue";

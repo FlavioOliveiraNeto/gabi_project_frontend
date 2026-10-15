@@ -21,8 +21,16 @@
         <div
           class="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-primary/20 rotate-2 hover:rotate-0 transition-transform duration-500"
         >
+          <!-- sizes espelha o layout: 16rem até md, coluna inteira (≤60rem) em md, e em lg a largura
+               vem da altura 40rem × proporção 2:3 (w-fit). Manter em sincronia com o preload do index.html. -->
           <img
-            src="@/assets/images/hero_image.webp"
+            :src="hero800"
+            :srcset="`${hero480} 480w, ${hero800} 800w, ${hero1200} 1200w`"
+            sizes="(min-width: 1024px) 427px, (min-width: 768px) 720px, 256px"
+            width="1200"
+            height="1800"
+            fetchpriority="high"
+            loading="eager"
             alt="Arte de colagem com formas orgânicas em roxo, verde e branco representando acolhimento e psicologia"
             class="w-full h-72 sm:h-96 md:h-[32rem] lg:h-[40rem] object-cover"
           >
@@ -94,6 +102,9 @@
 <script setup lang="ts">
 import { Heart, ArrowDown } from "lucide-vue-next";
 import Button from "@/components/ui/button/Button.vue";
+import hero480 from "@/assets/images/hero_image-480.webp";
+import hero800 from "@/assets/images/hero_image-800.webp";
+import hero1200 from "@/assets/images/hero_image-1200.webp";
 
 function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });

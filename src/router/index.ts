@@ -5,10 +5,6 @@ import {
 } from "vue-router";
 
 import HomeView from "../views/HomeView.vue";
-import LoginView from "../views/LoginView.vue";
-import PatientDashboard from "../views/PatientDashboard.vue";
-import PsychDashboard from "../views/PsychDashboard.vue";
-import NotFound from "../views/NotFound.vue";
 
 import type { Role } from "@/services/auth";
 import { useAuth } from "@/composables/useAuth";
@@ -36,12 +32,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/login",
     name: "login",
-    component: LoginView,
+    component: () => import("../views/LoginView.vue"),
   },
   {
     path: "/paciente",
     name: "paciente",
-    component: PatientDashboard,
+    component: () => import("../views/PatientDashboard.vue"),
     meta: {
       requiresAuth: true,
       role: "client" as Role,
@@ -50,7 +46,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/terapeuta",
     name: "terapeuta",
-    component: PsychDashboard,
+    component: () => import("../views/PsychDashboard.vue"),
     meta: {
       requiresAuth: true,
       role: "therapist" as Role,
@@ -59,7 +55,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/:pathMatch(.*)*",
     name: "not-found",
-    component: NotFound,
+    component: () => import("../views/NotFound.vue"),
   },
 ];
 
