@@ -15,7 +15,7 @@ export const FAQ_HOME: FaqItem[] = [
   },
   {
     q: "Atende fora de Goiás?",
-    a: "Sim. Como o atendimento é online, há pacientes de qualquer cidade do Brasil. Boa parte está em Goiânia e região, mas não há restrição geográfica.",
+    a: "Sim. Como o atendimento é online, não há restrição geográfica.",
   },
 ];
 
