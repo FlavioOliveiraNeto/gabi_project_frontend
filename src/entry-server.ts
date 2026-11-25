@@ -13,3 +13,4 @@ export async function render(url: string): Promise<string> {
 }
 
 export { headTags } from "./seo/head";
+export { PAGES } from "./seo/pages";

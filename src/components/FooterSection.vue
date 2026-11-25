@@ -27,6 +27,25 @@
           </p>
         </address>
 
+        <nav
+          aria-label="Páginas"
+          class="font-body text-sm"
+        >
+          <ul class="space-y-1">
+            <li
+              v-for="l in links"
+              :key="l.to"
+            >
+              <router-link
+                :to="l.to"
+                class="underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-background rounded"
+              >
+                {{ l.label }}
+              </router-link>
+            </li>
+          </ul>
+        </nav>
+
         <div class="font-body text-sm grid md:flex items-center gap-1">
           <p class="justify-self-center">
             Feito com <Heart
@@ -46,4 +65,10 @@ import { Heart } from "lucide-vue-next";
 import { SITE } from "@/seo/site";
 
 const currentYear = new Date().getFullYear();
+
+const links = [
+  { to: "/", label: "Início" },
+  { to: "/psicanalise-online", label: "Psicanálise online" },
+  { to: "/psicologia-questoes-raciais", label: "Psicologia e questões raciais" },
+];
 </script>

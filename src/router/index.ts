@@ -9,6 +9,7 @@ import HomeView from "../views/HomeView.vue";
 
 import type { Role } from "@/services/auth";
 import { user } from "@/composables/authState";
+import { PAGES } from "@/seo/pages";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -29,6 +30,16 @@ const routes: RouteRecordRaw[] = [
     path: "/",
     name: "home",
     component: HomeView,
+  },
+  {
+    path: "/psicanalise-online",
+    name: "psicanalise-online",
+    component: () => import("../views/PsicanaliseOnlineView.vue"),
+  },
+  {
+    path: "/psicologia-questoes-raciais",
+    name: "psicologia-questoes-raciais",
+    component: () => import("../views/QuestoesRaciaisView.vue"),
   },
   {
     path: "/login",
@@ -102,9 +113,10 @@ router.beforeEach(async (to) => {
 
 // Only indexable routes are listed; everything else (auth screens, dashboards, 404)
 // gets <meta name="robots" content="noindex">. Vercel also sends X-Robots-Tag for the private paths.
-const INDEXABLE = new Set(["home"]);
+const INDEXABLE = new Set(["home", "psicanalise-online", "psicologia-questoes-raciais"]);
 router.afterEach((to) => {
   if (import.meta.env.SSR) return;
+  document.title = (PAGES[to.path] ?? PAGES["/"]).title;
   let tag = document.head.querySelector<HTMLMetaElement>('meta[name="robots"]');
   if (INDEXABLE.has(String(to.name))) return tag?.remove();
   if (!tag) {

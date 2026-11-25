@@ -1,4 +1,6 @@
 import { SITE } from "./site";
+import { PAGES } from "./pages";
+import { jsonLdString } from "./faq";
 
 export function psychologistJsonLd() {
   return {
@@ -17,14 +19,26 @@ export function psychologistJsonLd() {
   };
 }
 
-// Extra <head> tags injected at build time by scripts/prerender.mjs.
+const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+// Per-page <head> tags injected at build time by scripts/prerender.mjs.
+// The shell's own <title>/description/og:title/og:description are stripped there.
 export function headTags(path: string): string {
+  const page = PAGES[path];
+  if (!page) throw new Error(`headTags: no page meta for ${path}`);
   const url = `${SITE.url}${path}`;
-  // "<" escaped so the JSON can never close the <script> tag.
-  const json = JSON.stringify(psychologistJsonLd()).replace(/</g, "\\u003c");
+  const t = esc(page.title);
+  const d = esc(page.description);
   return [
+    `<title>${t}</title>`,
+    `<meta name="description" content="${d}" />`,
     `<link rel="canonical" href="${url}" />`,
+    `<meta property="og:title" content="${t}" />`,
+    `<meta property="og:description" content="${d}" />`,
     `<meta property="og:url" content="${url}" />`,
-    `<script type="application/ld+json">${json}</script>`,
+    `<meta name="twitter:card" content="summary" />`,
+    `<meta name="twitter:title" content="${t}" />`,
+    `<meta name="twitter:description" content="${d}" />`,
+    `<script type="application/ld+json">${jsonLdString(psychologistJsonLd())}</script>`,
   ].join("\n    ");
 }
