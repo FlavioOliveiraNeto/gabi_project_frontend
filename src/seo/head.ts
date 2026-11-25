@@ -2,10 +2,10 @@ import { SITE } from "./site";
 import { normalizePath, pageFor } from "./pages";
 import { jsonLdString } from "./faq";
 
-export function psychologistJsonLd() {
+export function businessJsonLd() {
   return {
     "@context": "https://schema.org",
-    "@type": "Psychologist",
+    "@type": "ProfessionalService",
     name: SITE.name,
     url: `${SITE.url}/`,
     telephone: SITE.phoneSchema,
@@ -14,7 +14,7 @@ export function psychologistJsonLd() {
       { "@type": "City", name: "Goiânia" },
       { "@type": "AdministrativeArea", name: "Goiás" },
     ],
-    availableLanguage: "pt-BR",
+    knowsLanguage: "pt-BR",
     sameAs: [SITE.googleBusinessProfile, SITE.instagram],
   };
 }
@@ -39,6 +39,6 @@ export function headTags(path: string): string {
     `<meta name="twitter:card" content="summary" />`,
     `<meta name="twitter:title" content="${t}" />`,
     `<meta name="twitter:description" content="${d}" />`,
-    `<script type="application/ld+json">${jsonLdString(psychologistJsonLd())}</script>`,
+    `<script type="application/ld+json">${jsonLdString(businessJsonLd())}</script>`,
   ].join("\n    ");
 }

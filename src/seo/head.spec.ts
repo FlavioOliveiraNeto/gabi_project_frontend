@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { headTags } from "./head";
 import { PAGES, pageFor } from "./pages";
+import { FAQ_HOME, FAQ_PSICANALISE, faqJsonLd } from "./faq";
 
 const FORBIDDEN = ["address", "streetAddress", "geo", "aggregateRating", "review", "priceRange", "price"];
 
@@ -32,8 +33,9 @@ describe("head tags", () => {
     expect(tags).toContain('<link rel="canonical" href="https://www.psigabriellafelix.com.br/" />');
   });
 
-  it("emits valid Psychologist JSON-LD with required fields", () => {
-    expect(json["@type"]).toBe("Psychologist");
+  it("emits valid ProfessionalService JSON-LD with required fields", () => {
+    expect(json["@type"]).toBe("ProfessionalService");
+    expect(json.knowsLanguage).toBe("pt-BR");
     expect(json.name).toBe("Gabriella Felix - Psicóloga Clínica");
     expect(json.telephone).toBe("+55 62 99619-5671");
     expect(json.sameAs).toEqual([
@@ -45,6 +47,33 @@ describe("head tags", () => {
   it("contains no forbidden fields", () => {
     const keys = keysDeep(json);
     for (const f of FORBIDDEN) expect(keys).not.toContain(f);
+  });
+});
+
+const TYPE_ALLOWLIST = ["ProfessionalService", "FAQPage", "Question", "Answer", "City", "AdministrativeArea"];
+
+function typesDeep(v: unknown): string[] {
+  if (Array.isArray(v)) return v.flatMap(typesDeep);
+  if (v && typeof v === "object")
+    return Object.entries(v).flatMap(([k, x]) => (k === "@type" ? [String(x)] : typesDeep(x)));
+  return [];
+}
+
+describe("all emitted JSON-LD", () => {
+  const blocks = [
+    ...Object.keys(PAGES).map((p) => JSON.parse(headTags(p).match(/<script type="application\/ld\+json">(.*)<\/script>/)![1])),
+    faqJsonLd(FAQ_HOME),
+    faqJsonLd(FAQ_PSICANALISE),
+  ];
+
+  it("only uses allowlisted schema.org types", () => {
+    for (const t of typesDeep(blocks)) expect(TYPE_ALLOWLIST).toContain(t);
+  });
+
+  it("never emits Psychologist or availableLanguage", () => {
+    const s = JSON.stringify(blocks);
+    expect(s).not.toContain("Psychologist");
+    expect(s).not.toContain("availableLanguage");
   });
 });
 
