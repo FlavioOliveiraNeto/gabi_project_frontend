@@ -5,7 +5,7 @@
     >
       <button
         class="font-display text-xl text-primary"
-        aria-label="Psi. Gabriella — voltar ao topo"
+        aria-label="Gabriella Felix - Psicóloga Clínica — voltar ao topo"
         @click="scrollTop"
       >
         <LogoComponent />

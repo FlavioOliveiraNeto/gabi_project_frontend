@@ -5,8 +5,8 @@
       src="@/assets/images/logo-144.webp"
       width="144"
       height="112"
-      alt="Logo da Gabriella"
+      alt=""
     >
-    <span>Psi<span class="text-secondary lg:text-3xl">.</span> Gabriella</span>
+    <span class="text-base md:text-xl">Gabriella Felix - Psicóloga Clínica</span>
   </div>
 </template>
