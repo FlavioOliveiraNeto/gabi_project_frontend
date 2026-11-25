@@ -8,7 +8,7 @@ export interface PageMeta {
 // Indexable, prerendered pages. Keys are route paths.
 export const PAGES: Record<string, PageMeta> = {
   "/": {
-    title: `${SITE.name} | Psicanálise online em Goiânia`,
+    title: `${SITE.name} | Psicanálise online`,
     description:
       "Psicanálise online com Gabriella Felix, psicóloga clínica e psicanalista em Goiânia, GO. Atendimento por videochamada. CRP 09/21105.",
   },

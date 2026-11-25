@@ -12,9 +12,9 @@ function keysDeep(v: unknown): string[] {
 
 describe.each(Object.keys(PAGES))("page meta %s", (path) => {
   const tags = headTags(path);
-  it("has a self-canonical, title <= 60 (except home, fixed by spec) and description <= 155", () => {
+  it("has a self-canonical, title <= 60 and description <= 155", () => {
     expect(tags).toContain(`<link rel="canonical" href="https://www.psigabriellafelix.com.br${path}" />`);
-    if (path !== "/") expect(PAGES[path].title.length).toBeLessThanOrEqual(60);
+    expect(PAGES[path].title.length).toBeLessThanOrEqual(60);
     expect(PAGES[path].description.length).toBeLessThanOrEqual(155);
     expect(PAGES[path].title).toContain("Gabriella Felix - Psicóloga Clínica");
   });
@@ -23,6 +23,10 @@ describe.each(Object.keys(PAGES))("page meta %s", (path) => {
 describe("head tags", () => {
   const tags = headTags("/");
   const json = JSON.parse(tags.match(/<script type="application\/ld\+json">(.*)<\/script>/)![1]);
+
+  it("uses the exact home title", () => {
+    expect(PAGES["/"].title).toBe("Gabriella Felix - Psicóloga Clínica | Psicanálise online");
+  });
 
   it("emits a self-referencing canonical", () => {
     expect(tags).toContain('<link rel="canonical" href="https://www.psigabriellafelix.com.br/" />');
