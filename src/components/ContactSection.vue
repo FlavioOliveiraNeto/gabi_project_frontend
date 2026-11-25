@@ -132,7 +132,7 @@ const contactItems = [
   {
     icon: Mail,
     title: "E-mail",
-    text: "psi.gabriellafelixx@gmail.com",
+    text: "gabrielafelixsilva@gmail.com",
     bg: "bg-secondary/10",
     iconColor: "text-secondary",
   },
