@@ -21,7 +21,10 @@ describe("head tags", () => {
     expect(json["@type"]).toBe("Psychologist");
     expect(json.name).toBe("Gabriella Felix - Psicóloga Clínica");
     expect(json.telephone).toBe("+55 62 99619-5671");
-    expect(json.sameAs).toContain("https://www.instagram.com/psi.gabriellafelix/");
+    expect(json.sameAs).toEqual([
+      "https://maps.google.com/?cid=9477565020376263146",
+      "https://www.instagram.com/psi.gabriellafelix/",
+    ]);
   });
 
   it("contains no forbidden fields", () => {

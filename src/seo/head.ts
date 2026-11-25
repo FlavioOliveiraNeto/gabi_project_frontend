@@ -13,8 +13,7 @@ export function psychologistJsonLd() {
       { "@type": "AdministrativeArea", name: "Goiás" },
     ],
     availableLanguage: "pt-BR",
-    // ponytail: empty GBP URL is filtered out until the professional provides it.
-    sameAs: [SITE.googleBusinessProfile, SITE.instagram].filter(Boolean),
+    sameAs: [SITE.googleBusinessProfile, SITE.instagram],
   };
 }
 

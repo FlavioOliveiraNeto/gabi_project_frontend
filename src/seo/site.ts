@@ -9,6 +9,5 @@ export const SITE = {
   crp: "CRP 09/21105",
   email: "gabrielafelixsilva@gmail.com",
   instagram: "https://www.instagram.com/psi.gabriellafelix/",
-  // TODO: Google Business Profile URL (pending from the professional).
-  googleBusinessProfile: "",
+  googleBusinessProfile: "https://maps.google.com/?cid=9477565020376263146",
 } as const;
