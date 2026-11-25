@@ -12,11 +12,14 @@ const shell = await readFile(path.join(dist, "index.html"), "utf8");
 const placeholder = '<div id="app"></div>';
 if (!shell.includes(placeholder)) throw new Error(`prerender: ${placeholder} não encontrado em dist/index.html`);
 
-const { render } = await import(pathToFileURL(path.join(ssrDir, "entry-server.js")).href);
+const { render, headTags } = await import(pathToFileURL(path.join(ssrDir, "entry-server.js")).href);
 const html = await render("/");
 
 await writeFile(path.join(dist, "app.html"), shell);
-await writeFile(path.join(dist, "index.html"), shell.replace(placeholder, `<div id="app">${html}</div>`));
+const page = shell
+  .replace(placeholder, `<div id="app">${html}</div>`)
+  .replace("</head>", `  ${headTags("/")}\n  </head>`);
+await writeFile(path.join(dist, "index.html"), page);
 await rm(ssrDir, { recursive: true, force: true });
 
 console.log(`prerender: / → dist/index.html (${html.length} bytes de HTML), shell → dist/app.html`);

@@ -11,3 +11,5 @@ export async function render(url: string): Promise<string> {
   await router.isReady();
   return renderToString(app);
 }
+
+export { headTags } from "./seo/head";
