@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { headTags } from "./head";
-import { PAGES } from "./pages";
+import { PAGES, pageFor } from "./pages";
 
 const FORBIDDEN = ["address", "streetAddress", "geo", "aggregateRating", "review", "priceRange", "price"];
 
@@ -45,5 +45,27 @@ describe("head tags", () => {
   it("contains no forbidden fields", () => {
     const keys = keysDeep(json);
     for (const f of FORBIDDEN) expect(keys).not.toContain(f);
+  });
+});
+
+describe("pageFor", () => {
+  it.each([
+    ["/psicanalise-online", "Psicanálise online | Gabriella Felix - Psicóloga Clínica"],
+    ["/psicanalise-online/", "Psicanálise online | Gabriella Felix - Psicóloga Clínica"],
+    ["/psicologia-questoes-raciais", "Questões raciais | Gabriella Felix - Psicóloga Clínica"],
+    ["/psicologia-questoes-raciais/", "Questões raciais | Gabriella Felix - Psicóloga Clínica"],
+    ["/", "Gabriella Felix - Psicóloga Clínica | Psicanálise online"],
+  ])("resolves %s", (path, title) => {
+    expect(pageFor(path)?.title).toBe(title);
+  });
+
+  it("returns undefined for unknown paths (router falls back to the home title)", () => {
+    expect(pageFor("/login")).toBeUndefined();
+  });
+
+  it("keeps the canonical without trailing slash", () => {
+    expect(headTags("/psicanalise-online/")).toContain(
+      '<link rel="canonical" href="https://www.psigabriellafelix.com.br/psicanalise-online" />',
+    );
   });
 });

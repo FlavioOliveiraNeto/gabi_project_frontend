@@ -1,5 +1,5 @@
 import { SITE } from "./site";
-import { PAGES } from "./pages";
+import { normalizePath, pageFor } from "./pages";
 import { jsonLdString } from "./faq";
 
 export function psychologistJsonLd() {
@@ -24,9 +24,9 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").repl
 // Per-page <head> tags injected at build time by scripts/prerender.mjs.
 // The shell's own <title>/description/og:title/og:description are stripped there.
 export function headTags(path: string): string {
-  const page = PAGES[path];
+  const page = pageFor(path);
   if (!page) throw new Error(`headTags: no page meta for ${path}`);
-  const url = `${SITE.url}${path}`;
+  const url = `${SITE.url}${normalizePath(path)}`;
   const t = esc(page.title);
   const d = esc(page.description);
   return [
