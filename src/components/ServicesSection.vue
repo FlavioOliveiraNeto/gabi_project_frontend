@@ -78,9 +78,9 @@ const services = [
   },
   {
     icon: Users,
-    title: "Atendimento com adolescentes, adultos e idosos",
+    title: "Atendimento com adultos e idosos",
     description:
-      "Cada fase da vida carrega seus próprios desafios, dúvidas e transformações. Ofereço um espaço de escuta cuidadosa e respeitosa para adolescentes em descoberta, adultos em construção e idosos em ressignificação de suas histórias.",
+      "Cada fase da vida carrega seus próprios desafios, dúvidas e transformações. Ofereço um espaço de escuta cuidadosa e respeitosa para adultos em construção e idosos em ressignificação de suas histórias.",
     color: "bg-primary/10 text-primary",
   },
   {

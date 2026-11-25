@@ -59,9 +59,9 @@
           </p>
 
           <p class="text-lg font-body text-muted-foreground leading-relaxed">
-            Atendo adolescentes, adultos e pessoas idosas, buscando ouvir todos
+            Atendo adultos e pessoas idosas, buscando ouvir todos
             os tipos de demandas psíquicas como ansiedade, depressão, vício em
-            jogos, processos pós-bariátrica e questões relacionadas aos
+            jogos e questões relacionadas aos
             atravessamentos de gênero e raça. Minha prática clínica é sensível e
             comprometida com uma escuta que reconhece a singularidade de cada
             trajetória, sem desconsiderar os impactos do mundo sobre ela.
