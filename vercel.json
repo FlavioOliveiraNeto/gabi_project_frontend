@@ -9,6 +9,15 @@
     ],
     "headers": [
         {
+            "source": "/(login|reset-senha|trocar-senha|paciente|terapeuta)(.*)",
+            "headers": [
+                {
+                    "key": "X-Robots-Tag",
+                    "value": "noindex, nofollow"
+                }
+            ]
+        },
+        {
             "source": "/(.*)",
             "headers": [
                 {

@@ -100,4 +100,19 @@ router.beforeEach(async (to) => {
   return true;
 });
 
+// Only indexable routes are listed; everything else (auth screens, dashboards, 404)
+// gets <meta name="robots" content="noindex">. Vercel also sends X-Robots-Tag for the private paths.
+const INDEXABLE = new Set(["home"]);
+router.afterEach((to) => {
+  if (import.meta.env.SSR) return;
+  let tag = document.head.querySelector<HTMLMetaElement>('meta[name="robots"]');
+  if (INDEXABLE.has(String(to.name))) return tag?.remove();
+  if (!tag) {
+    tag = document.createElement("meta");
+    tag.name = "robots";
+    document.head.appendChild(tag);
+  }
+  tag.content = "noindex, nofollow";
+});
+
 export default router;
