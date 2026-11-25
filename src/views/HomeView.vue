@@ -6,6 +6,9 @@
       <About />
       <Services />
       <Contact />
+      <div class="container mx-auto px-6 lg:px-12 max-w-4xl">
+        <FaqSection :items="FAQ_HOME" />
+      </div>
     </main>
     <Footer />
   </div>
@@ -18,4 +21,6 @@ import About from "@/components/AboutSection.vue";
 import Services from "@/components/ServicesSection.vue";
 import Contact from "@/components/ContactSection.vue";
 import Footer from "@/components/FooterSection.vue";
+import FaqSection from "@/components/FaqSection.vue";
+import { FAQ_HOME } from "@/seo/faq";
 </script>
